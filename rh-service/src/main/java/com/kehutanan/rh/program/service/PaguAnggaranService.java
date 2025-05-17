@@ -4,7 +4,7 @@ import com.kehutanan.rh.program.model.PaguAnggaran;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.PaguAnggaranRepository;
 import com.kehutanan.rh.program.repository.ProgramRepository;
-import com.kehutanan.rh.program.dto.PaguAnggaranDTO;
+import com.kehutanan.rh.program.dto.PaguAnggaranDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class PaguAnggaranService {
     }
 
     @Transactional
-    public PaguAnggaran create(PaguAnggaranDTO dto) {
+    public PaguAnggaran create(PaguAnggaranDto dto) {
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
@@ -49,7 +49,7 @@ public class PaguAnggaranService {
     }
 
     @Transactional
-    public PaguAnggaran update(UUID id, PaguAnggaranDTO dto) {
+    public PaguAnggaran update(UUID id, PaguAnggaranDto dto) {
         PaguAnggaran existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));

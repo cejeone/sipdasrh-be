@@ -2,7 +2,7 @@ package com.kehutanan.rh.program.controller;
 
 import com.kehutanan.rh.program.model.SkemaTanam;
 import com.kehutanan.rh.program.service.SkemaTanamService;
-import com.kehutanan.rh.program.dto.SkemaTanamDTO;
+import com.kehutanan.rh.program.dto.SkemaTanamDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +39,13 @@ public class SkemaTanamController {
 
     @PostMapping
     @Operation(summary = "Create new skema tanam")
-    public ResponseEntity<SkemaTanam> create(@RequestBody SkemaTanamDTO dto) {
+    public ResponseEntity<SkemaTanam> create(@RequestBody SkemaTanamDto dto) {
         return ResponseEntity.ok(skemaTanamService.create(dto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update existing skema tanam")
-    public ResponseEntity<SkemaTanam> update(@PathVariable UUID id, @RequestBody SkemaTanamDTO dto) {
+    public ResponseEntity<SkemaTanam> update(@PathVariable UUID id, @RequestBody SkemaTanamDto dto) {
         return ResponseEntity.ok(skemaTanamService.update(id, dto));
     }
 
