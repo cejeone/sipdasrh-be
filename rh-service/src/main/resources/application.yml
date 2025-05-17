@@ -24,6 +24,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
 
 server:
   port: 8081
@@ -38,5 +42,4 @@ minio:
   endpoint: http://minio:9000
   access-key: minioadmin
   secret-key: minioadmin
-  bucket:
-    name: kehutanan-files
+  bucket: rhkehutanan
