@@ -4,104 +4,68 @@ import com.kehutanan.rh.program.model.PaguAnggaran;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.PaguAnggaranRepository;
 import com.kehutanan.rh.program.repository.ProgramRepository;
-import com.kehutanan.rh.program.dto.PaguAnggaranDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.kehutanan.rh.program.dto.PaguAnggaranDTO;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class PaguAnggaranService {
-
+    
     private final PaguAnggaranRepository paguAnggaranRepository;
     private final ProgramRepository programRepository;
-
-    @Autowired
-    public PaguAnggaranService(PaguAnggaranRepository paguAnggaranRepository,
-                              ProgramRepository programRepository) {
-        this.paguAnggaranRepository = paguAnggaranRepository;
-        this.programRepository = programRepository;
-    }
 
     public List<PaguAnggaran> findAll() {
         return paguAnggaranRepository.findAll();
     }
 
     public List<PaguAnggaran> findByProgramId(UUID programId) {
-        return paguAnggaranRepository.findByProgram_Id(programId);
+        return paguAnggaranRepository.findByProgramId(programId);
     }
 
-    public Optional<PaguAnggaran> findById(UUID id) {
-        return paguAnggaranRepository.findById(id);
+    public PaguAnggaran findById(UUID id) {
+        return paguAnggaranRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Pagu Anggaran not found with id: " + id));
     }
 
-    public PaguAnggaran save(PaguAnggaran paguAnggaran) {
-        // Verify that program exists
-        programRepository.findById(paguAnggaran.getProgram().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Program not found"));
-        return paguAnggaranRepository.save(paguAnggaran);
-    }
-
-    public PaguAnggaran update(UUID id, PaguAnggaran paguAnggaran) {
-        if (paguAnggaranRepository.existsById(id)) {
-            // Verify that program exists
-            programRepository.findById(paguAnggaran.getProgram().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
-            paguAnggaran.setId(id);
-            return paguAnggaranRepository.save(paguAnggaran);
-        }
-        return null;
-    }
-
-    public PaguAnggaran update(UUID id, UUID programId, String kategori, 
-            String sumberAnggaran, Integer tahunAnggaran,
-            BigDecimal pagu, String status, String keterangan) {
-        
-        if (!paguAnggaranRepository.existsById(id)) {
-            throw new EntityNotFoundException(
-                String.format("PaguAnggaran with ID %s not found", id)
-            );
-        }
-
-        Program program = programRepository.findById(programId)
-            .orElseThrow(() -> new EntityNotFoundException(
-                String.format("Program with ID %s not found", programId)
-            ));
-
-        PaguAnggaran paguAnggaran = paguAnggaranRepository.findById(id).get();
-        paguAnggaran.setKategori(kategori);
-        paguAnggaran.setSumberAnggaran(sumberAnggaran);
-        paguAnggaran.setTahunAnggaran(tahunAnggaran);
-        paguAnggaran.setPagu(pagu);
-        paguAnggaran.setStatus(status);
-        paguAnggaran.setKeterangan(keterangan);
-        paguAnggaran.setProgram(program);
-
-        return paguAnggaranRepository.save(paguAnggaran);
-    }
-
-    public void deleteById(UUID id) {
-        paguAnggaranRepository.deleteById(id);
-    }
-
-    public PaguAnggaran createFromRequest(PaguAnggaranDto request) {
-        Program program = programRepository.findById(request.getProgramId())
-            .orElseThrow(() -> new EntityNotFoundException(
-                String.format("Program with ID %s not found", request.getProgramId())
-            ));
+    @Transactional
+    public PaguAnggaran create(PaguAnggaranDTO dto) {
+        Program program = programRepository.findById(dto.getProgramId())
+            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         PaguAnggaran paguAnggaran = new PaguAnggaran();
-        paguAnggaran.setKategori(request.getKategori());
-        paguAnggaran.setSumberAnggaran(request.getSumberAnggaran());
-        paguAnggaran.setTahunAnggaran(request.getTahunAnggaran());
-        paguAnggaran.setPagu(request.getPagu());
-        paguAnggaran.setStatus(request.getStatus());
-        paguAnggaran.setKeterangan(request.getKeterangan());
+        paguAnggaran.setSumberAnggaran(dto.getSumberAnggaran());
+        paguAnggaran.setTahunAnggaran(dto.getTahunAnggaran());
+        paguAnggaran.setPagu(dto.getPagu());
+        paguAnggaran.setStatus(dto.getStatus());
+        paguAnggaran.setKeterangan(dto.getKeterangan());
         paguAnggaran.setProgram(program);
 
-        return save(paguAnggaran);
+        return paguAnggaranRepository.save(paguAnggaran);
+    }
+
+    @Transactional
+    public PaguAnggaran update(UUID id, PaguAnggaranDTO dto) {
+        PaguAnggaran existing = findById(id);
+        Program program = programRepository.findById(dto.getProgramId())
+            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
+
+        existing.setSumberAnggaran(dto.getSumberAnggaran());
+        existing.setTahunAnggaran(dto.getTahunAnggaran());
+        existing.setPagu(dto.getPagu());
+        existing.setStatus(dto.getStatus());
+        existing.setKeterangan(dto.getKeterangan());
+        existing.setProgram(program);
+
+        return paguAnggaranRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        paguAnggaranRepository.deleteById(id);
     }
 }

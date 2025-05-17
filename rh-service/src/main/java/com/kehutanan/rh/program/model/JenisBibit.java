@@ -1,12 +1,10 @@
 package com.kehutanan.rh.program.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 @Data
@@ -37,13 +35,8 @@ public class JenisBibit {
     @Column(columnDefinition = "TEXT")
     private String keterangan;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rh_program_id", nullable = false)
     @JsonIgnore
     private Program program;
-
-    @JsonProperty("rh_program_id")
-    public UUID getProgramId() {
-        return program != null ? program.getId() : null;
-    }
 }

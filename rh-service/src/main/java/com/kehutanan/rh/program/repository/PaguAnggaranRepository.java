@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface PaguAnggaranRepository extends JpaRepository<PaguAnggaran, UUID> {
-    List<PaguAnggaran> findByProgram_Id(UUID programId);
+    List<PaguAnggaran> findByProgramId(UUID programId);
 }

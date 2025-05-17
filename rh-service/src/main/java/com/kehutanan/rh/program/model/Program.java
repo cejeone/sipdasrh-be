@@ -1,27 +1,18 @@
 package com.kehutanan.rh.program.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "rh_program")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Program {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
-    @Column(nullable = false)
-    private String direktorat;
     
     @Column(nullable = false)
     private String kategori;
@@ -40,16 +31,4 @@ public class Program {
     
     @Column(nullable = false)
     private String status;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
-    private List<JenisBibit> jenisBibits;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
-    private List<PaguAnggaran> paguAnggarans;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
-    private List<SkemaTanam> skemaTanams;
 }
