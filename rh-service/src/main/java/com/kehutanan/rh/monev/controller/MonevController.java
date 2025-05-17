@@ -8,8 +8,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import java.util.UUID;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/monev")
@@ -17,17 +22,29 @@ import java.util.UUID;
 public class MonevController {
 
     private final MonevService monevService;
+    private final PagedResourcesAssembler<Monev> pagedResourcesAssembler;
 
     @Autowired
-    public MonevController(MonevService monevService) {
+    public MonevController(MonevService monevService,PagedResourcesAssembler<Monev> pagedResourcesAssembler) {
         this.monevService = monevService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua data monev")
-    public List<Monev> getAll() {
-        return monevService.findAll();
+    @Operation(summary = "Mendapatkan semua data monev dengan pagination")
+    public ResponseEntity<PagedModel<EntityModel<Monev>>> getAll(
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<Monev> monevPage = monevService.findAll(pageable);
+        PagedModel<EntityModel<Monev>> pagedModel = pagedResourcesAssembler.toModel(monevPage);
+        
+        return ResponseEntity.ok(pagedModel);
     }
+
+    // @GetMapping
+    // @Operation(summary = "Mendapatkan semua data monev")
+    // public List<Monev> getAll() {
+    //     return monevService.findAll();
+    // }
 
     @GetMapping("/{id}")
     @Operation(summary = "Mendapatkan data monev berdasarkan ID")
