@@ -1,5 +1,6 @@
 package com.kehutanan.rh.dokumen.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class Dokumen {
     
     private LocalDateTime uploadedAt;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "dokumen", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DokumenFile> files = new ArrayList<>();
 }

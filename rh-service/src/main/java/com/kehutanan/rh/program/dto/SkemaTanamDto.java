@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class SkemaTanamDTO {
+public class SkemaTanamDto {
     private UUID id;
     private String pola;
     private Integer jumlahBtgHa;

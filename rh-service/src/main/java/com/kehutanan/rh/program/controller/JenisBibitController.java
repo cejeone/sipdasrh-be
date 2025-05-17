@@ -2,7 +2,9 @@ package com.kehutanan.rh.program.controller;
 
 import com.kehutanan.rh.program.model.JenisBibit;
 import com.kehutanan.rh.program.service.JenisBibitService;
-import com.kehutanan.rh.program.dto.JenisBibitDTO;
+import com.kehutanan.rh.program.dto.JenisBibitDto;
+import com.kehutanan.rh.program.dto.JenisBibitDto;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +41,13 @@ public class JenisBibitController {
 
     @PostMapping
     @Operation(summary = "Create new jenis bibit")
-    public ResponseEntity<JenisBibit> create(@RequestBody JenisBibitDTO dto) {
+    public ResponseEntity<JenisBibit> create(@RequestBody JenisBibitDto dto) {
         return ResponseEntity.ok(jenisBibitService.create(dto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update existing jenis bibit")
-    public ResponseEntity<JenisBibit> update(@PathVariable UUID id, @RequestBody JenisBibitDTO dto) {
+    public ResponseEntity<JenisBibit> update(@PathVariable UUID id, @RequestBody JenisBibitDto dto) {
         return ResponseEntity.ok(jenisBibitService.update(id, dto));
     }
 

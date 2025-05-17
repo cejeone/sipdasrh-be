@@ -4,7 +4,7 @@ import com.kehutanan.rh.program.model.SkemaTanam;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.SkemaTanamRepository;
 import com.kehutanan.rh.program.repository.ProgramRepository;
-import com.kehutanan.rh.program.dto.SkemaTanamDTO;
+import com.kehutanan.rh.program.dto.SkemaTanamDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class SkemaTanamService {
     }
 
     @Transactional
-    public SkemaTanam create(SkemaTanamDTO dto) {
+    public SkemaTanam create(SkemaTanamDto dto) {
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
@@ -49,7 +49,7 @@ public class SkemaTanamService {
     }
 
     @Transactional
-    public SkemaTanam update(UUID id, SkemaTanamDTO dto) {
+    public SkemaTanam update(UUID id, SkemaTanamDto dto) {
         SkemaTanam existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));

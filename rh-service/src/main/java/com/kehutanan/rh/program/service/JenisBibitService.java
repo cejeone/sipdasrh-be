@@ -4,7 +4,7 @@ import com.kehutanan.rh.program.model.JenisBibit;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.JenisBibitRepository;
 import com.kehutanan.rh.program.repository.ProgramRepository;
-import com.kehutanan.rh.program.dto.JenisBibitDTO;
+import com.kehutanan.rh.program.dto.JenisBibitDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class JenisBibitService {
     }
 
     @Transactional
-    public JenisBibit create(JenisBibitDTO dto) {
+    public JenisBibit create(JenisBibitDto dto) {
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
@@ -50,7 +50,7 @@ public class JenisBibitService {
     }
 
     @Transactional
-    public JenisBibit update(UUID id, JenisBibitDTO dto) {
+    public JenisBibit update(UUID id, JenisBibitDto dto) {
         JenisBibit existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
             .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));

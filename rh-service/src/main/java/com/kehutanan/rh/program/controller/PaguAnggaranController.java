@@ -2,7 +2,7 @@ package com.kehutanan.rh.program.controller;
 
 import com.kehutanan.rh.program.model.PaguAnggaran;
 import com.kehutanan.rh.program.service.PaguAnggaranService;
-import com.kehutanan.rh.program.dto.PaguAnggaranDTO;
+import com.kehutanan.rh.program.dto.PaguAnggaranDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +39,13 @@ public class PaguAnggaranController {
 
     @PostMapping
     @Operation(summary = "Create new pagu anggaran")
-    public ResponseEntity<PaguAnggaran> create(@RequestBody PaguAnggaranDTO dto) {
+    public ResponseEntity<PaguAnggaran> create(@RequestBody PaguAnggaranDto dto) {
         return ResponseEntity.ok(paguAnggaranService.create(dto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update existing pagu anggaran")
-    public ResponseEntity<PaguAnggaran> update(@PathVariable UUID id, @RequestBody PaguAnggaranDTO dto) {
+    public ResponseEntity<PaguAnggaran> update(@PathVariable UUID id, @RequestBody PaguAnggaranDto dto) {
         return ResponseEntity.ok(paguAnggaranService.update(id, dto));
     }
 

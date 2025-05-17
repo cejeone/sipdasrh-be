@@ -1,5 +1,6 @@
 package com.kehutanan.rh.dokumen.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class DokumenFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dokumen_id", nullable = false)
     private Dokumen dokumen;
