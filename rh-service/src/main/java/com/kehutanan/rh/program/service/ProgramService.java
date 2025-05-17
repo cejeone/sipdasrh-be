@@ -1,8 +1,12 @@
 package com.kehutanan.rh.program.service;
 
+import com.kehutanan.rh.monev.model.Monev;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.ProgramRepository;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +18,10 @@ import java.util.UUID;
 public class ProgramService {
     
     private final ProgramRepository programRepository;
+
+    public Page<Program> findAll(Pageable pageable) {
+        return programRepository.findAll(pageable);
+    }
 
     public List<Program> findAll() {
         return programRepository.findAll();

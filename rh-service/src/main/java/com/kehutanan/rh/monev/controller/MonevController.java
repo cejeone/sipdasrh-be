@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/monev")
@@ -25,7 +26,7 @@ public class MonevController {
     private final PagedResourcesAssembler<Monev> pagedResourcesAssembler;
 
     @Autowired
-    public MonevController(MonevService monevService,PagedResourcesAssembler<Monev> pagedResourcesAssembler) {
+    public MonevController(MonevService monevService, PagedResourcesAssembler<Monev> pagedResourcesAssembler) {
         this.monevService = monevService;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
@@ -33,17 +34,20 @@ public class MonevController {
     @GetMapping
     @Operation(summary = "Mendapatkan semua data monev dengan pagination")
     public ResponseEntity<PagedModel<EntityModel<Monev>>> getAll(
-            @PageableDefault(size = 10) Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         Page<Monev> monevPage = monevService.findAll(pageable);
         PagedModel<EntityModel<Monev>> pagedModel = pagedResourcesAssembler.toModel(monevPage);
-        
+
         return ResponseEntity.ok(pagedModel);
     }
 
     // @GetMapping
     // @Operation(summary = "Mendapatkan semua data monev")
     // public List<Monev> getAll() {
-    //     return monevService.findAll();
+    // return monevService.findAll();
     // }
 
     @GetMapping("/{id}")
