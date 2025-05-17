@@ -1,12 +1,10 @@
 package com.kehutanan.rh.program.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 
 @Data
@@ -21,13 +19,13 @@ public class SkemaTanam {
     private UUID id;
     
     @Column(nullable = false)
-    private String kategori;
+    private String pola;
     
-    @Column(name = "skema_btg_ha", precision = 10, scale = 2)
-    private BigDecimal skemaBtgHa;
+    @Column(name = "jumlah_btg_ha")
+    private Integer jumlahBtgHa;
     
-    @Column(name = "target_luas", precision = 10, scale = 2)
-    private BigDecimal targetLuas;
+    @Column(name = "target_luas")
+    private Integer targetLuas;
     
     @Column(nullable = false)
     private String status;
@@ -35,13 +33,8 @@ public class SkemaTanam {
     @Column(columnDefinition = "TEXT")
     private String keterangan;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rh_program_id", nullable = false)
     @JsonIgnore
     private Program program;
-
-    @JsonProperty("rh_program_id")
-    public UUID getProgramId() {
-        return program != null ? program.getId() : null;
-    }
 }

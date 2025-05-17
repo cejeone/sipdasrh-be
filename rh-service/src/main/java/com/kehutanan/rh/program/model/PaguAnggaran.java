@@ -1,11 +1,10 @@
 package com.kehutanan.rh.program.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -19,9 +18,6 @@ public class PaguAnggaran {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
-    @Column(nullable = false)
-    private String kategori;
     
     @Column(name = "sumber_anggaran", nullable = false)
     private String sumberAnggaran;
@@ -38,13 +34,8 @@ public class PaguAnggaran {
     @Column(columnDefinition = "TEXT")
     private String keterangan;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rh_program_id", nullable = false)
     @JsonIgnore
     private Program program;
-
-    @JsonProperty("rh_program_id")
-    public UUID getProgramId() {
-        return program != null ? program.getId() : null;
-    }
 }

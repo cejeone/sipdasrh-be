@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface SkemaTanamRepository extends JpaRepository<SkemaTanam, UUID> {
-    List<SkemaTanam> findByProgram_Id(UUID programId);
+    List<SkemaTanam> findByProgramId(UUID programId);
 }

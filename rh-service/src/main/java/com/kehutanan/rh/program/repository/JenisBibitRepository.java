@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface JenisBibitRepository extends JpaRepository<JenisBibit, UUID> {
-    List<JenisBibit> findByProgram_Id(UUID programId);
+    List<JenisBibit> findByProgramId(UUID programId);
 }
