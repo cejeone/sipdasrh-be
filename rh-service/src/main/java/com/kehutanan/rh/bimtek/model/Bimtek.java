@@ -5,7 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Data
 @Entity
@@ -43,4 +47,8 @@ public class Bimtek {
     
     @Column(columnDefinition = "TEXT")
     private String keterangan;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BimtekFoto> fotos = new ArrayList<>();
 }
