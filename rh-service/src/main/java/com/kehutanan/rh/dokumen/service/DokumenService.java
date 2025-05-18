@@ -8,12 +8,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
 
 @Slf4j
 @Service
@@ -68,7 +76,7 @@ public class DokumenService {
     }
 
     @Transactional
-    public Dokumen update(UUID id,String tipe, String namaDokumen, String status, String keterangan) throws Exception {
+    public Dokumen update(UUID id, String tipe, String namaDokumen, String status, String keterangan) throws Exception {
 
         Dokumen dokumen = findById(id);
 
@@ -101,6 +109,33 @@ public class DokumenService {
                 .orElseThrow(() -> new EntityNotFoundException("File tidak ditemukan"));
 
         return minioService.getPresignedUrl(file.getNamaFile());
+    }
+
+    /**
+     * Downloads a file from the document and returns it as a response
+     * 
+     * @param dokumenId Document ID
+     * @param fileId    File ID
+     * @return ResponseEntity with the file for download
+     * @throws Exception If file cannot be retrieved
+     */
+    public ResponseEntity<byte[]> downloadFile(UUID dokumenId, UUID fileId) throws Exception {
+        Dokumen dokumen = findById(dokumenId);
+        DokumenFile file = dokumen.getFiles().stream()
+                .filter(f -> f.getId().equals(fileId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("File tidak ditemukan"));
+
+        byte[] data = minioService.getFileData(file.getNamaFile());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(file.getContentType()));
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename(file.getNamaAsli())
+                .build());
+        headers.setContentLength(data.length);
+
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
     }
 
     @Transactional

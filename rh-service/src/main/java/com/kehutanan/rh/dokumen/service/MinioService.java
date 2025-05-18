@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -81,6 +82,39 @@ public class MinioService {
         } catch (Exception e) {
             log.error("Error generating presigned URL for file {}: {}", fileName, e.getMessage(), e);
             throw new Exception("Could not generate presigned URL", e);
+        }
+    }
+
+    /**
+     * Gets the file data as byte array from MinIO
+     * 
+     * @param fileName The name of the file in MinIO storage
+     * @return byte array containing file data
+     * @throws Exception If there's an error retrieving the file
+     */
+    public byte[] getFileData(String fileName) throws Exception {
+        String objectName = FOLDER_PREFIX + fileName;
+        try {
+            log.info("Retrieving file from MinIO: {}", objectName);
+            
+            GetObjectResponse response = minioClient.getObject(
+                GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)  // Make sure this matches how files are stored
+                    .build()
+            );
+            
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = response.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            log.error("Error getting file data from MinIO: {}", fileName, e);
+            throw new Exception("Failed to retrieve file from storage", e);
         }
     }
 

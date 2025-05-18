@@ -6,11 +6,13 @@ import com.kehutanan.rh.program.model.Program;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +66,17 @@ public class DokumenController {
             @PathVariable UUID fileId) throws Exception {
         return ResponseEntity.ok(dokumenService.getFileUrl(dokumenId, fileId));
     }
+
+    @GetMapping("/{dokumenId}/files/{fileId}/download")
+public ResponseEntity<?> downloadFile(@PathVariable UUID dokumenId, @PathVariable UUID fileId) {
+    try {
+        return dokumenService.downloadFile(dokumenId, fileId);
+    } catch (EntityNotFoundException e) {
+        return ResponseEntity.notFound().build();
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gagal mengunduh file: " + e.getMessage());
+    }
+}
 
     // @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // @Operation(summary = "Membuat dokumen baru dengan multiple file")
