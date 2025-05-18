@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/jenis-bibit")
-@Tag(name = "Jenis Bibit", description = "API untuk manajemen Jenis Bibit")
+@Tag(name = "Program -> Jenis Bibit", description = "API untuk manajemen Jenis Bibit")
 @RequiredArgsConstructor
 public class JenisBibitController {
     

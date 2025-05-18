@@ -28,22 +28,19 @@ public class DokumenService {
         this.minioService = minioService;
     }
 
-    public Page<Dokumen> findAll(String search, Pageable pageable) {
-        if (search != null && !search.isEmpty()) {
-            return dokumenRepository.findByNamaDokumenContainingIgnoreCase(search, pageable);
-        }
+    public Page<Dokumen> findAll(Pageable pageable) {
         return dokumenRepository.findAll(pageable);
     }
 
-    public Dokumen findById(Long id) {
+    public Dokumen findById(UUID id) {
         return dokumenRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Dokumen tidak ditemukan dengan id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Dokumen tidak ditemukan dengan id: " + id));
     }
 
     @Transactional
-    public Dokumen create(List<MultipartFile> files, String tipe, String namaDokumen, 
+    public Dokumen create(List<MultipartFile> files, String tipe, String namaDokumen,
             String status, String keterangan) throws Exception {
-        
+
         Dokumen dokumen = new Dokumen();
         dokumen.setTipe(tipe);
         dokumen.setNamaDokumen(namaDokumen);
@@ -53,9 +50,9 @@ public class DokumenService {
 
         for (MultipartFile file : files) {
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            
+
             minioService.uploadFile(fileName, file.getInputStream(), file.getContentType());
-            
+
             DokumenFile dokumenFile = new DokumenFile();
             dokumenFile.setDokumen(dokumen);
             dokumenFile.setNamaFile(fileName);
@@ -63,7 +60,7 @@ public class DokumenService {
             dokumenFile.setUkuranMb((double) file.getSize() / (1024 * 1024));
             dokumenFile.setContentType(file.getContentType());
             dokumenFile.setUploadedAt(LocalDateTime.now());
-            
+
             dokumen.getFiles().add(dokumenFile);
         }
 
@@ -71,45 +68,9 @@ public class DokumenService {
     }
 
     @Transactional
-    public Dokumen update(Long id, List<MultipartFile> newFiles, List<Long> deleteFileIds,
-            String tipe, String namaDokumen, String status, String keterangan) throws Exception {
-        
+    public Dokumen update(UUID id,String tipe, String namaDokumen, String status, String keterangan) throws Exception {
+
         Dokumen dokumen = findById(id);
-
-        // Delete files if requested
-        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
-            dokumen.getFiles().removeIf(file -> {
-                if (deleteFileIds.contains(file.getId())) {
-                    try {
-                        minioService.deleteFile(file.getNamaFile());
-                        return true;
-                    } catch (Exception e) {
-                        log.error("Error deleting file: {}", file.getNamaFile(), e);
-                        return false;
-                    }
-                }
-                return false;
-            });
-        }
-
-        // Add new files
-        if (newFiles != null) {
-            for (MultipartFile file : newFiles) {
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                
-                minioService.uploadFile(fileName, file.getInputStream(), file.getContentType());
-                
-                DokumenFile dokumenFile = new DokumenFile();
-                dokumenFile.setDokumen(dokumen);
-                dokumenFile.setNamaFile(fileName);
-                dokumenFile.setNamaAsli(file.getOriginalFilename());
-                dokumenFile.setUkuranMb((double) file.getSize() / (1024 * 1024));
-                dokumenFile.setContentType(file.getContentType());
-                dokumenFile.setUploadedAt(LocalDateTime.now());
-                
-                dokumen.getFiles().add(dokumenFile);
-            }
-        }
 
         // Update metadata
         dokumen.setTipe(tipe);
@@ -121,24 +82,69 @@ public class DokumenService {
     }
 
     @Transactional
-    public void delete(Long id) throws Exception {
+    public void delete(UUID id) throws Exception {
         Dokumen dokumen = findById(id);
-        
+
         // Delete all files from MinIO
         for (DokumenFile file : dokumen.getFiles()) {
             minioService.deleteFile(file.getNamaFile());
         }
-        
+
         dokumenRepository.delete(dokumen);
     }
 
-    public String getFileUrl(Long dokumenId, Long fileId) throws Exception {
+    public String getFileUrl(UUID dokumenId, UUID fileId) throws Exception {
         Dokumen dokumen = findById(dokumenId);
         DokumenFile file = dokumen.getFiles().stream()
-            .filter(f -> f.getId().equals(fileId))
-            .findFirst()
-            .orElseThrow(() -> new EntityNotFoundException("File tidak ditemukan"));
-            
+                .filter(f -> f.getId().equals(fileId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("File tidak ditemukan"));
+
         return minioService.getPresignedUrl(file.getNamaFile());
+    }
+
+    @Transactional
+    public Dokumen addFiles(UUID id, List<MultipartFile> files) throws Exception {
+        Dokumen dokumen = findById(id);
+
+        for (MultipartFile file : files) {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            minioService.uploadFile(fileName, file.getInputStream(), file.getContentType());
+
+            DokumenFile dokumenFile = new DokumenFile();
+            dokumenFile.setDokumen(dokumen);
+            dokumenFile.setNamaFile(fileName);
+            dokumenFile.setNamaAsli(file.getOriginalFilename());
+            dokumenFile.setUkuranMb((double) file.getSize() / (1024 * 1024));
+            dokumenFile.setContentType(file.getContentType());
+            dokumenFile.setUploadedAt(LocalDateTime.now());
+
+            dokumen.getFiles().add(dokumenFile);
+        }
+
+        return dokumenRepository.save(dokumen);
+    }
+
+    @Transactional
+    public Dokumen deleteFiles(UUID dokumenId, List<UUID> fileIds) throws Exception {
+        Dokumen dokumen = findById(dokumenId);
+        System.out.println("Deleting files with IDs: " + fileIds);
+        dokumen.getFiles().removeIf(file -> {
+            System.out.println("Checking file with ID: " + file.getId());
+            if (fileIds.contains(file.getId())) {
+                System.out.println("Deleting file with ID: " + file.getId());
+                try {
+                    minioService.deleteFile(file.getNamaFile());
+                    return true;
+                } catch (Exception e) {
+                    log.error("Error deleting file: {}", file.getNamaFile(), e);
+                    return false;
+                }
+            }
+            return false;
+        });
+
+        return dokumenRepository.save(dokumen);
     }
 }

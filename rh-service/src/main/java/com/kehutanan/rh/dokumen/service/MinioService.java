@@ -14,6 +14,7 @@ public class MinioService {
 
     private final MinioClient minioClient;
     private final String bucketName;
+    private static final String FOLDER_PREFIX = "Dokumen/";
 
     public MinioService(
             @Value("${minio.endpoint}") String endpoint,
@@ -50,15 +51,16 @@ public class MinioService {
 
     public void uploadFile(String fileName, InputStream inputStream, String contentType) throws Exception {
         try {
+            String objectName = FOLDER_PREFIX + fileName;
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(fileName)
+                    .object(objectName)
                     .stream(inputStream, inputStream.available(), -1)
                     .contentType(contentType)
                     .build()
             );
-            log.info("File {} uploaded successfully", fileName);
+            log.info("File {} uploaded successfully to {}", fileName, objectName);
         } catch (Exception e) {
             log.error("Error uploading file {}: {}", fileName, e.getMessage(), e);
             throw new Exception("Could not upload file to MinIO", e);
@@ -67,10 +69,11 @@ public class MinioService {
 
     public String getPresignedUrl(String fileName) throws Exception {
         try {
+            String objectName = FOLDER_PREFIX + fileName;
             return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .bucket(bucketName)
-                    .object(fileName)
+                    .object(objectName)
                     .method(Method.GET)
                     .expiry(24, TimeUnit.HOURS)
                     .build()
@@ -83,13 +86,14 @@ public class MinioService {
 
     public void deleteFile(String fileName) throws Exception {
         try {
+            String objectName = FOLDER_PREFIX + fileName;
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(fileName)
+                    .object(objectName)
                     .build()
             );
-            log.info("File {} deleted successfully", fileName);
+            log.info("File {} deleted successfully", objectName);
         } catch (Exception e) {
             log.error("Error deleting file {}: {}", fileName, e.getMessage(), e);
             throw new Exception("Could not delete file from MinIO", e);
@@ -98,10 +102,11 @@ public class MinioService {
 
     public boolean fileExists(String fileName) throws Exception {
         try {
+            String objectName = FOLDER_PREFIX + fileName;
             minioClient.statObject(
                 StatObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(fileName)
+                    .object(objectName)
                     .build()
             );
             return true;

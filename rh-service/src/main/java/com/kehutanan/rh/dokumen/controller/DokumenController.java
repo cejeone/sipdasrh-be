@@ -2,19 +2,28 @@ package com.kehutanan.rh.dokumen.controller;
 
 import com.kehutanan.rh.dokumen.model.Dokumen;
 import com.kehutanan.rh.dokumen.service.DokumenService;
+import com.kehutanan.rh.program.model.Program;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.UUID;
+
+import javax.swing.text.html.parser.Entity;
 import com.kehutanan.rh.dokumen.dto.DokumenDto;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/dokumen")
@@ -22,31 +31,37 @@ import com.kehutanan.rh.dokumen.dto.DokumenDto;
 public class DokumenController {
 
     private final DokumenService dokumenService;
+    private final PagedResourcesAssembler<Dokumen> pagedResourcesAssembler;
 
     @Autowired
-    public DokumenController(DokumenService dokumenService) {
+    public DokumenController(DokumenService dokumenService,
+            PagedResourcesAssembler<Dokumen> pagedResourcesAssembler) {
         this.dokumenService = dokumenService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping
     @Operation(summary = "Mendapatkan semua dokumen dengan pagination")
-    public ResponseEntity<Page<Dokumen>> getAll(
-            @RequestParam(required = false) String search,
-            Pageable pageable) {
-        return ResponseEntity.ok(dokumenService.findAll(search, pageable));
+    public ResponseEntity<PagedModel<EntityModel<Dokumen>>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Dokumen> dokumenPage = dokumenService.findAll(pageable);
+        PagedModel<EntityModel<Dokumen>> pagedModel = pagedResourcesAssembler.toModel(dokumenPage);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Mendapatkan dokumen berdasarkan ID")
-    public ResponseEntity<Dokumen> getById(@PathVariable Long id) {
+    public ResponseEntity<Dokumen> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(dokumenService.findById(id));
     }
 
     @GetMapping("/{dokumenId}/files/{fileId}/url")
     @Operation(summary = "Mendapatkan URL file dokumen")
     public ResponseEntity<String> getFileUrl(
-            @PathVariable Long dokumenId,
-            @PathVariable Long fileId) throws Exception {
+            @PathVariable UUID dokumenId,
+            @PathVariable UUID fileId) throws Exception {
         return ResponseEntity.ok(dokumenService.getFileUrl(dokumenId, fileId));
     }
 
@@ -66,7 +81,7 @@ public class DokumenController {
 
     // Controller implementation
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload files with JSON data")
+    @Operation(summary = "Membuat dokumen baru dengan multiple file")
     public ResponseEntity<Dokumen> create(
             @RequestPart("files") List<MultipartFile> files,
             @RequestPart("tipe") String tipe,
@@ -84,20 +99,17 @@ public class DokumenController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Memperbarui dokumen dan file-filenya")
+    @Operation(summary = "Memperbarui field di tabel Dokumen")
     public ResponseEntity<Dokumen> update(
-            @PathVariable Long id,
-            @RequestPart("files") List<MultipartFile> files,
-            @RequestPart("tipe") String tipe,
-            @RequestPart("namaDokumen") String namaDokumen,
-            @RequestPart("status") String status,
-            @RequestPart(value = "keterangan", required = false) String keterangan,
-            @RequestPart(value = "deleteFileIds", required = false) List<Long> deleteFileIds) throws Exception {
+            @PathVariable UUID id,
+            @RequestPart(value = "tipe", required = true) String tipe,
+            @RequestPart(value = "namaDokumen", required = true) String namaDokumen,
+            @RequestPart(value = "status", required = true) String status,
+            @RequestPart(value = "keterangan", required = false) String keterangan
+            ) throws Exception {
         return ResponseEntity.ok(
                 dokumenService.update(
                         id,
-                        files,
-                        deleteFileIds,
                         tipe,
                         namaDokumen,
                         status,
@@ -106,8 +118,25 @@ public class DokumenController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Menghapus dokumen beserta file-filenya")
-    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) throws Exception {
         dokumenService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(value = "/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Menambahkan file ke dokumen yang sudah ada")
+    public ResponseEntity<Dokumen> addFiles(
+            @PathVariable UUID id,
+            @RequestPart("files") List<MultipartFile> files) throws Exception {
+        return ResponseEntity.ok(dokumenService.addFiles(id, files));
+    }
+
+    @DeleteMapping("/{id}/files")
+    @Operation(summary = "Menghapus file-file tertentu dari dokumen")
+    public ResponseEntity<Dokumen> deleteFiles(
+            @PathVariable UUID id,
+            @RequestBody List<UUID> fileIds) throws Exception {
+        return ResponseEntity.ok(dokumenService.deleteFiles(id, fileIds));
+    }
+
 }

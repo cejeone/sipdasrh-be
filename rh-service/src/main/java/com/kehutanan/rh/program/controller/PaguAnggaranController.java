@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pagu-anggaran")
-@Tag(name = "Pagu Anggaran", description = "API untuk manajemen Pagu Anggaran")
+@Tag(name = "Program -> Pagu Anggaran", description = "API untuk manajemen Pagu Anggaran")
 @RequiredArgsConstructor
 public class PaguAnggaranController {
     
