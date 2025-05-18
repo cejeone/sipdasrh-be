@@ -3,8 +3,6 @@ package com.kehutanan.rh.program.controller;
 import com.kehutanan.rh.program.model.JenisBibit;
 import com.kehutanan.rh.program.service.JenisBibitService;
 import com.kehutanan.rh.program.dto.JenisBibitDto;
-import com.kehutanan.rh.program.dto.JenisBibitDto;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

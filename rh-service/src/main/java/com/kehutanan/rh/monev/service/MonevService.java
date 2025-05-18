@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 @Service
 public class MonevService {
 
@@ -18,9 +19,13 @@ public class MonevService {
         this.monevRepository = monevRepository;
     }
 
-    public List<Monev> findAll() {
-        return monevRepository.findAll();
+    public Page<Monev> findAll(Pageable pageable) {
+        return monevRepository.findAll(pageable);
     }
+    
+    // public List<Monev> findAll() {
+    //     return monevRepository.findAll();
+    // }
 
     public Monev findById(UUID id) {
         return monevRepository.findById(id)
