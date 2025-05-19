@@ -5,6 +5,7 @@ import com.kehutanan.rh.serahterima.repository.SerahTerimaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,5 +32,13 @@ public class SerahTerimaService {
 
     public void deleteById(UUID id) {
         serahTerimaRepository.deleteById(id);
+    }
+
+    public Page<SerahTerima> findByFilters(String program, Pageable pageable) {
+        Specification<SerahTerima> spec = (root, query, criteriaBuilder) -> criteriaBuilder.like(
+                criteriaBuilder.lower(root.get("program")),
+                "%" + program.toLowerCase() + "%");
+
+        return serahTerimaRepository.findAll(spec, pageable);
     }
 }

@@ -38,15 +38,21 @@ public class SerahTerimaController {
     }
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua data SerahTerima dengan pagination")
+    @Operation(summary = "Mendapatkan semua data SerahTerima dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<SerahTerima>>> getAllSerahTerima(
+            @RequestParam(required = false) String program,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<SerahTerima> serahTerimaPage = serahTerimaService.findAll(pageable);
+        Page<SerahTerima> serahTerimaPage;
+        
+        if (program != null && !program.isEmpty()) {
+            serahTerimaPage = serahTerimaService.findByFilters(program, pageable);
+        } else {
+            serahTerimaPage = serahTerimaService.findAll(pageable);
+        }
+        
         PagedModel<EntityModel<SerahTerima>> pagedModel = pagedResourcesAssembler.toModel(serahTerimaPage);
-
         return ResponseEntity.ok(pagedModel);
     }
 
