@@ -43,12 +43,22 @@ public class DokumenController {
     }
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua dokumen dengan pagination")
+    @Operation(summary = "Mendapatkan semua dokumen dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<Dokumen>>> getAll(
+            @RequestParam(required = false) String namaDokumen,
+            @RequestParam(required = false) List<String> bpdas,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        
         Pageable pageable = PageRequest.of(page, size);
-        Page<Dokumen> dokumenPage = dokumenService.findAll(pageable);
+        Page<Dokumen> dokumenPage;
+        
+        if ((namaDokumen != null && !namaDokumen.isEmpty()) || (bpdas != null && !bpdas.isEmpty())) {
+            dokumenPage = dokumenService.findByFilters(namaDokumen, bpdas, pageable);
+        } else {
+            dokumenPage = dokumenService.findAll(pageable);
+        }
+        
         PagedModel<EntityModel<Dokumen>> pagedModel = pagedResourcesAssembler.toModel(dokumenPage);
         return ResponseEntity.ok(pagedModel);
     }

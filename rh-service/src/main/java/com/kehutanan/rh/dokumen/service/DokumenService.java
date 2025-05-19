@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -181,5 +182,24 @@ public class DokumenService {
         });
 
         return dokumenRepository.save(dokumen);
+    }
+
+    public Page<Dokumen> findByFilters(String namaDokumen, List<String> bpdas, Pageable pageable) {
+          Specification<Dokumen> spec = Specification.where(null);
+    
+    if (namaDokumen != null && !namaDokumen.isEmpty()) {
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("namaDokumen")),
+                    "%" + namaDokumen.toLowerCase() + "%"
+                ));
+    }
+    
+    if (bpdas != null && !bpdas.isEmpty()) {
+        spec = spec.and((root, query, criteriaBuilder) ->
+                root.get("bpdas").in(bpdas));
+    }
+    
+    return dokumenRepository.findAll(spec, pageable);
     }
 }
