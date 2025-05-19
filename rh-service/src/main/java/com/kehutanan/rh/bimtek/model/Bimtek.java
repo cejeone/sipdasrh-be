@@ -55,4 +55,8 @@ public class Bimtek {
     @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<BimtekVideo> videos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<BimtekPdf> pdfs = new ArrayList<>();
 }

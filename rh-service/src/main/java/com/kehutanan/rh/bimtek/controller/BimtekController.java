@@ -2,6 +2,7 @@ package com.kehutanan.rh.bimtek.controller;
 
 import com.kehutanan.rh.bimtek.model.Bimtek;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
+import com.kehutanan.rh.bimtek.model.BimtekPdf;
 import com.kehutanan.rh.bimtek.model.BimtekVideo;
 import com.kehutanan.rh.bimtek.service.BimtekService;
 import com.kehutanan.rh.dokumen.model.Dokumen;
@@ -186,4 +187,29 @@ public class BimtekController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping(value = "/{id}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload multiple PDFs for a Bimtek")
+    public ResponseEntity<?> uploadPdfs(
+            @PathVariable UUID id,
+            @RequestPart("files") List<MultipartFile> files) {
+        try {
+            List<BimtekPdf> uploadedPdfs = bimtekService.uploadPdfs(id, files);
+            return ResponseEntity.ok(uploadedPdfs);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal mengupload PDF: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}/pdfs")
+    @Operation(summary = "Menghapus PDF-PDF tertentu dari Bimtek")
+    public ResponseEntity<Bimtek> deletePdfs(
+            @PathVariable UUID id,
+            @RequestBody List<UUID> pdfIds) throws Exception {
+        return ResponseEntity.ok(bimtekService.deletePdfs(id, pdfIds));
+    }
+
 }

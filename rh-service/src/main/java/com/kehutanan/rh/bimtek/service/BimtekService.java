@@ -2,8 +2,10 @@ package com.kehutanan.rh.bimtek.service;
 
 import com.kehutanan.rh.bimtek.model.Bimtek;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
+import com.kehutanan.rh.bimtek.model.BimtekPdf;
 import com.kehutanan.rh.bimtek.model.BimtekVideo;
 import com.kehutanan.rh.bimtek.repository.BimtekFotoRepository;
+import com.kehutanan.rh.bimtek.repository.BimtekPdfRepository;
 import com.kehutanan.rh.bimtek.repository.BimtekRepository;
 import com.kehutanan.rh.bimtek.repository.BimtekVideoRepository;
 
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,8 @@ public class BimtekService {
     private final BimtekFotoRepository bimtekFotoRepository;
     private final BimtekVideoRepository bimtekVideoRepository;
     private final MinioBimtekService minioBimtekService;
+    private final BimtekPdfRepository bimtekPdfRepository;
+
 
     public Page<Bimtek> findAll(Pageable pageable) {
         return bimtekRepository.findAll(pageable);
@@ -56,14 +61,14 @@ public class BimtekService {
 
         // Load photos and set URLs
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
-        for (BimtekFoto foto : fotos) {
-            try {
-                String viewUrl = "/api/bimtek/" + id + "/fotos/" + foto.getId() + "/view";
-                foto.setUrl(viewUrl);
-            } catch (Exception e) {
-                log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-            }
-        }
+        // for (BimtekFoto foto : fotos) {
+        //     try {
+        //         String viewUrl = "/api/bimtek/" + id + "/fotos/" + foto.getId() + "/view";
+        //         foto.setUrl(viewUrl);
+        //     } catch (Exception e) {
+        //         log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
+        //     }
+        // }
         bimtek.setFotos(fotos);
 
         return bimtek;
@@ -77,14 +82,14 @@ public class BimtekService {
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(bimtekId);
 
         // Set URL for each photo
-        for (BimtekFoto foto : fotos) {
-            try {
-                String viewUrl = "/api/bimtek/" + bimtekId + "/fotos/" + foto.getId() + "/view";
-                foto.setUrl(viewUrl);
-            } catch (Exception e) {
-                log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-            }
-        }
+        // for (BimtekFoto foto : fotos) {
+        //     try {
+        //         String viewUrl = "/api/bimtek/" + bimtekId + "/fotos/" + foto.getId() + "/view";
+        //         foto.setUrl(viewUrl);
+        //     } catch (Exception e) {
+        //         log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
+        //     }
+        // }
 
         return fotos;
     }
@@ -242,16 +247,59 @@ public class BimtekService {
     }
 
     public InputStream getVideoStream(UUID bimtekId, UUID videoId) throws Exception {
-    // Ambil data video dari database
-    BimtekVideo video = bimtekVideoRepository.findById(videoId)
-            .orElseThrow(() -> new EntityNotFoundException("Video tidak ditemukan dengan id: " + videoId));
+        // Ambil data video dari database
+        BimtekVideo video = bimtekVideoRepository.findById(videoId)
+                .orElseThrow(() -> new EntityNotFoundException("Video tidak ditemukan dengan id: " + videoId));
 
-    // Validasi video tersebut memang milik bimtek yang dimaksud
-    if (!video.getBimtek().getId().equals(bimtekId)) {
-        throw new EntityNotFoundException("Video tidak terkait dengan Bimtek yang dimaksud");
+        // Validasi video tersebut memang milik bimtek yang dimaksud
+        if (!video.getBimtek().getId().equals(bimtekId)) {
+            throw new EntityNotFoundException("Video tidak terkait dengan Bimtek yang dimaksud");
+        }
+
+        // Return the video stream instead of loading all bytes at once
+        return minioBimtekService.getFileStream(video.getNamaFile());
     }
-    
-    // Return the video stream instead of loading all bytes at once
-    return minioBimtekService.getFileStream(video.getNamaFile());
-}
+
+    @Transactional
+    public List<BimtekPdf> uploadPdfs(UUID bimtekId, List<MultipartFile> files) throws Exception {
+        Bimtek bimtek = bimtekRepository.findById(bimtekId)
+                .orElseThrow(() -> new EntityNotFoundException("Bimtek tidak ditemukan dengan id: " + bimtekId));
+
+        List<BimtekPdf> uploadedPdfs = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            minioBimtekService.uploadFile(fileName, file.getInputStream(), file.getContentType());
+
+            BimtekPdf bimtekPdf = new BimtekPdf();
+            bimtekPdf.setBimtek(bimtek);
+            bimtekPdf.setNamaFile(fileName);
+            bimtekPdf.setNamaAsli(file.getOriginalFilename());
+            bimtekPdf.setUkuranMb((double) file.getSize() / (1024 * 1024));
+            bimtekPdf.setContentType(file.getContentType());
+            bimtekPdf.setUploadedAt(LocalDateTime.now());
+
+            uploadedPdfs.add(bimtekPdfRepository.save(bimtekPdf));
+        }
+
+        return uploadedPdfs;
+    }
+
+    @Transactional
+    public Bimtek deletePdfs(UUID bimtekId, List<UUID> pdfIds) throws Exception {
+        Bimtek bimtek = bimtekRepository.findById(bimtekId)
+                .orElseThrow(() -> new EntityNotFoundException("Bimtek tidak ditemukan dengan id: " + bimtekId));
+
+        List<BimtekPdf> pdfsToDelete = bimtekPdfRepository.findAllById(pdfIds);
+
+        for (BimtekPdf pdf : pdfsToDelete) {
+            if (pdf.getBimtek().getId().equals(bimtekId)) {
+                minioBimtekService.deleteFile(pdf.getNamaFile());
+                bimtekPdfRepository.delete(pdf);
+            }
+        }
+
+        return bimtekRepository.save(bimtek);
+    }
 }
