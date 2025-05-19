@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/monev")
@@ -32,23 +33,27 @@ public class MonevController {
     }
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua data monev dengan pagination")
+    @Operation(summary = "Mendapatkan semua data monev dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<Monev>>> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String program,
+            @RequestParam(required = false) List<String> bpdas) {
+
         Pageable pageable = PageRequest.of(page, size);
+        Page<Monev> monevPage;
 
-        Page<Monev> monevPage = monevService.findAll(pageable);
+        if ((program == null || program.isEmpty()) && (bpdas == null || bpdas.isEmpty())) {
+            // No filters provided
+            monevPage = monevService.findAll(pageable);
+        } else {
+            // Apply filters
+            monevPage = monevService.findByFilters(program, bpdas, pageable);
+        }
+
         PagedModel<EntityModel<Monev>> pagedModel = pagedResourcesAssembler.toModel(monevPage);
-
         return ResponseEntity.ok(pagedModel);
     }
-
-    // @GetMapping
-    // @Operation(summary = "Mendapatkan semua data monev")
-    // public List<Monev> getAll() {
-    // return monevService.findAll();
-    // }
 
     @GetMapping("/{id}")
     @Operation(summary = "Mendapatkan data monev berdasarkan ID")
