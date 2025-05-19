@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_bimtek_foto")
+@Table(name = "rh_bimtek_video")
 @NoArgsConstructor
 @AllArgsConstructor
-public class BimtekFoto {
+public class BimtekVideo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

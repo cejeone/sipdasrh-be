@@ -59,24 +59,25 @@ public class DokumenController {
         return ResponseEntity.ok(dokumenService.findById(id));
     }
 
-    @GetMapping("/{dokumenId}/files/{fileId}/url")
-    @Operation(summary = "Mendapatkan URL file dokumen")
-    public ResponseEntity<String> getFileUrl(
-            @PathVariable UUID dokumenId,
-            @PathVariable UUID fileId) throws Exception {
-        return ResponseEntity.ok(dokumenService.getFileUrl(dokumenId, fileId));
-    }
+    // @GetMapping("/{dokumenId}/files/{fileId}/url")
+    // @Operation(summary = "Mendapatkan URL file dokumen")
+    // public ResponseEntity<String> getFileUrl(
+    //         @PathVariable UUID dokumenId,
+    //         @PathVariable UUID fileId) throws Exception {
+    //     return ResponseEntity.ok(dokumenService.getFileUrl(dokumenId, fileId));
+    // }
 
     @GetMapping("/{dokumenId}/files/{fileId}/download")
-public ResponseEntity<?> downloadFile(@PathVariable UUID dokumenId, @PathVariable UUID fileId) {
-    try {
-        return dokumenService.downloadFile(dokumenId, fileId);
-    } catch (EntityNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gagal mengunduh file: " + e.getMessage());
+    public ResponseEntity<?> downloadFile(@PathVariable UUID dokumenId, @PathVariable UUID fileId) {
+        try {
+            return dokumenService.downloadFile(dokumenId, fileId);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal mengunduh file: " + e.getMessage());
+        }
     }
-}
 
     // @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // @Operation(summary = "Membuat dokumen baru dengan multiple file")
@@ -118,8 +119,7 @@ public ResponseEntity<?> downloadFile(@PathVariable UUID dokumenId, @PathVariabl
             @RequestPart(value = "tipe", required = true) String tipe,
             @RequestPart(value = "namaDokumen", required = true) String namaDokumen,
             @RequestPart(value = "status", required = true) String status,
-            @RequestPart(value = "keterangan", required = false) String keterangan
-            ) throws Exception {
+            @RequestPart(value = "keterangan", required = false) String keterangan) throws Exception {
         return ResponseEntity.ok(
                 dokumenService.update(
                         id,

@@ -22,7 +22,7 @@ public class MinioBimtekService {
             @Value("${minio.access-key}") String accessKey,
             @Value("${minio.secret-key}") String secretKey,
             @Value("${minio.bucket}") String bucketName) {
-        
+
         this.bucketName = bucketName;
         this.minioClient = MinioClient.builder()
                 .endpoint(endpoint)
@@ -35,13 +35,11 @@ public class MinioBimtekService {
     private void initializeBucket() {
         try {
             boolean bucketExists = minioClient.bucketExists(
-                BucketExistsArgs.builder().bucket(bucketName).build()
-            );
+                    BucketExistsArgs.builder().bucket(bucketName).build());
 
             if (!bucketExists) {
                 minioClient.makeBucket(
-                    MakeBucketArgs.builder().bucket(bucketName).build()
-                );
+                        MakeBucketArgs.builder().bucket(bucketName).build());
                 log.info("Bucket {} created successfully", bucketName);
             }
         } catch (Exception e) {
@@ -54,13 +52,12 @@ public class MinioBimtekService {
         try {
             String objectName = FOLDER_PREFIX + fileName;
             minioClient.putObject(
-                PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .stream(inputStream, inputStream.available(), -1)
-                    .contentType(contentType)
-                    .build()
-            );
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .stream(inputStream, inputStream.available(), -1)
+                            .contentType(contentType)
+                            .build());
             log.info("File {} uploaded successfully to {}", fileName, objectName);
         } catch (Exception e) {
             log.error("Error uploading file {}: {}", fileName, e.getMessage(), e);
@@ -72,13 +69,12 @@ public class MinioBimtekService {
         try {
             String objectName = FOLDER_PREFIX + fileName;
             return minioClient.getPresignedObjectUrl(
-                GetPresignedObjectUrlArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .method(Method.GET)
-                    .expiry(24, TimeUnit.HOURS)
-                    .build()
-            );
+                    GetPresignedObjectUrlArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .method(Method.GET)
+                            .expiry(24, TimeUnit.HOURS)
+                            .build());
         } catch (Exception e) {
             log.error("Error generating presigned URL for file {}: {}", fileName, e.getMessage(), e);
             throw new Exception("Could not generate presigned URL", e);
@@ -96,21 +92,20 @@ public class MinioBimtekService {
         String objectName = FOLDER_PREFIX + fileName;
         try {
             log.info("Retrieving file from MinIO: {}", objectName);
-            
+
             GetObjectResponse response = minioClient.getObject(
-                GetObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)  // Make sure this matches how files are stored
-                    .build()
-            );
-            
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName) // Make sure this matches how files are stored
+                            .build());
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[8192];
             int bytesRead;
             while ((bytesRead = response.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
-            
+
             return outputStream.toByteArray();
         } catch (Exception e) {
             log.error("Error getting file data from MinIO: {}", fileName, e);
@@ -122,11 +117,10 @@ public class MinioBimtekService {
         try {
             String objectName = FOLDER_PREFIX + fileName;
             minioClient.removeObject(
-                RemoveObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build()
-            );
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build());
             log.info("File {} deleted successfully", objectName);
         } catch (Exception e) {
             log.error("Error deleting file {}: {}", fileName, e.getMessage(), e);
@@ -138,14 +132,27 @@ public class MinioBimtekService {
         try {
             String objectName = FOLDER_PREFIX + fileName;
             minioClient.statObject(
-                StatObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build()
-            );
+                    StatObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build());
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public InputStream getFileStream(String fileName) throws Exception {
+         String objectName = FOLDER_PREFIX + fileName;
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error getting file stream from MinIO: {}", e.getMessage());
+            throw new RuntimeException("Could not get file stream from storage", e);
         }
     }
 }

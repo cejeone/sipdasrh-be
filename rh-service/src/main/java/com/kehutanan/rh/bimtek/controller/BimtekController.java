@@ -2,6 +2,7 @@ package com.kehutanan.rh.bimtek.controller;
 
 import com.kehutanan.rh.bimtek.model.Bimtek;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
+import com.kehutanan.rh.bimtek.model.BimtekVideo;
 import com.kehutanan.rh.bimtek.service.BimtekService;
 import com.kehutanan.rh.dokumen.model.Dokumen;
 import com.kehutanan.rh.dokumen.service.DokumenService;
@@ -24,9 +25,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.io.IOUtils;
 
 @RestController
 @RequestMapping("/api/bimtek")
@@ -97,5 +101,89 @@ public class BimtekController {
             @PathVariable UUID id,
             @RequestBody List<UUID> fotoIds) throws Exception {
         return ResponseEntity.ok(bimtekService.deleteFotos(id, fotoIds));
+    }
+
+    @GetMapping("/{bimtekId}/fotos/{fotoId}/view")
+    @Operation(summary = "Menampilkan foto Bimtek")
+    public ResponseEntity<byte[]> viewFoto(
+            @PathVariable UUID bimtekId, @PathVariable UUID fotoId) {
+
+        try {
+            // Dapatkan foto dari service
+            byte[] imageData = bimtekService.viewFoto(bimtekId, fotoId);
+
+            // Dapatkan informasi foto untuk contentType
+            BimtekFoto foto = bimtekService.getFotoById(fotoId);
+
+            // Buat response dengan header Content-Type yang sesuai
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(foto.getContentType()))
+                    .body(imageData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @PostMapping(value = "/{id}/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload multiple videos for a Bimtek")
+    public ResponseEntity<?> uploadVideos(
+            @PathVariable UUID id,
+            @RequestPart("files") List<MultipartFile> files) {
+        try {
+            List<BimtekVideo> uploadedVideos = bimtekService.uploadVideos(id, files);
+            return ResponseEntity.ok(uploadedVideos);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal mengupload video: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}/videos")
+    @Operation(summary = "Menghapus video-video tertentu dari Bimtek")
+    public ResponseEntity<Bimtek> deleteVideos(
+            @PathVariable UUID id,
+            @RequestBody List<UUID> videoIds) throws Exception {
+        return ResponseEntity.ok(bimtekService.deleteVideos(id, videoIds));
+    }
+
+    @GetMapping("/{bimtekId}/videos/{videoId}/view")
+    @Operation(summary = "Menampilkan video Bimtek")
+    public ResponseEntity<StreamingResponseBody> viewVideo(
+            @PathVariable UUID bimtekId,
+            @PathVariable UUID videoId,
+            @RequestHeader(value = "Range", required = false) String rangeHeader) {
+
+        try {
+            // Dapatkan informasi video untuk contentType
+            BimtekVideo video = bimtekService.getVideoById(videoId);
+
+            // Validasi video tersebut milik bimtek yang dimaksud
+            if (!video.getBimtek().getId().equals(bimtekId)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Create a streaming response that reads from the MinIO/storage
+            StreamingResponseBody responseBody = outputStream -> {
+                try (InputStream videoStream = bimtekService.getVideoStream(bimtekId, videoId)) {
+                    IOUtils.copy(videoStream, outputStream);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            };
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.parseMediaType(video.getContentType()))
+                    // Add content-disposition with filename for better browser handling
+                    .header("Content-Disposition", "inline; filename=\"" + video.getNamaAsli() + "\"")
+                    // Add accept-ranges header to indicate server supports range requests
+                    .header("Accept-Ranges", "bytes")
+                    .body(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
