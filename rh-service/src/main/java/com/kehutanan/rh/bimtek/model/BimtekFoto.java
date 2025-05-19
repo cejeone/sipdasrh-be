@@ -1,8 +1,6 @@
 package com.kehutanan.rh.bimtek.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,7 +35,4 @@ public class BimtekFoto {
 
     private LocalDateTime uploadedAt;
 
-    @Transient
-    @JsonInclude
-    private String url;
 }

@@ -36,8 +36,4 @@ public class BimtekVideo {
     private String contentType;
 
     private LocalDateTime uploadedAt;
-
-    @Transient
-    @JsonInclude
-    private String url;
 }
