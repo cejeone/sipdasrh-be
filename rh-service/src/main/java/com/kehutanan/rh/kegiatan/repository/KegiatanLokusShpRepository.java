@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface KegiatanLokusShpRepository extends JpaRepository<KegiatanLokusShp, UUID>, JpaSpecificationExecutor<KegiatanLokusShp> {
-    List<KegiatanLokusShp> findByKegiatanId(UUID kegiatanId);
+
 }

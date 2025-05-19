@@ -33,8 +33,8 @@ public class Kegiatan {
     @Column(name = "jenis_kegiatan", nullable = false)
     private String jenisKegiatan;
 
-    @Column(name = "ref_p0")
-    private String refP0;
+    @Column(name = "ref_po")
+    private String refPo;
 
     @Column(name = "nama_kegiatan", nullable = false)
     private String namaKegiatan;

@@ -41,7 +41,7 @@ public class KegiatanMonev {
     @JsonManagedReference
     private List<KegiatanMonevKriteriaEvaluasi> kriteriaEvaluasiList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kegiatanMonev", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KegiatanMonevPdf> kegiatanMonevPdfs = new ArrayList<>();
 

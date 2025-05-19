@@ -47,7 +47,7 @@ public class KegiatanSerahTerima {
     private Kegiatan kegiatan;
 
     
-    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kegiatanSerahTerima", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KegiatanSerahTerimaPdf> kegiatanSerahTerimaPdfs = new ArrayList<>();
 
