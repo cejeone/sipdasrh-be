@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -204,7 +205,16 @@ public class KontenService {
     }
 
     public KontenGambarUtama getGambarUtamaById(UUID gambarUtamaId) {
-       return kontenGambarUtamaRepository.findById(gambarUtamaId)
-                .orElseThrow(() -> new EntityNotFoundException("Gambar Utama tidak ditemukan dengan id: " + gambarUtamaId));
+        return kontenGambarUtamaRepository.findById(gambarUtamaId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Gambar Utama tidak ditemukan dengan id: " + gambarUtamaId));
+    }
+
+    public Page<Konten> findByFilters(String judul, Pageable pageable) {
+        Specification<Konten> spec = (root, query, criteriaBuilder) -> criteriaBuilder.like(
+                criteriaBuilder.lower(root.get("judul")),
+                "%" + judul.toLowerCase() + "%");
+
+        return kontenRepository.findAll(spec, pageable);
     }
 }

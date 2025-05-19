@@ -41,12 +41,20 @@ public class KontenController {
     private final PagedResourcesAssembler<Konten> pagedResourcesAssembler;
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua konten dengan pagination")
+    @Operation(summary = "Mendapatkan semua konten dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<Konten>>> getAll(
+            @RequestParam(required = false) String judul,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Konten> kontenPage = kontenService.findAll(pageable);
+        Page<Konten> kontenPage;
+        
+        if (judul != null && !judul.isEmpty()) {
+            kontenPage = kontenService.findByFilters(judul, pageable);
+        } else {
+            kontenPage = kontenService.findAll(pageable);
+        }
+        
         PagedModel<EntityModel<Konten>> pagedModel = pagedResourcesAssembler.toModel(kontenPage);
         return ResponseEntity.ok(pagedModel);
     }
