@@ -43,12 +43,24 @@ public class BimtekController {
     private final PagedResourcesAssembler<Bimtek> pagedResourcesAssembler;
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua bimtek dengan pagination")
+    @Operation(summary = "Mendapatkan semua bimtek dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<Bimtek>>> getAll(
+            @RequestParam(required = false) String namaBimtek,
+            @RequestParam(required = false) String subjek,
+            @RequestParam(required = false) List<String> bpdas,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        
         Pageable pageable = PageRequest.of(page, size);
-        Page<Bimtek> bimtekPage = bimtekService.findAll(pageable);
+        Page<Bimtek> bimtekPage;
+        
+        // Use filtered search if any filter parameter is provided, otherwise get all
+        if (namaBimtek != null || subjek != null || (bpdas != null && !bpdas.isEmpty())) {
+            bimtekPage = bimtekService.findByFilters(namaBimtek, subjek, bpdas, pageable);
+        } else {
+            bimtekPage = bimtekService.findAll(pageable);
+        }
+        
         PagedModel<EntityModel<Bimtek>> pagedModel = pagedResourcesAssembler.toModel(bimtekPage);
         return ResponseEntity.ok(pagedModel);
     }

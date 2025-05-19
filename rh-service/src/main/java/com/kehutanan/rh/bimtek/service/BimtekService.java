@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -355,6 +356,33 @@ public void delete(UUID id) {
             log.error("Gagal mengambil data PDF: {}", e.getMessage(), e);
             throw new RuntimeException("Gagal mengambil data PDF: " + e.getMessage(), e);
         }
+    }
+
+    public Page<Bimtek> findByFilters(String namaBimtek, String subjek, List<String> bpdas, Pageable pageable) {
+        Specification<Bimtek> spec = Specification.where(null);
+        
+        if (namaBimtek != null && !namaBimtek.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("namaBimtek")),
+                        "%" + namaBimtek.toLowerCase() + "%"
+                    ));
+        }
+        
+        if (subjek != null && !subjek.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("subjek")),
+                        "%" + subjek.toLowerCase() + "%"
+                    ));
+        }
+        
+        if (bpdas != null && !bpdas.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("bpdas").in(bpdas));
+        }
+        
+        return bimtekRepository.findAll(spec, pageable);
     }
 
 }
