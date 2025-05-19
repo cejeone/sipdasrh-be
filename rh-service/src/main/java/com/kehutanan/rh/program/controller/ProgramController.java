@@ -35,20 +35,29 @@ public class ProgramController {
     }
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua data program dengan pagination")
+    @Operation(summary = "Mendapatkan semua data program dengan pagination dan filter dinamis")
     public ResponseEntity<PagedModel<EntityModel<Program>>> findAll(
+            @RequestParam(required = false) String nama,
+            @RequestParam(required = false) String totalAnggaran,
+            @RequestParam(required = false) List<String> status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        
         Pageable pageable = PageRequest.of(page, size);
-        Page<Program> programPage = programService.findAll(pageable);
+        Page<Program> programPage;
+        
+        // Check if any filter is provided
+        if ((nama != null && !nama.isEmpty()) || 
+            (totalAnggaran != null && !totalAnggaran.isEmpty()) ||
+            (status != null && !status.isEmpty())) {
+            programPage = programService.findByFilters(nama, totalAnggaran, status, pageable);
+        } else {
+            programPage = programService.findAll(pageable);
+        }
+        
         PagedModel<EntityModel<Program>> pagedModel = pagedResourcesAssembler.toModel(programPage);
         return ResponseEntity.ok(pagedModel);
     }
-
-    // @GetMapping
-    // public ResponseEntity<List<Program>> findAll() {
-    // return ResponseEntity.ok(programService.findAll());
-    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<Program> findById(@PathVariable UUID id) {
