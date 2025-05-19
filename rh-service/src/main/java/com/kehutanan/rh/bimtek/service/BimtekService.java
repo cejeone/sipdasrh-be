@@ -59,14 +59,7 @@ public class BimtekService {
 
         // Load photos and set URLs
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
-        // for (BimtekFoto foto : fotos) {
-        // try {
-        // String viewUrl = "/api/bimtek/" + id + "/fotos/" + foto.getId() + "/view";
-        // foto.setUrl(viewUrl);
-        // } catch (Exception e) {
-        // log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-        // }
-        // }
+
         bimtek.setFotos(fotos);
 
         return bimtek;
@@ -79,16 +72,6 @@ public class BimtekService {
         }
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(bimtekId);
 
-        // Set URL for each photo
-        // for (BimtekFoto foto : fotos) {
-        // try {
-        // String viewUrl = "/api/bimtek/" + bimtekId + "/fotos/" + foto.getId() +
-        // "/view";
-        // foto.setUrl(viewUrl);
-        // } catch (Exception e) {
-        // log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-        // }
-        // }
 
         return fotos;
     }
@@ -115,10 +98,40 @@ public class BimtekService {
         return bimtekRepository.save(existing);
     }
 
-    @Transactional
-    public void delete(UUID id) {
+@Transactional
+public void delete(UUID id) {
+    Bimtek bimtek = bimtekRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Bimtek tidak ditemukan dengan id: " + id));
+    
+    try {
+        // Delete all photos associated with the bimtek
+        List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
+        List<UUID> fotoIds = fotos.stream().map(BimtekFoto::getId).toList();
+        if (!fotoIds.isEmpty()) {
+            deleteFotos(id, fotoIds);
+        }
+        
+        // Delete all videos associated with the bimtek
+        List<BimtekVideo> videos = bimtekVideoRepository.findByBimtekId(id);
+        List<UUID> videoIds = videos.stream().map(BimtekVideo::getId).toList();
+        if (!videoIds.isEmpty()) {
+            deleteVideos(id, videoIds);
+        }
+        
+        // Delete all PDFs associated with the bimtek
+        List<BimtekPdf> pdfs = bimtekPdfRepository.findByBimtekId(id);
+        List<UUID> pdfIds = pdfs.stream().map(BimtekPdf::getId).toList();
+        if (!pdfIds.isEmpty()) {
+            deletePdfs(id, pdfIds);
+        }
+        
+        // Finally delete the bimtek record itself
         bimtekRepository.deleteById(id);
+    } catch (Exception e) {
+        log.error("Gagal menghapus Bimtek dan file terkait: {}", e.getMessage(), e);
+        throw new RuntimeException("Gagal menghapus Bimtek dan file terkait: " + e.getMessage(), e);
     }
+}
 
     @Transactional
     public List<BimtekFoto> uploadFotos(UUID bimtekId, List<MultipartFile> files) throws Exception {
