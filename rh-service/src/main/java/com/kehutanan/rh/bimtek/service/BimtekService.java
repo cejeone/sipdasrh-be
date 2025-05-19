@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,6 @@ public class BimtekService {
     private final BimtekVideoRepository bimtekVideoRepository;
     private final MinioBimtekService minioBimtekService;
     private final BimtekPdfRepository bimtekPdfRepository;
-
 
     public Page<Bimtek> findAll(Pageable pageable) {
         return bimtekRepository.findAll(pageable);
@@ -62,12 +60,12 @@ public class BimtekService {
         // Load photos and set URLs
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
         // for (BimtekFoto foto : fotos) {
-        //     try {
-        //         String viewUrl = "/api/bimtek/" + id + "/fotos/" + foto.getId() + "/view";
-        //         foto.setUrl(viewUrl);
-        //     } catch (Exception e) {
-        //         log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-        //     }
+        // try {
+        // String viewUrl = "/api/bimtek/" + id + "/fotos/" + foto.getId() + "/view";
+        // foto.setUrl(viewUrl);
+        // } catch (Exception e) {
+        // log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
+        // }
         // }
         bimtek.setFotos(fotos);
 
@@ -83,12 +81,13 @@ public class BimtekService {
 
         // Set URL for each photo
         // for (BimtekFoto foto : fotos) {
-        //     try {
-        //         String viewUrl = "/api/bimtek/" + bimtekId + "/fotos/" + foto.getId() + "/view";
-        //         foto.setUrl(viewUrl);
-        //     } catch (Exception e) {
-        //         log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
-        //     }
+        // try {
+        // String viewUrl = "/api/bimtek/" + bimtekId + "/fotos/" + foto.getId() +
+        // "/view";
+        // foto.setUrl(viewUrl);
+        // } catch (Exception e) {
+        // log.error("Gagal menghasilkan URL untuk foto: {}", foto.getId(), e);
+        // }
         // }
 
         return fotos;
@@ -302,4 +301,47 @@ public class BimtekService {
 
         return bimtekRepository.save(bimtek);
     }
+
+    /**
+     * Mendapatkan PDF Bimtek berdasarkan ID PDF
+     * 
+     * @param pdfId ID dari PDF
+     * @return BimtekPdf objek yang dicari
+     * @throws EntityNotFoundException jika PDF tidak ditemukan
+     */
+    @Transactional(readOnly = true)
+    public BimtekPdf getPdfById(UUID pdfId) {
+        return bimtekPdfRepository.findById(pdfId)
+                .orElseThrow(() -> new EntityNotFoundException("PDF tidak ditemukan dengan id: " + pdfId));
+    }
+
+    /**
+     * Menampilkan PDF Bimtek berdasarkan ID bimtek dan ID pdf
+     * 
+     * @param bimtekId ID dari Bimtek
+     * @param pdfId    ID dari PDF
+     * @return byte array berisi data PDF
+     * @throws EntityNotFoundException jika PDF tidak ditemukan atau tidak terkait
+     *                                 dengan Bimtek
+     */
+    @Transactional(readOnly = true)
+    public byte[] viewPdf(UUID bimtekId, UUID pdfId) {
+        // Ambil data PDF dari database
+        BimtekPdf pdf = bimtekPdfRepository.findById(pdfId)
+                .orElseThrow(() -> new EntityNotFoundException("PDF tidak ditemukan dengan id: " + pdfId));
+
+        // Validasi PDF tersebut memang milik bimtek yang dimaksud
+        if (!pdf.getBimtek().getId().equals(bimtekId)) {
+            throw new EntityNotFoundException("PDF tidak terkait dengan Bimtek yang dimaksud");
+        }
+
+        try {
+            // Ambil data file dari penyimpanan (Minio atau sistem file)
+            return minioBimtekService.getFileData(pdf.getNamaFile());
+        } catch (Exception e) {
+            log.error("Gagal mengambil data PDF: {}", e.getMessage(), e);
+            throw new RuntimeException("Gagal mengambil data PDF: " + e.getMessage(), e);
+        }
+    }
+
 }

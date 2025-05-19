@@ -212,4 +212,32 @@ public class BimtekController {
         return ResponseEntity.ok(bimtekService.deletePdfs(id, pdfIds));
     }
 
+    @GetMapping("/{bimtekId}/pdfs/{pdfId}/download")
+    @Operation(summary = "Download PDF Bimtek")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID bimtekId, @PathVariable UUID pdfId) {
+        try {
+            // Dapatkan data PDF dari service
+            byte[] pdfData = bimtekService.viewPdf(bimtekId, pdfId);
+
+            // Dapatkan informasi PDF untuk contentType
+            BimtekPdf pdf = bimtekService.getPdfById(pdfId);
+
+            // Validasi PDF tersebut milik bimtek yang dimaksud
+            if (!pdf.getBimtek().getId().equals(bimtekId)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Buat response dengan header Content-Type yang sesuai
+            // Gunakan "attachment" untuk menandakan browser harus mendownload file
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(pdf.getContentType()))
+                    .header("Content-Disposition", "attachment; filename=\"" + pdf.getNamaAsli() + "\"")
+                    .body(pdfData);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
