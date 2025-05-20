@@ -57,8 +57,8 @@ public class Kegiatan {
     @Column(name = "detail_pemangku_kawasan")
     private String detailPemangkuKawasan;
 
-    @Column(name = "detail_pelaksanaan")
-    private String detailPelaksanaan;
+    @Column(name = "detail_pelaksana")
+    private String detailPelaksana;
 
     @Column(name = "kontrak_nomor")
     private String kontrakNomor;
@@ -69,8 +69,8 @@ public class Kegiatan {
     @Column(name = "kontrak_tipe")
     private String kontrakTipe;
 
-    @Column(name = "kontrak_pelaksanaan")
-    private String kontrakPelaksanaan;
+    @Column(name = "kontrak_pelaksana")
+    private String kontrakPelaksana;
 
     @Column(name = "kontrak_tanggal_kontrak")
     private LocalDate kontrakTanggalKontrak;
@@ -86,7 +86,11 @@ public class Kegiatan {
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanLokus> lokusList = new ArrayList<>();
+    private List<KegiatanLokus> kegiatanLokus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<KegiatanFungsiKawasan> fungsiKawasans = new ArrayList<>();
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -122,10 +126,10 @@ public class Kegiatan {
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanDokumentasiFoto> dokumentasiFotos = new ArrayList<>();
+    private List<KegiatanDokumentasiFoto> kegiatanDokumentasiFotos = new ArrayList<>();
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanDokumentasiVideo> dokumentasiVideos = new ArrayList<>();
+    private List<KegiatanDokumentasiVideo> kegiatanDokumentasiVideos = new ArrayList<>();
 
 }

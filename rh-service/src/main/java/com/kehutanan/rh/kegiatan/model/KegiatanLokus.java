@@ -1,11 +1,15 @@
 package com.kehutanan.rh.kegiatan.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -37,4 +41,8 @@ public class KegiatanLokus {
     @JoinColumn(name = "kegiatan_id", nullable = false)
     @JsonBackReference
     private Kegiatan kegiatan;
+
+    @OneToMany(mappedBy = "kegiatanLokus", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<KegiatanLokusShp> kegiatanLokusShps = new ArrayList<>();
 }
