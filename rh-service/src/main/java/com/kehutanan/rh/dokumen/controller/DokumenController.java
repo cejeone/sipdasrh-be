@@ -89,19 +89,6 @@ public class DokumenController {
         }
     }
 
-    // @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    // @Operation(summary = "Membuat dokumen baru dengan multiple file")
-    // public ResponseEntity<Dokumen> create(
-    // @RequestParam("files") List<MultipartFile> files,
-    // @RequestParam("tipe") String tipe,
-    // @RequestParam("namaDokumen") String namaDokumen,
-    // @RequestParam("status") String status,
-    // @RequestParam(value = "keterangan", required = false) String keterangan
-    // ) throws Exception {
-    // return ResponseEntity.ok(
-    // dokumenService.create(files, tipe, namaDokumen, status, keterangan)
-    // );
-    // }
 
     // Controller implementation
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
