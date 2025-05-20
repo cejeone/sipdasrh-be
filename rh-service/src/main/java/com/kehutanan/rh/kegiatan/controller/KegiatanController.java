@@ -50,13 +50,15 @@ public class KegiatanController {
     private final PagedResourcesAssembler<KegiatanDto> pagedResourcesAssembler;
 
     @GetMapping
-    @Operation(summary = "Mendapatkan semua kegiatan dengan pagination")
+    @Operation(summary = "Mendapatkan semua kegiatan dengan pagination dan filter")
     public ResponseEntity<PagedModel<EntityModel<KegiatanDto>>> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String programName,
+            @RequestParam(required = false) String namaKegiatan) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<KegiatanDto> kegiatanPage = kegiatanService.findAll(pageable);
+        Page<KegiatanDto> kegiatanPage = kegiatanService.findAll(pageable, programName, namaKegiatan);
         PagedModel<EntityModel<KegiatanDto>> pagedModel = pagedResourcesAssembler.toModel(kegiatanPage);
         return ResponseEntity.ok(pagedModel);
     }

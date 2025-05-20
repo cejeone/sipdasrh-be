@@ -10,6 +10,7 @@ import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisVideo;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface KegiatanRepository extends JpaRepository<Kegiatan, UUID> {
+public interface KegiatanRepository extends JpaRepository<Kegiatan, UUID> ,  JpaSpecificationExecutor<Kegiatan>{
     @Query("SELECT k FROM Kegiatan k WHERE k.id = :id")
     Optional<Kegiatan> findByIdAllChild(@Param("id") UUID id);
     

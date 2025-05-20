@@ -23,6 +23,8 @@ import com.kehutanan.rh.kegiatan.repository.KegiatanRancanganTeknisFotoRepositor
 import com.kehutanan.rh.kegiatan.repository.KegiatanRancanganTeknisPdfRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +33,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,12 +62,40 @@ public class KegiatanService {
     private final KegiatanDokumentasiFotoRepository kegiatanDokumentasiFotoRepository;
     private final KegiatanDokumentasiVideoRepository kegiatanDokumentasiVideoRepository;
 
-    public Page<KegiatanDto> findAll(Pageable pageable) {
-        Page<Kegiatan> kegiatanPage = kegiatanRepository.findAll(pageable);
+    public Page<KegiatanDto> findAll(Pageable pageable, String programName, String namaKegiatan) {
+        Specification<Kegiatan> spec = Specification.where(null);
+
+        // Add filter for programName if provided
+        if (programName != null && !programName.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                Join<Kegiatan, Program> programJoin = root.join("program", JoinType.LEFT);
+                return criteriaBuilder.like(
+                        criteriaBuilder.lower(programJoin.get("nama")),
+                        "%" + programName.toLowerCase() + "%");
+            });
+        }
+
+        // Add filter for namaKegiatan if provided
+        if (namaKegiatan != null && !namaKegiatan.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("namaKegiatan")),
+                    "%" + namaKegiatan.toLowerCase() + "%"));
+        }
+
+        // Execute the query with the specifications
+        Page<Kegiatan> kegiatanPage = kegiatanRepository.findAll(spec, pageable);
+
+        // Convert entities to DTOs
         List<KegiatanDto> dtoList = kegiatanPage.getContent().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+
         return new PageImpl<>(dtoList, pageable, kegiatanPage.getTotalElements());
+    }
+
+    // Keep the existing method for backward compatibility
+    public Page<KegiatanDto> findAll(Pageable pageable) {
+        return findAll(pageable, null, null);
     }
 
     public Kegiatan findById(UUID id) {
@@ -94,7 +125,7 @@ public class KegiatanService {
         dto.setDetailPola(kegiatan.getDetailPola());
         dto.setDetailTahunKegiatan(kegiatan.getDetailTahunKegiatan());
         dto.setDetailSumberAnggaran(kegiatan.getDetailSumberAnggaran());
-        dto.setDetailTotalBibit(kegiatan.getDetailTotalBibit());    
+        dto.setDetailTotalBibit(kegiatan.getDetailTotalBibit());
         dto.setDetailTotalLuasHa(kegiatan.getDetailTotalLuasHa());
         dto.setDetailPemangkuKawasan(kegiatan.getDetailPemangkuKawasan());
         dto.setDetailPelaksana(kegiatan.getDetailPelaksana());
@@ -737,7 +768,8 @@ public class KegiatanService {
         Kegiatan kegiatan = kegiatanRepository.findById(kegiatanId)
                 .orElseThrow(() -> new EntityNotFoundException("Kegiatan tidak ditemukan dengan id: " + kegiatanId));
 
-        List<KegiatanRancanganTeknisVideo> videosToDelete = kegiatanRancanganTeknisVideoRepository.findAllById(videoIds);
+        List<KegiatanRancanganTeknisVideo> videosToDelete = kegiatanRancanganTeknisVideoRepository
+                .findAllById(videoIds);
 
         for (KegiatanRancanganTeknisVideo video : videosToDelete) {
             if (video.getKegiatan().getId().equals(kegiatanId)) {
