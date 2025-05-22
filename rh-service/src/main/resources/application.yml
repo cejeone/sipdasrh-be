@@ -29,6 +29,23 @@ spring:
       max-file-size: -1
       max-request-size: -1
 
+  # Redis Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600  # Cache TTL in seconds (1 hour)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+      # password: yourpassword  # Uncomment and set if using password
+
+      
+
+      # Cache Configuration
+      # Additional cache properties as needed
+
 server:
   port: 8081
 

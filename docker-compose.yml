@@ -14,16 +14,34 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   rh-service:
-    build: 
+    build:
       context: ./rh-service
       dockerfile: Dockerfile
     container_name: rh-service
     depends_on:
       - postgres
+      - redis
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kehutanan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      # Redis configuration
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      # Default Cache TTL setting (in seconds)
+      SPRING_CACHE_REDIS_TIME_TO_LIVE: 3600
+      # Custom TTL settings for specific cache names (in seconds)
+      # 60 minutes (3600 seconds)
+      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_60MIN_TIME_TO_LIVE: 3600
+      # 30 minutes (1800 seconds)
+      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_30MIN_TIME_TO_LIVE: 1800
+      # 15 minutes (900 seconds)
+      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_15MIN_TIME_TO_LIVE: 900
+      # 5 minutes (300 seconds)
+      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_5MIN_TIME_TO_LIVE: 300
+      # 1 minute (60 seconds)
+      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_1MIN_TIME_TO_LIVE: 60
+
     ports:
       - "8081:8081"
 
@@ -39,6 +57,21 @@ services:
       - minio_data:/data
     command: server --console-address ":9001" /data
 
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+
 volumes:
   postgres_data:
   minio_data:
+  redis_data:
