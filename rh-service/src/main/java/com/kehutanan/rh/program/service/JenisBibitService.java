@@ -7,21 +7,61 @@ import com.kehutanan.rh.program.repository.ProgramRepository;
 import com.kehutanan.rh.program.dto.JenisBibitDto;
 
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedModel;
+
 @Service
 @RequiredArgsConstructor
 public class JenisBibitService {
-    
+
     private final JenisBibitRepository jenisBibitRepository;
     private final ProgramRepository programRepository;
 
-    public List<JenisBibit> findAll() {
-        return jenisBibitRepository.findAll();
+    public PagedModel<EntityModel<JenisBibit>> findAll(String programId, String search, Pageable pageable,
+            PagedResourcesAssembler<JenisBibit> assembler) {
+
+        Page<JenisBibit> page;
+
+        // Create base specification
+        Specification<JenisBibit> spec = Specification.where(null);
+
+        // Add program ID filter if provided
+        if (programId != null && !programId.isEmpty()) {
+            try {
+                UUID programUuid = UUID.fromString(programId);
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("program").get("id"),
+                        programUuid));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid UUID format
+                throw new IllegalArgumentException("Invalid Program ID format");
+            }
+        }
+
+        // Add search filter if provided
+        if (search != null && !search.isEmpty()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("namaBibit")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("keterangan")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("kategori")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("sumberBibit")), searchPattern)));
+        }
+
+        // Execute the query with all applicable filters
+        page = jenisBibitRepository.findAll(spec, pageable);
+
+        return assembler.toModel(page);
     }
 
     public List<JenisBibit> findByProgramId(UUID programId) {
@@ -30,13 +70,13 @@ public class JenisBibitService {
 
     public JenisBibit findById(UUID id) {
         return jenisBibitRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Jenis Bibit not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Jenis Bibit not found with id: " + id));
     }
 
     @Transactional
     public JenisBibit create(JenisBibitDto dto) {
         Program program = programRepository.findById(dto.getProgramId())
-            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
+                .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         JenisBibit jenisBibit = new JenisBibit();
         jenisBibit.setKategori(dto.getKategori());
@@ -54,7 +94,7 @@ public class JenisBibitService {
     public JenisBibit update(UUID id, JenisBibitDto dto) {
         JenisBibit existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
-            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
+                .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         existing.setKategori(dto.getKategori());
         existing.setNamaBibit(dto.getNamaBibit());

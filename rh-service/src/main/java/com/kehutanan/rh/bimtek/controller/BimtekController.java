@@ -1,5 +1,6 @@
 package com.kehutanan.rh.bimtek.controller;
 
+import com.kehutanan.rh.bimtek.dto.BimtekDto;
 import com.kehutanan.rh.bimtek.model.Bimtek;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
 import com.kehutanan.rh.bimtek.model.BimtekPdf;
@@ -73,16 +74,16 @@ public class BimtekController {
 
     @PostMapping
     @Operation(summary = "Membuat data bimtek baru")
-    public ResponseEntity<Bimtek> create(@Valid @RequestBody Bimtek bimtek) {
-        return ResponseEntity.ok(bimtekService.create(bimtek));
+    public ResponseEntity<Bimtek> create(@Valid @RequestBody BimtekDto bimtekDto) {
+        return ResponseEntity.ok(bimtekService.create(bimtekDto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Memperbarui data bimtek")
     public ResponseEntity<Bimtek> update(
             @PathVariable UUID id,
-            @Valid @RequestBody Bimtek bimtek) {
-        return ResponseEntity.ok(bimtekService.update(id, bimtek));
+            @Valid @RequestBody BimtekDto bimtekDto) {
+        return ResponseEntity.ok(bimtekService.update(id, bimtekDto));
     }
 
     @DeleteMapping("/{id}")

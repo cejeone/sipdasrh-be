@@ -47,12 +47,13 @@ public class KegiatanPemeliharaanPemupukanController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the kegiatan pemeliharaan pemupukan", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = PagedModel.class)))
     })
     public ResponseEntity<PagedModel<EntityModel<KegiatanPemeliharaanPemupukan>>> getAll(
+        @Parameter(description = "Id Kegiatan") @RequestParam String KegiatanId,
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Search term for jenis or keterangan") @RequestParam(required = false) String search) {
 
         Pageable pageable = PageRequest.of(page, size);
-        PagedModel<EntityModel<KegiatanPemeliharaanPemupukan>> pagedModel = kegiatanPemeliharaanPemupukanService.findAll(search,
+        PagedModel<EntityModel<KegiatanPemeliharaanPemupukan>> pagedModel = kegiatanPemeliharaanPemupukanService.findAll(KegiatanId, search,
                 pageable, pagedResourcesAssembler);
 
         return ResponseEntity.ok(pagedModel);

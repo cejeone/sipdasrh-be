@@ -33,37 +33,40 @@ public class KegiatanFungsiKawasanService {
     /**
      * Find all kegiatan fungsi kawasan with optional search filtering
      * 
-     * @param search search term for filtering
-     * @param pageable pagination information
+     * @param search    search term for filtering
+     * @param pageable  pagination information
      * @param assembler resource assembler for HATEOAS
      * @return PagedModel with kegiatan fungsi kawasan data
      */
-    public PagedModel<EntityModel<KegiatanFungsiKawasan>> findAll(
-            String search, 
-            Pageable pageable,
-            PagedResourcesAssembler<KegiatanFungsiKawasan> assembler) {
-        
-        Page<KegiatanFungsiKawasan> page;
-        
-        if (search != null && !search.isEmpty()) {
-            // Create specification for searching in fungsiKawasan and keterangan fields
-            Specification<KegiatanFungsiKawasan> spec = (root, query, criteriaBuilder) -> {
-                List<Predicate> predicates = new ArrayList<>();
-                
-                String searchPattern = "%" + search.toLowerCase() + "%";
-                predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fungsiKawasan")), searchPattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("keterangan")), searchPattern)
-                ));
-                
-                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-            };
-            
-            page = kegiatanFungsiKawasanRepository.findAll(spec, pageable);
-        } else {
-            page = kegiatanFungsiKawasanRepository.findAll(pageable);
+    public PagedModel<EntityModel<KegiatanFungsiKawasan>> findAll(String kegiatanId, String search,
+            Pageable pageable, PagedResourcesAssembler<KegiatanFungsiKawasan> assembler) {
+
+        // Create base specification
+        Specification<KegiatanFungsiKawasan> spec = Specification.where(null);
+
+        // Add kegiatan ID filter if provided
+        if (kegiatanId != null && !kegiatanId.isEmpty()) {
+            try {
+                UUID kegiatanUuid = UUID.fromString(kegiatanId);
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("kegiatan").get("id"),
+                        kegiatanUuid));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid UUID format
+                throw new IllegalArgumentException("Invalid Kegiatan ID format");
+            }
         }
-        
+
+        // Add search filter if provided
+        if (search != null && !search.isEmpty()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fungsiKawasan")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("keterangan")), searchPattern)));
+        }
+
+        // Execute the query with all applicable filters
+        Page<KegiatanFungsiKawasan> page = kegiatanFungsiKawasanRepository.findAll(spec, pageable);
+
         return assembler.toModel(page);
     }
 
@@ -86,21 +89,22 @@ public class KegiatanFungsiKawasanService {
      * @return the created kegiatan fungsi kawasan
      */
     public KegiatanFungsiKawasan create(KegiatanFungsiKawasan kegiatanFungsiKawasan) {
-        
+
         return kegiatanFungsiKawasanRepository.save(kegiatanFungsiKawasan);
     }
 
     /**
      * Update an existing kegiatan fungsi kawasan
      * 
-     * @param id the ID of the kegiatan fungsi kawasan to update
+     * @param id                           the ID of the kegiatan fungsi kawasan to
+     *                                     update
      * @param updatedKegiatanFungsiKawasan the updated kegiatan fungsi kawasan data
      * @return the updated kegiatan fungsi kawasan
      * @throws EntityNotFoundException if kegiatan fungsi kawasan is not found
      */
     public KegiatanFungsiKawasan update(UUID id, KegiatanFungsiKawasanDto kegiatanFungsiKawasanDto) {
         KegiatanFungsiKawasan existing = findById(id);
-        
+
         // Update fields from the updatedKegiatanFungsiKawasan
         existing.setFungsiKawasan(kegiatanFungsiKawasanDto.getFungsiKawasan());
         existing.setTargetLuasHa(kegiatanFungsiKawasanDto.getTargetLuasHa());
@@ -110,7 +114,7 @@ public class KegiatanFungsiKawasanService {
         existing.setStatus(kegiatanFungsiKawasanDto.getStatus());
 
         // Update any other fields as needed
-        
+
         return kegiatanFungsiKawasanRepository.save(existing);
     }
 
@@ -124,7 +128,7 @@ public class KegiatanFungsiKawasanService {
         if (!kegiatanFungsiKawasanRepository.existsById(id)) {
             throw new EntityNotFoundException("KegiatanFungsiKawasan not found with ID: " + id);
         }
-        
+
         kegiatanFungsiKawasanRepository.deleteById(id);
     }
 }

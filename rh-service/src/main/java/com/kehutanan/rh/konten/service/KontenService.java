@@ -3,6 +3,7 @@ package com.kehutanan.rh.konten.service;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
 import com.kehutanan.rh.generic.GenericFileService;
 import com.kehutanan.rh.generic.MinioGenericService;
+import com.kehutanan.rh.konten.dto.KontenDto;
 import com.kehutanan.rh.konten.model.Konten;
 import com.kehutanan.rh.konten.model.KontenGambar;
 import com.kehutanan.rh.konten.model.KontenGambarUtama;
@@ -50,25 +51,31 @@ public class KontenService {
     }
 
     @Transactional
-    public Konten create(Konten konten) {
-        // Set default status jika belum diset
-        if (konten.getStatus() == null || konten.getStatus().isEmpty()) {
-            konten.setStatus("DRAFT");
-        }
+    public Konten create(KontenDto kontenDto) {
+        Konten konten = new Konten();
+        konten.setTipe(kontenDto.getTipe());
+        konten.setJudul(kontenDto.getJudul());
+        konten.setKonten(kontenDto.getKonten());
+        konten.setKataKunci(kontenDto.getKataKunci());
+        konten.setWaktuAwalTayang(kontenDto.getWaktuAwalTayang());
+        konten.setWaktuAkhirTayang(kontenDto.getWaktuAkhirTayang());
+        konten.setStatus(kontenDto.getStatus());
+        
         return kontenRepository.save(konten);
     }
 
     @Transactional
-    public Konten update(UUID id, Konten konten) {
-        Konten existing = findById(id);
+    public Konten update(UUID id, KontenDto kontenDto) {
+        Konten existing = kontenRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Konten tidak ditemukan dengan id: " + id));
 
-        existing.setTipe(konten.getTipe());
-        existing.setJudul(konten.getJudul());
-        existing.setKonten(konten.getKonten());
-        existing.setKataKunci(konten.getKataKunci());
-        existing.setWaktuAwalTayang(konten.getWaktuAwalTayang());
-        existing.setWaktuAkhirTayang(konten.getWaktuAkhirTayang());
-        existing.setStatus(konten.getStatus());
+        existing.setTipe(kontenDto.getTipe());
+        existing.setJudul(kontenDto.getJudul());
+        existing.setKonten(kontenDto.getKonten());
+        existing.setKataKunci(kontenDto.getKataKunci());
+        existing.setWaktuAwalTayang(kontenDto.getWaktuAwalTayang());
+        existing.setWaktuAkhirTayang(kontenDto.getWaktuAkhirTayang());
+        existing.setStatus(kontenDto.getStatus());
 
         return kontenRepository.save(existing);
     }
@@ -76,7 +83,6 @@ public class KontenService {
     @Transactional
     public void delete(UUID id) {
         Konten konten = findById(id);
-
         kontenRepository.deleteById(id);
     }
 

@@ -4,10 +4,17 @@ import com.kehutanan.rh.program.model.SkemaTanam;
 import com.kehutanan.rh.program.service.SkemaTanamService;
 import com.kehutanan.rh.program.dto.SkemaTanamDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,10 +26,22 @@ public class SkemaTanamController {
     
     private final SkemaTanamService skemaTanamService;
 
+    @Autowired
+    private PagedResourcesAssembler<SkemaTanam> pagedResourcesAssembler;
+
     @GetMapping
-    @Operation(summary = "Get all skema tanam")
-    public ResponseEntity<List<SkemaTanam>> findAll() {
-        return ResponseEntity.ok(skemaTanamService.findAll());
+    @Operation(summary = "Get all skema tanam with pagination")
+    public ResponseEntity<PagedModel<EntityModel<SkemaTanam>>> findAll(
+            @Parameter(description = "Id Program") @RequestParam(required = false) String programId,
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Filter by nama skema") @RequestParam(required = false) String search) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        PagedModel<EntityModel<SkemaTanam>> pagedModel = skemaTanamService.findAll(programId, search,
+                pageable, pagedResourcesAssembler);
+
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")

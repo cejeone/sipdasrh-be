@@ -1,12 +1,15 @@
 package com.kehutanan.rh.serahterima.service;
 
+import com.kehutanan.rh.serahterima.dto.SerahTerimaDto;
 import com.kehutanan.rh.serahterima.model.SerahTerima;
 import com.kehutanan.rh.serahterima.repository.SerahTerimaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +28,18 @@ public class SerahTerimaService {
         return serahTerimaRepository.findById(id);
     }
 
-    public SerahTerima save(SerahTerima serahTerima) {
+    public SerahTerima save(SerahTerimaDto serahTerimaDto) {
+        SerahTerima serahTerima = new SerahTerima();
+
+        serahTerima.setProgram(serahTerimaDto.getProgram());
+        serahTerima.setBpdas(serahTerimaDto.getBpdas());
+        serahTerima.setProvinsi(serahTerimaDto.getProvinsi());
+        serahTerima.setFungsiKawasan(serahTerimaDto.getFungsiKawasan());
+        serahTerima.setRealisasiLuas(serahTerimaDto.getRealisasiLuas());
+        serahTerima.setStatus(serahTerimaDto.getStatus());
+        serahTerima.setKeterangan(serahTerimaDto.getKeterangan());
+
+        
         return serahTerimaRepository.save(serahTerima);
     }
 
@@ -39,5 +53,19 @@ public class SerahTerimaService {
                 "%" + program.toLowerCase() + "%");
 
         return serahTerimaRepository.findAll(spec, pageable);
+    }
+
+    public SerahTerima update(UUID id, SerahTerimaDto serahTerimaDto) {
+        SerahTerima serahTerima = serahTerimaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Serah Terima not found with id " + id));
+        serahTerima.setProgram(serahTerimaDto.getProgram());
+        serahTerima.setBpdas(serahTerimaDto.getBpdas());
+        serahTerima.setProvinsi(serahTerimaDto.getProvinsi());
+        serahTerima.setFungsiKawasan(serahTerimaDto.getFungsiKawasan());
+        serahTerima.setRealisasiLuas(serahTerimaDto.getRealisasiLuas());
+        serahTerima.setStatus(serahTerimaDto.getStatus());
+        serahTerima.setKeterangan(serahTerimaDto.getKeterangan());
+
+        return serahTerimaRepository.save(serahTerima);
     }
 }

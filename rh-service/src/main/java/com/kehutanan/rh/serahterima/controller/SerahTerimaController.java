@@ -2,6 +2,7 @@ package com.kehutanan.rh.serahterima.controller;
 
 import com.kehutanan.rh.monev.model.Monev;
 import com.kehutanan.rh.monev.service.MonevService;
+import com.kehutanan.rh.serahterima.dto.SerahTerimaDto;
 import com.kehutanan.rh.serahterima.model.SerahTerima;
 import com.kehutanan.rh.serahterima.service.SerahTerimaService;
 
@@ -66,19 +67,15 @@ public class SerahTerimaController {
 
     @PostMapping
     @Operation(summary = "Membuat data SerahTerima baru")
-    public SerahTerima createSerahTerima(@RequestBody SerahTerima serahTerima) {
-        return serahTerimaService.save(serahTerima);
+    public SerahTerima createSerahTerima(@RequestBody SerahTerimaDto serahTerimaDto) {
+        return serahTerimaService.save(serahTerimaDto);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mengupdate data SerahTerima berdasarkan ID")
-    public ResponseEntity<SerahTerima> updateSerahTerima(@PathVariable UUID id, @RequestBody SerahTerima serahTerima) {
-        return serahTerimaService.findById(id)
-                .map(existingSerahTerima -> {
-                    serahTerima.setId(id);
-                    return ResponseEntity.ok(serahTerimaService.save(serahTerima));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<SerahTerima> updateSerahTerima(@PathVariable UUID id, @RequestBody SerahTerimaDto serahTerimaDto) {
+        SerahTerima updatedSerahTerima = serahTerimaService.update(id,serahTerimaDto);
+        return ResponseEntity.ok(updatedSerahTerima);
     }
 
     @DeleteMapping("/{id}")

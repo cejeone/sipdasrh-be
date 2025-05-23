@@ -5,7 +5,6 @@ import java.util.UUID;
 
 @Data
 public class JenisBibitDto {
-    private UUID id;
     private String kategori;
     private String namaBibit;
     private String sumberBibit;

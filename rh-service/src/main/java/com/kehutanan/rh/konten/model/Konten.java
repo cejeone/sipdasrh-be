@@ -41,10 +41,6 @@ public class Konten {
     @Column(name = "waktu_akhir_tayang", nullable = false)
     private LocalDateTime waktuAkhirTayang;
 
-    @Column(name = "gambar_utama")
-    private String gambarUtama;
-
-
     @Column(name = "status", nullable = false)
     private String status;
 

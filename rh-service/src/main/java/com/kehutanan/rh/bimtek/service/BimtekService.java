@@ -1,5 +1,6 @@
 package com.kehutanan.rh.bimtek.service;
 
+import com.kehutanan.rh.bimtek.dto.BimtekDto;
 import com.kehutanan.rh.bimtek.model.Bimtek;
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
 import com.kehutanan.rh.bimtek.model.BimtekPdf;
@@ -80,23 +81,34 @@ public class BimtekService {
     }
 
     @Transactional
-    public Bimtek create(Bimtek bimtek) {
+    public Bimtek create(BimtekDto bimtekDto) {
+        Bimtek bimtek = new Bimtek();
+        bimtek.setNamaBimtek(bimtekDto.getNamaBimtek());
+        bimtek.setSubjek(bimtekDto.getSubjek());
+        bimtek.setProgram(bimtekDto.getProgram());
+        bimtek.setBpdas(bimtekDto.getBpdas());
+        bimtek.setTempat(bimtekDto.getTempat());
+        bimtek.setTanggal(bimtekDto.getTanggal());
+        bimtek.setAudience(bimtekDto.getAudience());
+        bimtek.setEvaluasi(bimtekDto.getEvaluasi());
+        bimtek.setKeterangan(bimtekDto.getKeterangan());
+
         return bimtekRepository.save(bimtek);
     }
 
     @Transactional
-    public Bimtek update(UUID id, Bimtek bimtek) {
+    public Bimtek update(UUID id, BimtekDto bimtekDto) {
         Bimtek existing = findById(id);
 
-        existing.setNamaBimtek(bimtek.getNamaBimtek());
-        existing.setSubjek(bimtek.getSubjek());
-        existing.setProgram(bimtek.getProgram());
-        existing.setBpdas(bimtek.getBpdas());
-        existing.setTempat(bimtek.getTempat());
-        existing.setTanggal(bimtek.getTanggal());
-        existing.setAudience(bimtek.getAudience());
-        existing.setEvaluasi(bimtek.getEvaluasi());
-        existing.setKeterangan(bimtek.getKeterangan());
+        existing.setNamaBimtek(bimtekDto.getNamaBimtek());
+        existing.setSubjek(bimtekDto.getSubjek());
+        existing.setProgram(bimtekDto.getProgram());
+        existing.setBpdas(bimtekDto.getBpdas());
+        existing.setTempat(bimtekDto.getTempat());
+        existing.setTanggal(bimtekDto.getTanggal());
+        existing.setAudience(bimtekDto.getAudience());
+        existing.setEvaluasi(bimtekDto.getEvaluasi());
+        existing.setKeterangan(bimtekDto.getKeterangan());
 
         return bimtekRepository.save(existing);
     }

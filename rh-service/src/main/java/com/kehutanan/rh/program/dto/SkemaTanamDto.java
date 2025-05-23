@@ -5,7 +5,6 @@ import java.util.UUID;
 
 @Data
 public class SkemaTanamDto {
-    private UUID id;
     private String pola;
     private Integer jumlahBtgHa;
     private Integer targetLuas;

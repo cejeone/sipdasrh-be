@@ -44,22 +44,23 @@ public class KegiatanFungsiKawasanController {
         this.kegiatanRepository = kegiatanRepository;
     }
 
-    @GetMapping
-    @Operation(summary = "Get all kegiatan fungsi kawasan", description = "Returns all kegiatan fungsi kawasan with pagination")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the kegiatan fungsi kawasan", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = PagedModel.class)))
-    })
-    public ResponseEntity<PagedModel<EntityModel<KegiatanFungsiKawasan>>> getAll(
-            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Search term for fungsiKawasan or keterangan") @RequestParam(required = false) String search) {
+@GetMapping
+@Operation(summary = "Get all kegiatan fungsi kawasan", description = "Returns all kegiatan fungsi kawasan with pagination")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the kegiatan fungsi kawasan", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = PagedModel.class)))
+})
+public ResponseEntity<PagedModel<EntityModel<KegiatanFungsiKawasan>>> getAll(
+        @Parameter(description = "Id Kegiatan") @RequestParam(required = false) String KegiatanId,
+        @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+        @Parameter(description = "Search term for fungsiKawasan or keterangan") @RequestParam(required = false) String search) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        PagedModel<EntityModel<KegiatanFungsiKawasan>> pagedModel = kegiatanFungsiKawasanService.findAll(search,
-                pageable, pagedResourcesAssembler);
+    Pageable pageable = PageRequest.of(page, size);
+    PagedModel<EntityModel<KegiatanFungsiKawasan>> pagedModel = kegiatanFungsiKawasanService.findAll(KegiatanId, search,
+            pageable, pagedResourcesAssembler);
 
-        return ResponseEntity.ok(pagedModel);
-    }
+    return ResponseEntity.ok(pagedModel);
+}
 
     @GetMapping("/{id}")
     @Operation(summary = "Find kegiatan fungsi kawasan by ID", description = "Returns a single kegiatan fungsi kawasan by its ID")

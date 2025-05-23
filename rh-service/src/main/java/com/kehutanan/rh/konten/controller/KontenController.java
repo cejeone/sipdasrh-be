@@ -1,6 +1,7 @@
 package com.kehutanan.rh.konten.controller;
 
 import com.kehutanan.rh.bimtek.model.BimtekFoto;
+import com.kehutanan.rh.konten.dto.KontenDto;
 import com.kehutanan.rh.konten.model.Konten;
 import com.kehutanan.rh.konten.model.KontenGambar;
 import com.kehutanan.rh.konten.model.KontenGambarUtama;
@@ -67,16 +68,16 @@ public class KontenController {
 
     @PostMapping
     @Operation(summary = "Membuat data konten baru")
-    public ResponseEntity<Konten> create(@Valid @RequestBody Konten konten) {
-        return ResponseEntity.ok(kontenService.create(konten));
+    public ResponseEntity<Konten> create(@Valid @RequestBody KontenDto kontenDto) {
+        return ResponseEntity.ok(kontenService.create(kontenDto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Memperbarui data konten")
     public ResponseEntity<Konten> update(
             @PathVariable UUID id,
-            @Valid @RequestBody Konten konten) {
-        return ResponseEntity.ok(kontenService.update(id, konten));
+            @Valid @RequestBody KontenDto kontenDto) {
+        return ResponseEntity.ok(kontenService.update(id, kontenDto));
     }
 
     @DeleteMapping("/{id}")
