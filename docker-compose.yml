@@ -44,22 +44,35 @@ services:
       SPRING_REDIS_PORT: 6379
       # Default Cache TTL setting (in seconds)
       SPRING_CACHE_REDIS_TIME_TO_LIVE: 3600
-      # Custom TTL settings for specific cache names (in seconds)
-      # 60 minutes (3600 seconds)
-      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_60MIN_TIME_TO_LIVE: 3600
-      # 30 minutes (1800 seconds)
-      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_30MIN_TIME_TO_LIVE: 1800
-      # 15 minutes (900 seconds)
-      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_15MIN_TIME_TO_LIVE: 900
-      # 5 minutes (300 seconds)
-      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_5MIN_TIME_TO_LIVE: 300
-      # 1 minute (60 seconds)
-      SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_1MIN_TIME_TO_LIVE: 60
       # Minio configuration
       MINIO_ENDPOINT: http://minio:9000
 
     ports:
       - "8081:8081"
+
+  pepdas-service:
+    build:
+      context: ./pepdas-service
+      dockerfile: Dockerfile
+    container_name: pepdas-service
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kehutanan
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      # Redis configuration
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      # Default Cache TTL setting (in seconds)
+      SPRING_CACHE_REDIS_TIME_TO_LIVE: 3600
+      # Minio configuration
+      MINIO_ENDPOINT: http://minio:9000
+
+    ports:
+      - "8082:8081"
 
 
   redis:
