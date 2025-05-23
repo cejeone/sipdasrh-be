@@ -7,6 +7,7 @@ import com.kehutanan.rh.konten.model.Konten;
 import com.kehutanan.rh.konten.model.KontenGambar;
 import com.kehutanan.rh.konten.model.KontenGambarUtama;
 import com.kehutanan.rh.konten.repository.KontenRepository;
+import com.kehutanan.rh.util.FileValidationUtil;
 import com.kehutanan.rh.konten.repository.KontenGambarRepository;
 import com.kehutanan.rh.konten.repository.KontenGambarUtamaRepository;
 
@@ -33,6 +34,7 @@ import java.util.UUID;
 public class KontenService {
 
     private final MinioKontenService minioKontenService;
+    private final FileValidationUtil fileValidationUtil;
 
     private final KontenRepository kontenRepository;
     private final KontenGambarRepository kontenGambarRepository;
@@ -86,6 +88,9 @@ public class KontenService {
         List<KontenGambar> uploadedGambars = new ArrayList<>();
 
         for (MultipartFile file : files) {
+
+            fileValidationUtil.validateFileType(file, "image");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKontenService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -128,6 +133,8 @@ public class KontenService {
         List<KontenGambarUtama> uploadedGambars = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "image");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKontenService.uploadFile(fileName, file.getInputStream(), file.getContentType());

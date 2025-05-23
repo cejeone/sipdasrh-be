@@ -26,8 +26,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      max-file-size: -1
-      max-request-size: -1
+      max-file-size: 600MB
+      max-request-size: 600MB
 
   # Redis Configuration
   cache:
@@ -60,3 +60,11 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket: rhkehutanan
+
+# Konfigurasi custom untuk validasi ukuran file
+file:
+  upload:
+    max-size:
+      pdf: 100  # dalam MB
+      image: 50  # dalam MB
+      video: 500 # dalam MB

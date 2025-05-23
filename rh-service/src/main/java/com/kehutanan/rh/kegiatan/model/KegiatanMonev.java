@@ -1,6 +1,7 @@
 package com.kehutanan.rh.kegiatan.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class KegiatanMonev {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kegiatan_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Kegiatan kegiatan;
 
     @OneToMany(mappedBy = "kegiatanMonev", cascade = CascadeType.ALL, orphanRemoval = true)

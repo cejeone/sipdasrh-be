@@ -1,5 +1,6 @@
 package com.kehutanan.rh.dokumen.service;
 
+import com.kehutanan.rh.dokumen.dto.DokumenDto;
 import com.kehutanan.rh.dokumen.model.Dokumen;
 import com.kehutanan.rh.dokumen.model.DokumenFile;
 import com.kehutanan.rh.dokumen.repository.DokumenRepository;
@@ -47,45 +48,28 @@ public class DokumenService {
     }
 
     @Transactional
-    public Dokumen create(List<MultipartFile> files, String tipe, String namaDokumen,
-            String status, String keterangan) throws Exception {
+    public Dokumen create(DokumenDto dokumenDto) throws Exception {
 
         Dokumen dokumen = new Dokumen();
-        dokumen.setTipe(tipe);
-        dokumen.setNamaDokumen(namaDokumen);
-        dokumen.setStatus(status);
-        dokumen.setKeterangan(keterangan);
+        dokumen.setTipe(dokumenDto.getTipe());
+        dokumen.setNamaDokumen(dokumenDto.getNamaDokumen());
+        dokumen.setStatus(dokumenDto.getStatus());
+        dokumen.setKeterangan(dokumenDto.getKeterangan());
         dokumen.setUploadedAt(LocalDateTime.now());
-
-        for (MultipartFile file : files) {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-            minioService.uploadFile(fileName, file.getInputStream(), file.getContentType());
-
-            DokumenFile dokumenFile = new DokumenFile();
-            dokumenFile.setDokumen(dokumen);
-            dokumenFile.setNamaFile(fileName);
-            dokumenFile.setNamaAsli(file.getOriginalFilename());
-            dokumenFile.setUkuranMb((double) file.getSize() / (1024 * 1024));
-            dokumenFile.setContentType(file.getContentType());
-            dokumenFile.setUploadedAt(LocalDateTime.now());
-
-            dokumen.getFiles().add(dokumenFile);
-        }
 
         return dokumenRepository.save(dokumen);
     }
 
     @Transactional
-    public Dokumen update(UUID id, String tipe, String namaDokumen, String status, String keterangan) throws Exception {
+    public Dokumen update(UUID id,DokumenDto dokumenDto) throws Exception {
 
         Dokumen dokumen = findById(id);
 
         // Update metadata
-        dokumen.setTipe(tipe);
-        dokumen.setNamaDokumen(namaDokumen);
-        dokumen.setStatus(status);
-        dokumen.setKeterangan(keterangan);
+        dokumen.setTipe(dokumenDto.getTipe());
+        dokumen.setNamaDokumen(dokumenDto.getNamaDokumen());
+        dokumen.setStatus(dokumenDto.getStatus());
+        dokumen.setKeterangan(dokumenDto.getKeterangan());
 
         return dokumenRepository.save(dokumen);
     }
@@ -93,12 +77,6 @@ public class DokumenService {
     @Transactional
     public void delete(UUID id) throws Exception {
         Dokumen dokumen = findById(id);
-
-        // Delete all files from MinIO
-        for (DokumenFile file : dokumen.getFiles()) {
-            minioService.deleteFile(file.getNamaFile());
-        }
-
         dokumenRepository.delete(dokumen);
     }
 

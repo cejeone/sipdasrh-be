@@ -1,5 +1,6 @@
 package com.kehutanan.rh.kegiatan.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kehutanan.rh.program.model.Program;
 import jakarta.persistence.*;
@@ -27,7 +28,7 @@ public class Kegiatan {
     private String subDirektorat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", nullable = false)
+    @JoinColumn(name = "program_id")
     private Program program;
 
     @Column(name = "jenis_kegiatan", nullable = false)

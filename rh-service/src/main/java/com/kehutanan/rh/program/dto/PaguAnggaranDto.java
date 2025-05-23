@@ -6,7 +6,6 @@ import java.util.UUID;
 
 @Data
 public class PaguAnggaranDto {
-    private UUID id;
     private String sumberAnggaran;
     private Integer tahunAnggaran;
     private BigDecimal pagu;

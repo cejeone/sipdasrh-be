@@ -14,7 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class KegiatanDto {
     
-    private UUID id;
     private String subDirektorat;
     private UUID programId;
     private String programName; // For display purposes
@@ -37,3 +36,5 @@ public class KegiatanDto {
     private String dokumentasiCatatanFoto;
     private String dokumentasiCatatanVideo;
 }
+
+

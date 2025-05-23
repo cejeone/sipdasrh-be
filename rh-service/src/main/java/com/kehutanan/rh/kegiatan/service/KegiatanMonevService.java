@@ -7,6 +7,7 @@ import com.kehutanan.rh.kegiatan.model.KegiatanMonevPdf;
 import com.kehutanan.rh.kegiatan.repository.KegiatanMonevPdfRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanMonevRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanRepository;
+import com.kehutanan.rh.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -37,13 +38,16 @@ public class KegiatanMonevService {
     private final KegiatanRepository kegiatanRepository;
     private final MinioKegiatanService minioKegiatanService;
     private final KegiatanMonevPdfRepository kegiatanMonevPdfRepository;
+    private final FileValidationUtil fileValidationUtil;
 
     public KegiatanMonevService(KegiatanMonevRepository kegiatanMonevRepository, KegiatanRepository kegiatanRepository,
-            MinioKegiatanService minioKegiatanService, KegiatanMonevPdfRepository kegiatanMonevPdfRepository) {
+            MinioKegiatanService minioKegiatanService, KegiatanMonevPdfRepository kegiatanMonevPdfRepository, 
+            FileValidationUtil fileValidationUtil) {
         this.kegiatanMonevPdfRepository = kegiatanMonevPdfRepository;
         this.kegiatanMonevRepository = kegiatanMonevRepository;
         this.kegiatanRepository = kegiatanRepository;
         this.minioKegiatanService = minioKegiatanService;
+        this.fileValidationUtil = fileValidationUtil;
     }
 
     /**
@@ -55,28 +59,36 @@ public class KegiatanMonevService {
      * @return PagedModel with kegiatan monev data
      */
     public PagedModel<EntityModel<KegiatanMonev>> findAll(
+            String parentId,
             String search,
             Pageable pageable,
             PagedResourcesAssembler<KegiatanMonev> assembler) {
 
         Page<KegiatanMonev> page;
 
-        if (search != null && !search.isEmpty()) {
-            // Create specification for searching in nomor and deskripsi fields
-            Specification<KegiatanMonev> spec = (root, query, criteriaBuilder) -> {
-                List<Predicate> predicates = new ArrayList<>();
+        // Create base specification
+        Specification<KegiatanMonev> spec = Specification.where(null);
 
-                String searchPattern = "%" + search.toLowerCase() + "%";
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("deskripsi")), searchPattern)));
-
-                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-            };
-
-            page = kegiatanMonevRepository.findAll(spec, pageable);
-        } else {
-            page = kegiatanMonevRepository.findAll(pageable);
+        // Add program ID filter if provided
+        if (parentId != null && !parentId.isEmpty()) {
+            try {
+                UUID programUuid = UUID.fromString(parentId);
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("kegiatan").get("id"),
+                        programUuid));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid UUID format
+                throw new IllegalArgumentException("Invalid Kegiatan ID format");
+            }
         }
+
+        // Add search filter if provided
+        if (search != null && !search.isEmpty()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("deskripsi")), searchPattern)));
+        }
+
+        page = kegiatanMonevRepository.findAll(spec, pageable);
 
         return assembler.toModel(page);
     }
@@ -99,8 +111,17 @@ public class KegiatanMonevService {
      * @param kegiatanMonev the kegiatan monev to create
      * @return the created kegiatan monev
      */
-    public KegiatanMonev create(KegiatanMonev kegiatanMonev) {
-        return kegiatanMonevRepository.save(kegiatanMonev);
+    public KegiatanMonev create(KegiatanMonevDto kegiatanMonevDto) {
+        KegiatanMonev newKegiatanMonev = new KegiatanMonev();
+        newKegiatanMonev.setNomor(kegiatanMonevDto.getNomor());
+        newKegiatanMonev.setTanggal(kegiatanMonevDto.getTanggal());
+        newKegiatanMonev.setDeskripsi(kegiatanMonevDto.getDeskripsi());
+        newKegiatanMonev.setStatus(kegiatanMonevDto.getStatus());
+        newKegiatanMonev.setKegiatan(kegiatanRepository.findById(kegiatanMonevDto.getKegiatanId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Kegiatan not found with ID: " + kegiatanMonevDto.getKegiatanId())));
+
+        return kegiatanMonevRepository.save(newKegiatanMonev);
     }
 
     /**
@@ -119,6 +140,9 @@ public class KegiatanMonevService {
         existing.setTanggal(kegiatanMonevDto.getTanggal());
         existing.setDeskripsi(kegiatanMonevDto.getDeskripsi());
         existing.setStatus(kegiatanMonevDto.getStatus());
+        existing.setKegiatan(kegiatanRepository.findById(kegiatanMonevDto.getKegiatanId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Kegiatan not found with ID: " + kegiatanMonevDto.getKegiatanId())));
 
         return kegiatanMonevRepository.save(existing);
     }
@@ -152,6 +176,8 @@ public class KegiatanMonevService {
         // Handle file upload logic here
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
+                fileValidationUtil.validateFileType(file, "pdf");
+                fileValidationUtil.validateFileSize(file);
                 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
                 minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -182,6 +208,8 @@ public class KegiatanMonevService {
         List<KegiatanMonevPdf> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "pdf");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());

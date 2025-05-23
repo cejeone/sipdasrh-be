@@ -8,6 +8,7 @@ import com.kehutanan.rh.bimtek.repository.BimtekFotoRepository;
 import com.kehutanan.rh.bimtek.repository.BimtekPdfRepository;
 import com.kehutanan.rh.bimtek.repository.BimtekRepository;
 import com.kehutanan.rh.bimtek.repository.BimtekVideoRepository;
+import com.kehutanan.rh.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class BimtekService {
     private final BimtekVideoRepository bimtekVideoRepository;
     private final MinioBimtekService minioBimtekService;
     private final BimtekPdfRepository bimtekPdfRepository;
+    private final FileValidationUtil fileValidationUtil;
 
     public Page<Bimtek> findAll(Pageable pageable) {
         return bimtekRepository.findAll(pageable);
@@ -142,6 +144,8 @@ public void delete(UUID id) {
         List<BimtekFoto> uploadedFotos = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "image");
+fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioBimtekService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -218,6 +222,8 @@ public void delete(UUID id) {
         List<BimtekVideo> uploadedVideos = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "video");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioBimtekService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -281,6 +287,8 @@ public void delete(UUID id) {
         List<BimtekPdf> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "pdf");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioBimtekService.uploadFile(fileName, file.getInputStream(), file.getContentType());

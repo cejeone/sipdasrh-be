@@ -93,37 +93,21 @@ public class DokumenController {
     // Controller implementation
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Membuat dokumen baru dengan multiple file")
-    public ResponseEntity<Dokumen> create(
-            @RequestPart("files") List<MultipartFile> files,
-            @RequestPart("tipe") String tipe,
-            @RequestPart("namaDokumen") String namaDokumen,
-            @RequestPart("status") String status,
-            @RequestPart(value = "keterangan", required = false) String keterangan) throws Exception {
+    public ResponseEntity<Dokumen> create(@Valid @RequestBody DokumenDto dokumenDto) throws Exception {
 
         return ResponseEntity.ok(
                 dokumenService.create(
-                        files,
-                        tipe,
-                        namaDokumen,
-                        status,
-                        keterangan));
+                        dokumenDto));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Memperbarui field di tabel Dokumen")
     public ResponseEntity<Dokumen> update(
             @PathVariable UUID id,
-            @RequestPart(value = "tipe", required = true) String tipe,
-            @RequestPart(value = "namaDokumen", required = true) String namaDokumen,
-            @RequestPart(value = "status", required = true) String status,
-            @RequestPart(value = "keterangan", required = false) String keterangan) throws Exception {
+            @Valid @RequestBody DokumenDto dokumenDto
+            ) throws Exception {
         return ResponseEntity.ok(
-                dokumenService.update(
-                        id,
-                        tipe,
-                        namaDokumen,
-                        status,
-                        keterangan));
+                dokumenService.update(id,dokumenDto));
     }
 
     @DeleteMapping("/{id}")

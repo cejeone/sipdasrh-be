@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server --console-address ":9001" /data
+
   postgres:
     image: postgres:latest
     container_name: postgres_db
@@ -21,6 +34,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - minio
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kehutanan
       SPRING_DATASOURCE_USERNAME: postgres
@@ -41,21 +55,12 @@ services:
       SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_5MIN_TIME_TO_LIVE: 300
       # 1 minute (60 seconds)
       SPRING_CACHE_REDIS_CACHE_NAMES_CACHE_1MIN_TIME_TO_LIVE: 60
+      # Minio configuration
+      MINIO_ENDPOINT: http://minio:9000
 
     ports:
       - "8081:8081"
 
-  minio:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio_data:/data
-    command: server --console-address ":9001" /data
 
   redis:
     image: redis:latest

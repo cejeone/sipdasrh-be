@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,12 +53,13 @@ public class KegiatanMonevController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the kegiatan monev", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = PagedModel.class)))
     })
     public ResponseEntity<PagedModel<EntityModel<KegiatanMonev>>> getAll(
+             @Parameter(description = "Id Kegiatan") @RequestParam String KegiatanId,
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Mencari untuk deskripsi") @RequestParam(required = false) String search) {
 
         Pageable pageable = PageRequest.of(page, size);
-        PagedModel<EntityModel<KegiatanMonev>> pagedModel = kegiatanMonevService.findAll(search,
+        PagedModel<EntityModel<KegiatanMonev>> pagedModel = kegiatanMonevService.findAll(KegiatanId,search,
                 pageable, pagedResourcesAssembler);
 
         return ResponseEntity.ok(pagedModel);
@@ -76,32 +78,19 @@ public class KegiatanMonevController {
         return ResponseEntity.ok(kegiatanMonev);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @Operation(summary = "Create a new kegiatan monev", description = "Create a new kegiatan monitoring dan evaluasi with form data")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Kegiatan monev created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<KegiatanMonev> createWithFormData(
-            @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @RequestPart("nomor") String nomor,
-            @RequestPart("tanggal") String tanggal,  // Changed from LocalDate to String
-            @RequestPart("deskripsi") String deskripsi,
-            @RequestPart("status") String status,
-            @RequestPart("kegiatanId") String kegiatanId) throws Exception {  // Changed from UUID to String
+    public ResponseEntity<KegiatanMonev> create(
+            @Valid @RequestBody KegiatanMonevDto kegiatanMonevDto) throws Exception { // Changed from UUID to String
 
         // Parse the date and UUID manually to be more resilient
-        LocalDate parsedDate = LocalDate.parse(tanggal);
-        UUID parsedKegiatanId = UUID.fromString(kegiatanId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                kegiatanMonevService.create(
-                        files,
-                        nomor, 
-                        parsedDate, 
-                        deskripsi, 
-                        status, 
-                        parsedKegiatanId));
+                kegiatanMonevService.create(kegiatanMonevDto));
     }
 
     @PutMapping("/{id}")
@@ -132,54 +121,54 @@ public class KegiatanMonevController {
     }
 
     @PostMapping(value = "/{id}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-@Operation(summary = "Upload multiple PDFs for a Kegiatan Monev")
-public ResponseEntity<?> uploadPdfs(
-        @PathVariable UUID id,
-        @RequestPart("files") List<MultipartFile> files) {
-    try {
-        List<KegiatanMonevPdf> uploadedPdfs = kegiatanMonevService.uploadPdfs(id, files);
-        return ResponseEntity.ok(uploadedPdfs);
-    } catch (EntityNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Gagal mengupload PDF: " + e.getMessage());
-    }
-}
-
-@DeleteMapping("/{id}/pdfs")
-@Operation(summary = "Menghapus PDF-PDF tertentu dari Kegiatan Monev")
-public ResponseEntity<KegiatanMonev> deletePdfs(
-        @PathVariable UUID id,
-        @RequestBody List<UUID> pdfIds) throws Exception {
-    return ResponseEntity.ok(kegiatanMonevService.deletePdfs(id, pdfIds));
-}
-
-@GetMapping("/{monevId}/pdfs/{pdfId}/download")
-@Operation(summary = "Download PDF Kegiatan Monev")
-public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID monevId, @PathVariable UUID pdfId) {
-    try {
-        // Dapatkan data PDF dari service
-        byte[] pdfData = kegiatanMonevService.viewPdf(monevId, pdfId);
-
-        // Dapatkan informasi PDF untuk contentType
-        KegiatanMonevPdf pdf = kegiatanMonevService.getPdfById(pdfId);
-
-        // Validasi PDF tersebut milik kegiatan monev yang dimaksud
-        if (!pdf.getKegiatanMonev().getId().equals(monevId)) {
+    @Operation(summary = "Upload multiple PDFs for a Kegiatan Monev")
+    public ResponseEntity<?> uploadPdfs(
+            @PathVariable UUID id,
+            @RequestPart("files") List<MultipartFile> files) {
+        try {
+            List<KegiatanMonevPdf> uploadedPdfs = kegiatanMonevService.uploadPdfs(id, files);
+            return ResponseEntity.ok(uploadedPdfs);
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal mengupload PDF: " + e.getMessage());
         }
-
-        // Buat response dengan header Content-Type yang sesuai
-        // Gunakan "attachment" untuk menandakan browser harus mendownload file
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(pdf.getContentType()))
-                .header("Content-Disposition", "attachment; filename=\"" + pdf.getNamaAsli() + "\"")
-                .body(pdfData);
-    } catch (EntityNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-}
+
+    @DeleteMapping("/{id}/pdfs")
+    @Operation(summary = "Menghapus PDF-PDF tertentu dari Kegiatan Monev")
+    public ResponseEntity<KegiatanMonev> deletePdfs(
+            @PathVariable UUID id,
+            @RequestBody List<UUID> pdfIds) throws Exception {
+        return ResponseEntity.ok(kegiatanMonevService.deletePdfs(id, pdfIds));
+    }
+
+    @GetMapping("/{monevId}/pdfs/{pdfId}/download")
+    @Operation(summary = "Download PDF Kegiatan Monev")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID monevId, @PathVariable UUID pdfId) {
+        try {
+            // Dapatkan data PDF dari service
+            byte[] pdfData = kegiatanMonevService.viewPdf(monevId, pdfId);
+
+            // Dapatkan informasi PDF untuk contentType
+            KegiatanMonevPdf pdf = kegiatanMonevService.getPdfById(pdfId);
+
+            // Validasi PDF tersebut milik kegiatan monev yang dimaksud
+            if (!pdf.getKegiatanMonev().getId().equals(monevId)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Buat response dengan header Content-Type yang sesuai
+            // Gunakan "attachment" untuk menandakan browser harus mendownload file
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(pdf.getContentType()))
+                    .header("Content-Disposition", "attachment; filename=\"" + pdf.getNamaAsli() + "\"")
+                    .body(pdfData);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

@@ -16,6 +16,7 @@ import com.kehutanan.rh.kegiatan.repository.KegiatanRancanganTeknisVideoReposito
 import com.kehutanan.rh.kegiatan.repository.KegiatanRepository;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.ProgramRepository;
+import com.kehutanan.rh.util.FileValidationUtil;
 import com.kehutanan.rh.kegiatan.repository.KegiatanDokumentasiFotoRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanDokumentasiVideoRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanKontrakPdfRepository;
@@ -53,6 +54,7 @@ public class KegiatanService {
 
     private final KegiatanRancanganTeknisVideoRepository kegiatanRancanganTeknisVideoRepository;
 
+    private final FileValidationUtil fileValidationUtil;
     private final ProgramRepository programRepository;
     private final KegiatanRepository kegiatanRepository;
     private final KegiatanRancanganTeknisFotoRepository kegiatanRancanganTeknisFotoRepository;
@@ -62,7 +64,7 @@ public class KegiatanService {
     private final KegiatanDokumentasiFotoRepository kegiatanDokumentasiFotoRepository;
     private final KegiatanDokumentasiVideoRepository kegiatanDokumentasiVideoRepository;
 
-    public Page<KegiatanDto> findAll(Pageable pageable, String programName, String namaKegiatan) {
+    public Page<KegiatanDtoDetail> findAll(Pageable pageable, String programName, String namaKegiatan) {
         Specification<Kegiatan> spec = Specification.where(null);
 
         // Add filter for programName if provided
@@ -84,19 +86,15 @@ public class KegiatanService {
 
         // Execute the query with the specifications
         Page<Kegiatan> kegiatanPage = kegiatanRepository.findAll(spec, pageable);
-
-        // Convert entities to DTOs
-        List<KegiatanDto> dtoList = kegiatanPage.getContent().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(dtoList, pageable, kegiatanPage.getTotalElements());
+        
+        // Map entities to DTOs using the map method on Page
+        return kegiatanPage.map(kegiatan -> {
+            KegiatanDtoDetail dto = mapToDto(kegiatan);
+            
+            return dto;
+        });
     }
 
-    // Keep the existing method for backward compatibility
-    public Page<KegiatanDto> findAll(Pageable pageable) {
-        return findAll(pageable, null, null);
-    }
 
     public Kegiatan findById(UUID id) {
         return kegiatanRepository.findById(id)
@@ -300,13 +298,12 @@ public class KegiatanService {
     // Helper method to convert Entity to DTO
     private KegiatanDto convertToDto(Kegiatan kegiatan) {
         KegiatanDto dto = new KegiatanDto();
-        dto.setId(kegiatan.getId());
         dto.setSubDirektorat(kegiatan.getSubDirektorat());
 
-        if (kegiatan.getProgram() != null) {
+       
             dto.setProgramId(kegiatan.getProgram().getId());
             dto.setProgramName(kegiatan.getProgram().getNama());
-        }
+      
 
         dto.setJenisKegiatan(kegiatan.getJenisKegiatan());
         dto.setRefPo(kegiatan.getRefPo());
@@ -333,10 +330,6 @@ public class KegiatanService {
     private Kegiatan convertToEntity(KegiatanDto dto) {
         Kegiatan kegiatan = new Kegiatan();
 
-        // Don't set ID for new entities, let the database generate it
-        if (dto.getId() != null) {
-            kegiatan.setId(dto.getId());
-        }
 
         kegiatan.setSubDirektorat(dto.getSubDirektorat());
 
@@ -408,6 +401,10 @@ public class KegiatanService {
         List<KegiatanRancanganTeknisFoto> uploadedFotos = new ArrayList<>();
 
         for (MultipartFile file : files) {
+
+            fileValidationUtil.validateFileType(file, "image");
+            fileValidationUtil.validateFileSize(file);
+
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -434,6 +431,9 @@ public class KegiatanService {
         List<KegiatanRancanganTeknisPdf> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "pdf");
+            fileValidationUtil.validateFileSize(file);
+
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -460,6 +460,8 @@ public class KegiatanService {
         List<KegiatanRancanganTeknisVideo> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "video");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -485,6 +487,8 @@ public class KegiatanService {
         List<KegiatanKontrakPdf> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "pdf");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -511,6 +515,8 @@ public class KegiatanService {
         List<KegiatanDokumentasiFoto> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "image");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -537,6 +543,10 @@ public class KegiatanService {
         List<KegiatanDokumentasiVideo> uploadedPdfs = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            
+            fileValidationUtil.validateFileType(file, "video");
+            fileValidationUtil.validateFileSize(file);
+            
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());

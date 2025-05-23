@@ -1,5 +1,6 @@
 package com.kehutanan.rh.monev.controller;
 
+import com.kehutanan.rh.monev.dto.MonevDto;
 import com.kehutanan.rh.monev.model.Monev;
 import com.kehutanan.rh.monev.service.MonevService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,16 +64,16 @@ public class MonevController {
 
     @PostMapping
     @Operation(summary = "Membuat data monev baru")
-    public ResponseEntity<Monev> create(@Valid @RequestBody Monev monev) {
-        return ResponseEntity.ok(monevService.create(monev));
+    public ResponseEntity<Monev> create(@Valid @RequestBody MonevDto monevDto) {
+        return ResponseEntity.ok(monevService.create(monevDto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Memperbarui data monev")
     public ResponseEntity<Monev> update(
             @PathVariable UUID id,
-            @Valid @RequestBody Monev monev) {
-        return ResponseEntity.ok(monevService.update(id, monev));
+            @Valid @RequestBody MonevDto monevDto) {
+        return ResponseEntity.ok(monevService.update(id, monevDto));
     }
 
     @DeleteMapping("/{id}")

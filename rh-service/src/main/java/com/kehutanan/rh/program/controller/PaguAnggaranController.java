@@ -5,24 +5,46 @@ import com.kehutanan.rh.program.service.PaguAnggaranService;
 import com.kehutanan.rh.program.dto.PaguAnggaranDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pagu-anggaran")
 @Tag(name = "Program -> Pagu Anggaran", description = "API untuk manajemen Pagu Anggaran")
-@RequiredArgsConstructor
 public class PaguAnggaranController {
     
     private final PaguAnggaranService paguAnggaranService;
+    private final PagedResourcesAssembler<PaguAnggaran> pagedResourcesAssembler;
+
+    @Autowired
+    public PaguAnggaranController(PaguAnggaranService paguAnggaranService, 
+                                 PagedResourcesAssembler<PaguAnggaran> pagedResourcesAssembler) {
+        this.paguAnggaranService = paguAnggaranService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
 
     @GetMapping
-    @Operation(summary = "Get all pagu anggaran")
-    public ResponseEntity<List<PaguAnggaran>> findAll() {
-        return ResponseEntity.ok(paguAnggaranService.findAll());
+    @Operation(summary = "Get all pagu anggaran with pagination")
+    public ResponseEntity<PagedModel<EntityModel<PaguAnggaran>>> getAll(
+            @Parameter(description = "Id Program") @RequestParam String ProgramId,
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Filter by nama Sumber Anggaran dan Keterangan") @RequestParam(required = false) String search) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        PagedModel<EntityModel<PaguAnggaran>> pagedModel = paguAnggaranService.findAll(ProgramId,search,
+                pageable, pagedResourcesAssembler);
+
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")

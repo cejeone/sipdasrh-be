@@ -5,7 +5,9 @@ import com.kehutanan.rh.kegiatan.model.KegiatanLokusShp;
 import com.kehutanan.rh.kegiatan.repository.KegiatanLokusRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanLokusShpRepository;
 import com.kehutanan.rh.kegiatan.service.MinioKegiatanService;
+import com.kehutanan.rh.util.FileValidationUtil;
 import com.kehutanan.rh.kegiatan.controller.KegiatanLokusController;
+import com.kehutanan.rh.kegiatan.dto.KegiatanLokusDto;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -39,40 +41,45 @@ public class KegiatanLokusService {
     private final KegiatanLokusRepository kegiatanLokusRepository;
     private final KegiatanLokusShpRepository kegiatanLokusShpRepository;
     private final MinioKegiatanService minioKegiatanService;
+    private final FileValidationUtil fileValidationUtil;
 
     public KegiatanLokusService(KegiatanLokusRepository kegiatanLokusRepository,
             KegiatanLokusShpRepository kegiatanLokusShpRepository,
-            MinioKegiatanService minioKegiatanService) {
+            MinioKegiatanService minioKegiatanService,FileValidationUtil fileValidationUtil) {
         this.kegiatanLokusRepository = kegiatanLokusRepository;
         this.kegiatanLokusShpRepository = kegiatanLokusShpRepository;
         this.minioKegiatanService = minioKegiatanService;
+        this.fileValidationUtil = fileValidationUtil;
     }
 
-    public PagedModel<EntityModel<KegiatanLokus>> findAll(String search, Pageable pageable,
+    public PagedModel<EntityModel<KegiatanLokus>> findAll(String KegiatanId, String search, Pageable pageable,
             PagedResourcesAssembler<KegiatanLokus> assembler) {
 
         Page<KegiatanLokus> page;
 
-        if (search != null && !search.isEmpty()) {
-            Specification<KegiatanLokus> spec = (root, query, criteriaBuilder) -> {
-                List<Predicate> predicates = new ArrayList<>();
+        // Create base specification
+        Specification<KegiatanLokus> spec = Specification.where(null);
 
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("provinsi")),
-                        "%" + search.toLowerCase() + "%"));
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("kabupatenKota")),
-                        "%" + search.toLowerCase() + "%"));
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("kecamatan")),
-                        "%" + search.toLowerCase() + "%"));
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("kelurahanDesa")),
-                        "%" + search.toLowerCase() + "%"));
-
-                return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
-            };
-
-            page = kegiatanLokusRepository.findAll(spec, pageable);
-        } else {
-            page = kegiatanLokusRepository.findAll(pageable);
+        // Add program ID filter if provided
+        if (KegiatanId != null && !KegiatanId.isEmpty()) {
+            try {
+                UUID programUuid = UUID.fromString(KegiatanId);
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("kegiatan").get("id"),
+                        programUuid));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid UUID format
+                throw new IllegalArgumentException("Invalid Program ID format");
+            }
         }
+
+        // Add search filter if provided
+        if (search != null && !search.isEmpty()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("keterangan")), searchPattern)));
+        }
+
+         page = kegiatanLokusRepository.findAll(spec, pageable);
 
         return assembler.toModel(page, entity -> EntityModel.of(entity)
                 .add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(KegiatanLokusController.class)
@@ -86,49 +93,24 @@ public class KegiatanLokusService {
     }
 
     @Transactional
-    public KegiatanLokus create(KegiatanLokus kegiatanLokus, MultipartFile file) throws Exception {
+    public KegiatanLokus create(KegiatanLokus kegiatanLokus) throws Exception {
         KegiatanLokus saved = kegiatanLokusRepository.save(kegiatanLokus);
-
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());
-
-                KegiatanLokusShp kegiatanLokusShp = new KegiatanLokusShp();
-                kegiatanLokusShp.setKegiatanLokus(saved);
-                kegiatanLokusShp.setNamaFile(fileName);
-                kegiatanLokusShp.setNamaAsli(file.getOriginalFilename());
-                kegiatanLokusShp.setUkuranMb((double) file.getSize() / (1024 * 1024));
-                kegiatanLokusShp.setContentType(file.getContentType());
-                kegiatanLokusShp.setUploadedAt(LocalDateTime.now());
-
-                kegiatanLokusShpRepository.save(kegiatanLokusShp);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);
-            }
-        }
-
         // Return the saved entity with its ID
-
         return kegiatanLokusRepository.findById(saved.getId()).orElseThrow();
     }
 
     @Transactional
     public KegiatanLokus update(
             UUID id,
-            String provinsi,
-            String kabupatenKota,
-            String kecamatan,
-            String kelurahanDesa,
-            String alamat) throws Exception {
+            KegiatanLokusDto kegiatanLokusDto) throws Exception {
 
         KegiatanLokus kegiatanLokus = findById(id);
 
-        kegiatanLokus.setProvinsi(provinsi);
-        kegiatanLokus.setKabupatenKota(kabupatenKota);
-        kegiatanLokus.setKecamatan(kecamatan);
-        kegiatanLokus.setKelurahanDesa(kelurahanDesa);
-        kegiatanLokus.setAlamat(alamat);
+        kegiatanLokus.setProvinsi(kegiatanLokusDto.getProvinsi());
+        kegiatanLokus.setKabupatenKota(kegiatanLokusDto.getKabupatenKota());
+        kegiatanLokus.setKecamatan(kegiatanLokusDto.getKecamatan());
+        kegiatanLokus.setKelurahanDesa(kegiatanLokusDto.getKelurahanDesa());
+        kegiatanLokus.setAlamat(kegiatanLokusDto.getAlamat());
 
         return kegiatanLokusRepository.save(kegiatanLokus);
     }
@@ -175,6 +157,8 @@ public class KegiatanLokusService {
         KegiatanLokus kegiatanLokus = findById(id);
 
         for (MultipartFile file : files) {
+            fileValidationUtil.validateFileType(file, "shp");
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioKegiatanService.uploadFile(fileName, file.getInputStream(), file.getContentType());

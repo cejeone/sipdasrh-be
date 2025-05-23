@@ -1,6 +1,7 @@
 
 package com.kehutanan.rh.dokumen.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
@@ -11,5 +12,5 @@ public class DokumenDto {
     private String namaDokumen;
     private String status; 
     private String keterangan;
-    private List<Long> deleteFileIds;
+    private LocalDateTime uploadedAt;
 }

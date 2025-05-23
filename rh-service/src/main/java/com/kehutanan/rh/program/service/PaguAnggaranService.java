@@ -4,23 +4,63 @@ import com.kehutanan.rh.program.model.PaguAnggaran;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.PaguAnggaranRepository;
 import com.kehutanan.rh.program.repository.ProgramRepository;
+import com.kehutanan.rh.kegiatan.model.KegiatanMonev;
 import com.kehutanan.rh.program.dto.PaguAnggaranDto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PaguAnggaranService {
-    
+
     private final PaguAnggaranRepository paguAnggaranRepository;
     private final ProgramRepository programRepository;
 
-    public List<PaguAnggaran> findAll() {
-        return paguAnggaranRepository.findAll();
+    public PagedModel<EntityModel<PaguAnggaran>> findAll(String programId, String search, Pageable pageable,
+            PagedResourcesAssembler<PaguAnggaran> assembler) {
+
+        Page<PaguAnggaran> page;
+
+        // Create base specification
+        Specification<PaguAnggaran> spec = Specification.where(null);
+
+        // Add program ID filter if provided
+        if (programId != null && !programId.isEmpty()) {
+            try {
+                UUID programUuid = UUID.fromString(programId);
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("program").get("id"),
+                        programUuid));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid UUID format
+                throw new IllegalArgumentException("Invalid Program ID format");
+            }
+        }
+
+        // Add search filter if provided
+        if (search != null && !search.isEmpty()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("keterangan")), searchPattern)));
+        }
+
+        // Execute the query with all applicable filters
+        page = paguAnggaranRepository.findAll(spec, pageable);
+
+        return assembler.toModel(page);
     }
 
     public List<PaguAnggaran> findByProgramId(UUID programId) {
@@ -29,13 +69,13 @@ public class PaguAnggaranService {
 
     public PaguAnggaran findById(UUID id) {
         return paguAnggaranRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Pagu Anggaran not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Pagu Anggaran not found with id: " + id));
     }
 
     @Transactional
     public PaguAnggaran create(PaguAnggaranDto dto) {
         Program program = programRepository.findById(dto.getProgramId())
-            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
+                .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         PaguAnggaran paguAnggaran = new PaguAnggaran();
         paguAnggaran.setSumberAnggaran(dto.getSumberAnggaran());
@@ -52,7 +92,7 @@ public class PaguAnggaranService {
     public PaguAnggaran update(UUID id, PaguAnggaranDto dto) {
         PaguAnggaran existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
-            .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
+                .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         existing.setSumberAnggaran(dto.getSumberAnggaran());
         existing.setTahunAnggaran(dto.getTahunAnggaran());
