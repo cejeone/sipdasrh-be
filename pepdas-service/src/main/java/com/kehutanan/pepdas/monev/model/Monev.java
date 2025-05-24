@@ -4,7 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.pepdas.kegiatan.model.Kegiatan;
 
 @Data
 @Entity
@@ -12,53 +19,37 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Monev {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
-    @Column(nullable = false)
-    private String program;
-    
-    @Column(nullable = false)
-    private String bpdas;
-    
-    @Column(name = "total_target")
-    private Integer totalTarget;
-    
-    @Column(name = "total_realisasi")
-    private Integer totalRealisasi;
-    
-    @Column(name = "total_t1")
-    private Integer totalT1;
-    
-    @Column(name = "realisasi_t1")
-    private Integer realisasiT1;
-    
-    @Column(name = "total_p0")
-    private Integer totalP0;
-    
-    @Column(name = "realisasi_p0")
-    private Integer realisasiP0;
-    
-    @Column(name = "total_p1")
-    private Integer totalP1;
-    
-    @Column(name = "realisasi_p1")
-    private Integer realisasiP1;
-    
-    @Column(name = "total_p2")
-    private Integer totalP2;
-    
-    @Column(name = "realisasi_p2")
-    private Integer realisasiP2;
-    
-    @Column(name = "total_bast")
-    private Integer totalBast;
-    
-    @Column(name = "realisasi_bast")
-    private Integer realisasiBast;
-    
-    @Column(columnDefinition = "TEXT")
-    private String keterangan;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "kegiatan_id", nullable = false)
+    private Kegiatan kegiatan;
+
+    @Column(name = "nomor_monev", nullable = false)
+    private String nomorMonev;
+
+    @Column(name = "kontrak", nullable = false)
+    private String kontrak;
+
+    @Column(name = "rantek", nullable = false)
+    private String rantek;
+
+    @Column(name = "pelaksana", nullable = false)
+    private String pelaksana;
+
+    @Column(name = "tanggal")
+    private LocalDate tanggal;
+
+    @Column(name = "deskripsi", columnDefinition = "TEXT")
+    private String deskripsi;
+
+    @OneToMany(mappedBy = "monev", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<MonevPdf> monevPdfs = new ArrayList<>();
+
+    private String status;
+
 }

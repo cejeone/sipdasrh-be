@@ -1,45 +1,31 @@
 package com.kehutanan.pepdas.monev.dto;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonevDto {
     
-    private String program;
     
-    private String bpdas;
+    private UUID kegiatanId;
     
-    private Integer totalTarget;
+    private String nomorMonev;
+
+    private String kontrak;
     
-    private Integer totalRealisasi;
-    
-    private Integer totalT1;
-    
-    private Integer realisasiT1;
-    
-    private Integer totalP0;
-    
-    private Integer realisasiP0;
-    
-    private Integer totalP1;
-    
-    private Integer realisasiP1;
-    
-    private Integer totalP2;
-    
-    private Integer realisasiP2;
-    
-    private Integer totalBast;
-    
-    private Integer realisasiBast;
-    
-    private String keterangan;
+    private String rantek;
+   
+    private String pelaksana;
+
+    private LocalDate tanggal;
+        
+    private String deskripsi;
+
+    private String status;
 }
