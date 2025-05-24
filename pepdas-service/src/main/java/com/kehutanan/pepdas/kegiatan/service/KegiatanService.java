@@ -1,5 +1,6 @@
 package com.kehutanan.pepdas.kegiatan.service;
 
+import com.kehutanan.pepdas.common.service.MinioStorageService;
 import com.kehutanan.pepdas.kegiatan.dto.KegiatanDto;
 import com.kehutanan.pepdas.kegiatan.dto.KegiatanDtoDetail;
 import com.kehutanan.pepdas.kegiatan.dto.KegiatanFileDto;
@@ -58,12 +59,12 @@ public class KegiatanService {
     private final KegiatanRepository kegiatanRepository;
     private final KegiatanRancanganTeknisFotoRepository kegiatanRancanganTeknisFotoRepository;
     private final KegiatanRancanganTeknisPdfRepository kegiatanRancanganTeknisPdfRepository;
-    private final MinioKegiatanService minioKegiatanService;
+    private final MinioStorageService minioStorageService;
     private final KegiatanKontrakPdfRepository kegiatanKontrakPdfRepository;
     private final KegiatanDokumentasiFotoRepository kegiatanDokumentasiFotoRepository;
     private final KegiatanDokumentasiVideoRepository kegiatanDokumentasiVideoRepository;
 
-    public Page<KegiatanDtoDetail> findAll(Pageable pageable, String programName, String namaKegiatan) {
+    public Page<Kegiatan> findAll(Pageable pageable, String programName, String namaKegiatan) {
         Specification<Kegiatan> spec = Specification.where(null);
 
         // Add filter for programName if provided
@@ -86,11 +87,8 @@ public class KegiatanService {
         // Execute the query with the specifications
         Page<Kegiatan> kegiatanPage = kegiatanRepository.findAll(spec, pageable);
         
-        // Map entities to DTOs using the map method on Page
         return kegiatanPage.map(kegiatan -> {
-            KegiatanDtoDetail dto = mapToDto(kegiatan);
-            
-            return dto;
+            return kegiatan;
         });
     }
 
@@ -100,188 +98,83 @@ public class KegiatanService {
                 .orElseThrow(() -> new EntityNotFoundException("Kegiatan tidak ditemukan dengan id: " + id));
     }
 
-    @Transactional(readOnly = true)
-    public KegiatanDtoDetail findByIdDtoMin(UUID id) {
-        Kegiatan kegiatan = kegiatanRepository.findByIdAllChild(id)
-                .orElseThrow(() -> new EntityNotFoundException("Kegiatan not found with id: " + id));
+        @Transactional
+    public Kegiatan create(KegiatanDto kegiatanDto) {
 
-        // Collections will be initialized due to @EntityGraph
-        return mapToDto(kegiatan);
-    }
-
-    private KegiatanDtoDetail mapToDto(Kegiatan kegiatan) {
-        KegiatanDtoDetail dto = new KegiatanDtoDetail();
-        dto.setId(kegiatan.getId());
-        dto.setProgramId(kegiatan.getProgram().getId());
-        dto.setProgramName(kegiatan.getProgram().getNama());
-        dto.setSubDirektorat(kegiatan.getSubDirektorat());
-        dto.setJenisKegiatan(kegiatan.getJenisKegiatan());
-        dto.setRefPo(kegiatan.getRefPo());
-        dto.setNamaKegiatan(kegiatan.getNamaKegiatan());
-        dto.setKegiatanLokus(kegiatan.getKegiatanLokus());
-        dto.setDetailPola(kegiatan.getDetailPola());
-        dto.setDetailTahunKegiatan(kegiatan.getDetailTahunKegiatan());
-        dto.setDetailSumberAnggaran(kegiatan.getDetailSumberAnggaran());
-        dto.setDetailTotalBibit(kegiatan.getDetailTotalBibit());
-        dto.setDetailTotalLuasHa(kegiatan.getDetailTotalLuasHa());
-        dto.setDetailPemangkuKawasan(kegiatan.getDetailPemangkuKawasan());
-        dto.setDetailPelaksana(kegiatan.getDetailPelaksana());
-        dto.setKontrakNomor(kegiatan.getKontrakNomor());
-        dto.setKontrakNilai(kegiatan.getKontrakNilai());
-        dto.setKontrakTipe(kegiatan.getKontrakTipe());
-        dto.setKontrakPelaksana(kegiatan.getKontrakPelaksana());
-        dto.setKontrakTanggalKontrak(kegiatan.getKontrakTanggalKontrak());
-        dto.setKontrakStatus(kegiatan.getKontrakStatus());
-        dto.setDokumentasiCatatanFoto(kegiatan.getDokumentasiCatatanFoto());
-        dto.setDokumentasiCatatanVideo(kegiatan.getDokumentasiCatatanVideo());
-
-        // Map RancanganTeknisFotos
-        if (kegiatan.getKegiatanRancanganTeknisFotos() != null) {
-            dto.setRancanganTeknisFotos(
-                    kegiatan.getKegiatanRancanganTeknisFotos().stream()
-                            .map(foto -> {
-                                KegiatanFileDto fotoDto = new KegiatanFileDto();
-                                fotoDto.setId(foto.getId());
-                                fotoDto.setFileName(foto.getNamaAsli());
-                                fotoDto.setContentType(foto.getContentType());
-                                fotoDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/rancangan-teknis/fotos/" + foto.getId() + "/view");
-                                return fotoDto;
-                            })
-                            .collect(Collectors.toList()));
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setSubDirektorat(kegiatanDto.getSubDirektorat());
+        if (kegiatanDto.getProgramId() != null) {
+            Program program = programRepository.findById(kegiatanDto.getProgramId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Program tidak ditemukan dengan id: " + kegiatanDto.getProgramId()));
+            kegiatan.setProgram(program);
         }
-
-        // Map RancanganTeknisPdfs
-        if (kegiatan.getKegiatanRancanganTeknisPdfs() != null) {
-            dto.setRancanganTeknisPdfs(
-                    kegiatan.getKegiatanRancanganTeknisPdfs().stream()
-                            .map(pdf -> {
-                                KegiatanFileDto pdfDto = new KegiatanFileDto();
-                                pdfDto.setId(pdf.getId());
-                                pdfDto.setFileName(pdf.getNamaAsli());
-                                pdfDto.setContentType(pdf.getContentType());
-                                pdfDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/rancangan-teknis/pdfs/" + pdf.getId() + "/view");
-                                return pdfDto;
-                            })
-                            .collect(Collectors.toList()));
-        }
-
-        // Map RancanganTeknisVideos
-        if (kegiatan.getKegiatanRancanganTeknisVideos() != null) {
-            dto.setRancanganTeknisVideos(
-                    kegiatan.getKegiatanRancanganTeknisVideos().stream()
-                            .map(video -> {
-                                KegiatanFileDto videoDto = new KegiatanFileDto();
-                                videoDto.setId(video.getId());
-                                videoDto.setFileName(video.getNamaAsli());
-                                videoDto.setContentType(video.getContentType());
-                                videoDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/rancangan-teknis/videos/" + video.getId() + "/view");
-                                return videoDto;
-                            })
-                            .collect(Collectors.toList()));
-        }
-
-        // Map KontrakPdfs
-        if (kegiatan.getKegiatanKontrakPdfs() != null) {
-            dto.setKontrakPdfs(
-                    kegiatan.getKegiatanKontrakPdfs().stream()
-                            .map(pdf -> {
-                                KegiatanFileDto pdfDto = new KegiatanFileDto();
-                                pdfDto.setId(pdf.getId());
-                                pdfDto.setFileName(pdf.getNamaAsli());
-                                pdfDto.setContentType(pdf.getContentType());
-                                pdfDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/kontrak/pdfs/" + pdf.getId() + "/view");
-                                return pdfDto;
-                            })
-                            .collect(Collectors.toList()));
-        }
-
-        // Map DokumentasiFotos
-        if (kegiatan.getKegiatanDokumentasiFotos() != null) {
-            dto.setDokumentasiFotos(
-                    kegiatan.getKegiatanDokumentasiFotos().stream()
-                            .map(foto -> {
-                                KegiatanFileDto fotoDto = new KegiatanFileDto();
-                                fotoDto.setId(foto.getId());
-                                fotoDto.setFileName(foto.getNamaAsli());
-                                fotoDto.setContentType(foto.getContentType());
-                                fotoDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/dokumentasi/fotos/" + foto.getId() + "/view");
-                                return fotoDto;
-                            })
-                            .collect(Collectors.toList()));
-        }
-
-        // Map DokumentasiVideos
-        if (kegiatan.getKegiatanDokumentasiVideos() != null) {
-            dto.setDokumentasiVideos(
-                    kegiatan.getKegiatanDokumentasiVideos().stream()
-                            .map(video -> {
-                                KegiatanFileDto videoDto = new KegiatanFileDto();
-                                videoDto.setId(video.getId());
-                                videoDto.setFileName(video.getNamaAsli());
-                                videoDto.setContentType(video.getContentType());
-                                videoDto.setUrl("/api/kegiatan/" + kegiatan.getId() +
-                                        "/dokumentasi/videos/" + video.getId() + "/view");
-                                return videoDto;
-                            })
-                            .collect(Collectors.toList()));
-        }
-
-        return dto;
+        kegiatan.setJenisKegiatan(kegiatanDto.getJenisKegiatan());
+        kegiatan.setNamaKegiatan(kegiatanDto.getNamaKegiatan());
+        kegiatan.setBpdas(kegiatanDto.getBpdas());
+        kegiatan.setDas(kegiatanDto.getDas());
+        kegiatan.setLokusProvinsi(kegiatanDto.getLokusProvinsi());
+        kegiatan.setLokusKabupatenKota(kegiatanDto.getLokusKabupatenKota());
+        kegiatan.setLokusKecamatan(kegiatanDto.getLokusKecamatan());
+        kegiatan.setLokusKelurahanDesa(kegiatanDto.getLokusKelurahanDesa());
+        kegiatan.setLokusAlamat(kegiatanDto.getLokusAlamat());
+        kegiatan.setDetailSkema(kegiatanDto.getDetailSkema());
+        kegiatan.setDetailTahunKegiatan(kegiatanDto.getDetailTahunKegiatan());
+        kegiatan.setDetailSumberAnggaran(kegiatanDto.getDetailSumberAnggaran());
+        kegiatan.setDetailSumberAnggaran(kegiatanDto.getDetailSumberAnggaran());
+        kegiatan.setDetailPenerimaManfaat(kegiatanDto.getDetailPenerimaManfaat());
+        kegiatan.setDetailPelaksana(kegiatanDto.getDetailPelaksana());
+        kegiatan.setKontrakNomor(kegiatanDto.getKontrakNomor());
+        kegiatan.setKontrakNilai(kegiatanDto.getKontrakNilai());
+        kegiatan.setKontrakTipe(kegiatanDto.getKontrakTipe());
+        kegiatan.setKontrakPenerimaManfaat(kegiatanDto.getKontrakPenerimaManfaat());
+        kegiatan.setKontrakTanggalKontrak(kegiatanDto.getKontrakTanggalKontrak());
+        kegiatan.setKontrakStatus(kegiatanDto.getKontrakStatus());
+        kegiatan.setDokumentasiCatatanFoto(kegiatanDto.getDokumentasiCatatanFoto());
+        kegiatan.setDokumentasiCatatanVideo(kegiatanDto.getDokumentasiCatatanVideo());
+        
+        return kegiatanRepository.save(kegiatan);
     }
 
     @Transactional
-    public KegiatanDto create(KegiatanDto kegiatanDto) {
-        Kegiatan kegiatan = convertToEntity(kegiatanDto);
-        Kegiatan saved = kegiatanRepository.save(kegiatan);
-        return convertToDto(saved);
+    public Kegiatan update(UUID id, KegiatanDto kegiatanDto) {
+        Kegiatan kegiatan = findById(id);
+
+       kegiatan.setSubDirektorat(kegiatanDto.getSubDirektorat());
+        if (kegiatanDto.getProgramId() != null) {
+            Program program = programRepository.findById(kegiatanDto.getProgramId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Program tidak ditemukan dengan id: " + kegiatanDto.getProgramId()));
+            kegiatan.setProgram(program);
+        }
+        kegiatan.setJenisKegiatan(kegiatanDto.getJenisKegiatan());
+        kegiatan.setNamaKegiatan(kegiatanDto.getNamaKegiatan());
+        kegiatan.setBpdas(kegiatanDto.getBpdas());
+        kegiatan.setDas(kegiatanDto.getDas());
+        kegiatan.setLokusProvinsi(kegiatanDto.getLokusProvinsi());
+        kegiatan.setLokusKabupatenKota(kegiatanDto.getLokusKabupatenKota());
+        kegiatan.setLokusKecamatan(kegiatanDto.getLokusKecamatan());
+        kegiatan.setLokusKelurahanDesa(kegiatanDto.getLokusKelurahanDesa());
+        kegiatan.setLokusAlamat(kegiatanDto.getLokusAlamat());
+        kegiatan.setDetailSkema(kegiatanDto.getDetailSkema());
+        kegiatan.setDetailTahunKegiatan(kegiatanDto.getDetailTahunKegiatan());
+        kegiatan.setDetailSumberAnggaran(kegiatanDto.getDetailSumberAnggaran());
+        kegiatan.setDetailSumberAnggaran(kegiatanDto.getDetailSumberAnggaran());
+        kegiatan.setDetailPenerimaManfaat(kegiatanDto.getDetailPenerimaManfaat());
+        kegiatan.setDetailPelaksana(kegiatanDto.getDetailPelaksana());
+        kegiatan.setKontrakNomor(kegiatanDto.getKontrakNomor());
+        kegiatan.setKontrakNilai(kegiatanDto.getKontrakNilai());
+        kegiatan.setKontrakTipe(kegiatanDto.getKontrakTipe());
+        kegiatan.setKontrakPenerimaManfaat(kegiatanDto.getKontrakPenerimaManfaat());
+        kegiatan.setKontrakTanggalKontrak(kegiatanDto.getKontrakTanggalKontrak());
+        kegiatan.setKontrakStatus(kegiatanDto.getKontrakStatus());
+        kegiatan.setDokumentasiCatatanFoto(kegiatanDto.getDokumentasiCatatanFoto());
+        kegiatan.setDokumentasiCatatanVideo(kegiatanDto.getDokumentasiCatatanVideo());
+        
+        return kegiatanRepository.save(kegiatan);
     }
 
-    @Transactional
-    public Kegiatan update(UUID id, Kegiatan kegiatan) {
-        Kegiatan existing = findById(id);
-
-        existing.setSubDirektorat(kegiatan.getSubDirektorat());
-        existing.setProgram(kegiatan.getProgram());
-        existing.setJenisKegiatan(kegiatan.getJenisKegiatan());
-        existing.setRefPo(kegiatan.getRefPo());
-        existing.setNamaKegiatan(kegiatan.getNamaKegiatan());
-        existing.setDetailPola(kegiatan.getDetailPola());
-        existing.setDetailTahunKegiatan(kegiatan.getDetailTahunKegiatan());
-        existing.setDetailSumberAnggaran(kegiatan.getDetailSumberAnggaran());
-        existing.setDetailTotalBibit(kegiatan.getDetailTotalBibit());
-        existing.setDetailTotalLuasHa(kegiatan.getDetailTotalLuasHa());
-        existing.setDetailPemangkuKawasan(kegiatan.getDetailPemangkuKawasan());
-        existing.setDetailPelaksana(kegiatan.getDetailPelaksana());
-        existing.setKontrakNomor(kegiatan.getKontrakNomor());
-        existing.setKontrakNilai(kegiatan.getKontrakNilai());
-        existing.setKontrakTipe(kegiatan.getKontrakTipe());
-        existing.setKontrakPelaksana(kegiatan.getKontrakPelaksana());
-        existing.setKontrakTanggalKontrak(kegiatan.getKontrakTanggalKontrak());
-        existing.setKontrakStatus(kegiatan.getKontrakStatus());
-        existing.setDokumentasiCatatanFoto(kegiatan.getDokumentasiCatatanFoto());
-        existing.setDokumentasiCatatanVideo(kegiatan.getDokumentasiCatatanVideo());
-
-        return kegiatanRepository.save(existing);
-    }
-
-    @Transactional
-    public KegiatanDto update(UUID id, KegiatanDto kegiatanDto) {
-        Kegiatan existing = kegiatanRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Kegiatan tidak ditemukan dengan id: " + id));
-
-        // Update fields
-        updateEntityFromDto(existing, kegiatanDto);
-
-        Kegiatan saved = kegiatanRepository.save(existing);
-        return convertToDto(saved);
-    }
-
-    @Transactional
+        @Transactional
     public void delete(UUID id) {
         Kegiatan kegiatan = kegiatanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Kegiatan tidak ditemukan dengan id: " + id));
@@ -294,103 +187,18 @@ public class KegiatanService {
         }
     }
 
-    // Helper method to convert Entity to DTO
-    private KegiatanDto convertToDto(Kegiatan kegiatan) {
-        KegiatanDto dto = new KegiatanDto();
-        dto.setSubDirektorat(kegiatan.getSubDirektorat());
-
-       
-            dto.setProgramId(kegiatan.getProgram().getId());
-            dto.setProgramName(kegiatan.getProgram().getNama());
-      
-
-        dto.setJenisKegiatan(kegiatan.getJenisKegiatan());
-        dto.setRefPo(kegiatan.getRefPo());
-        dto.setNamaKegiatan(kegiatan.getNamaKegiatan());
-        dto.setDetailPola(kegiatan.getDetailPola());
-        dto.setDetailTahunKegiatan(kegiatan.getDetailTahunKegiatan());
-        dto.setDetailSumberAnggaran(kegiatan.getDetailSumberAnggaran());
-        dto.setDetailTotalBibit(kegiatan.getDetailTotalBibit());
-        dto.setDetailTotalLuasHa(kegiatan.getDetailTotalLuasHa());
-        dto.setDetailPemangkuKawasan(kegiatan.getDetailPemangkuKawasan());
-        dto.setDetailPelaksana(kegiatan.getDetailPelaksana());
-        dto.setKontrakNomor(kegiatan.getKontrakNomor());
-        dto.setKontrakNilai(kegiatan.getKontrakNilai());
-        dto.setKontrakTipe(kegiatan.getKontrakTipe());
-        dto.setKontrakPelaksana(kegiatan.getKontrakPelaksana());
-        dto.setKontrakTanggalKontrak(kegiatan.getKontrakTanggalKontrak());
-        dto.setKontrakStatus(kegiatan.getKontrakStatus());
-        dto.setDokumentasiCatatanFoto(kegiatan.getDokumentasiCatatanFoto());
-        dto.setDokumentasiCatatanVideo(kegiatan.getDokumentasiCatatanVideo());
-
-        return dto;
-    }
-
-    private Kegiatan convertToEntity(KegiatanDto dto) {
-        Kegiatan kegiatan = new Kegiatan();
+    
 
 
-        kegiatan.setSubDirektorat(dto.getSubDirektorat());
 
-        if (dto.getProgramId() != null) {
-            Program program = programRepository.findById(dto.getProgramId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Program tidak ditemukan dengan id: " + dto.getProgramId()));
-            kegiatan.setProgram(program);
-        }
 
-        kegiatan.setJenisKegiatan(dto.getJenisKegiatan());
-        kegiatan.setRefPo(dto.getRefPo());
-        kegiatan.setNamaKegiatan(dto.getNamaKegiatan());
-        kegiatan.setDetailPola(dto.getDetailPola());
-        kegiatan.setDetailTahunKegiatan(dto.getDetailTahunKegiatan());
-        kegiatan.setDetailSumberAnggaran(dto.getDetailSumberAnggaran());
-        kegiatan.setDetailTotalBibit(dto.getDetailTotalBibit());
-        kegiatan.setDetailTotalLuasHa(dto.getDetailTotalLuasHa());
-        kegiatan.setDetailPemangkuKawasan(dto.getDetailPemangkuKawasan());
-        kegiatan.setDetailPelaksana(dto.getDetailPelaksana());
-        kegiatan.setKontrakNomor(dto.getKontrakNomor());
-        kegiatan.setKontrakNilai(dto.getKontrakNilai());
-        kegiatan.setKontrakTipe(dto.getKontrakTipe());
-        kegiatan.setKontrakPelaksana(dto.getKontrakPelaksana());
-        kegiatan.setKontrakTanggalKontrak(dto.getKontrakTanggalKontrak());
-        kegiatan.setKontrakStatus(dto.getKontrakStatus());
-        kegiatan.setDokumentasiCatatanFoto(dto.getDokumentasiCatatanFoto());
-        kegiatan.setDokumentasiCatatanVideo(dto.getDokumentasiCatatanVideo());
 
-        return kegiatan;
-    }
+
+
+   
 
     // Helper method to update an entity from a DTO
-    private void updateEntityFromDto(Kegiatan kegiatan, KegiatanDto dto) {
-        kegiatan.setSubDirektorat(dto.getSubDirektorat());
-
-        if (dto.getProgramId() != null) {
-            Program program = programRepository.findById(dto.getProgramId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Program tidak ditemukan dengan id: " + dto.getProgramId()));
-            kegiatan.setProgram(program);
-        }
-
-        kegiatan.setJenisKegiatan(dto.getJenisKegiatan());
-        kegiatan.setRefPo(dto.getRefPo());
-        kegiatan.setNamaKegiatan(dto.getNamaKegiatan());
-        kegiatan.setDetailPola(dto.getDetailPola());
-        kegiatan.setDetailTahunKegiatan(dto.getDetailTahunKegiatan());
-        kegiatan.setDetailSumberAnggaran(dto.getDetailSumberAnggaran());
-        kegiatan.setDetailTotalBibit(dto.getDetailTotalBibit());
-        kegiatan.setDetailTotalLuasHa(dto.getDetailTotalLuasHa());
-        kegiatan.setDetailPemangkuKawasan(dto.getDetailPemangkuKawasan());
-        kegiatan.setDetailPelaksana(dto.getDetailPelaksana());
-        kegiatan.setKontrakNomor(dto.getKontrakNomor());
-        kegiatan.setKontrakNilai(dto.getKontrakNilai());
-        kegiatan.setKontrakTipe(dto.getKontrakTipe());
-        kegiatan.setKontrakPelaksana(dto.getKontrakPelaksana());
-        kegiatan.setKontrakTanggalKontrak(dto.getKontrakTanggalKontrak());
-        kegiatan.setKontrakStatus(dto.getKontrakStatus());
-        kegiatan.setDokumentasiCatatanFoto(dto.getDokumentasiCatatanFoto());
-        kegiatan.setDokumentasiCatatanVideo(dto.getDokumentasiCatatanVideo());
-    }
+    
 
     public List<KegiatanRancanganTeknisFoto> uploadKegiatanRancanganTeknisFotos(UUID id, List<MultipartFile> files)
             throws Exception {

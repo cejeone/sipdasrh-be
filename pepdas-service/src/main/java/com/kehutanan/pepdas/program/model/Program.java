@@ -3,7 +3,12 @@ package com.kehutanan.pepdas.program.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.pepdas.dokumen.model.DokumenFile;
 
 @Data
 @Entity
@@ -31,4 +36,8 @@ public class Program {
     
     @Column(nullable = false)
     private String status;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaguAnggaran> files = new ArrayList<>();
 }

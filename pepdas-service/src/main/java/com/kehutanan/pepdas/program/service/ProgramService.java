@@ -1,6 +1,7 @@
 package com.kehutanan.pepdas.program.service;
 
 import com.kehutanan.pepdas.monev.model.Monev;
+import com.kehutanan.pepdas.program.dto.ProgramDto;
 import com.kehutanan.pepdas.program.model.Program;
 import com.kehutanan.pepdas.program.repository.ProgramRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,20 +35,27 @@ public class ProgramService {
     }
 
     @Transactional
-    public Program save(Program program) {
-        return programRepository.save(program);
+    public Program save(ProgramDto programDto) {
+        Program newProgram = new Program();
+        newProgram.setKategori(programDto.getKategori());
+        newProgram.setNama(programDto.getNama());
+        newProgram.setTahunPelaksanaan(programDto.getTahunPelaksanaan());
+        newProgram.setTotalAnggaran(programDto.getTotalAnggaran());
+        newProgram.setTargetLuas(programDto.getTargetLuas());
+        newProgram.setStatus(programDto.getStatus());
+        return programRepository.save(newProgram);
     }
 
     @Transactional
-    public Program update(UUID id, Program program) {
+    public Program update(UUID id, ProgramDto programDto) {
         Program existingProgram = findById(id);
         
-        existingProgram.setKategori(program.getKategori());
-        existingProgram.setNama(program.getNama());
-        existingProgram.setTahunPelaksanaan(program.getTahunPelaksanaan());
-        existingProgram.setTotalAnggaran(program.getTotalAnggaran());
-        existingProgram.setTargetLuas(program.getTargetLuas());
-        existingProgram.setStatus(program.getStatus());
+        existingProgram.setKategori(programDto.getKategori());
+        existingProgram.setNama(programDto.getNama());
+        existingProgram.setTahunPelaksanaan(programDto.getTahunPelaksanaan());
+        existingProgram.setTotalAnggaran(programDto.getTotalAnggaran());
+        existingProgram.setTargetLuas(programDto.getTargetLuas());
+        existingProgram.setStatus(programDto.getStatus());
         
         return programRepository.save(existingProgram);
     }
