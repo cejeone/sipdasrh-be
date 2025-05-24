@@ -2,35 +2,44 @@ package com.kehutanan.pepdas.serahterima.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.pepdas.monev.model.MonevPdf;
 
 @Data
 @Entity
 @Table(name = "pepdas_serah_terima")
 public class SerahTerima {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
-    @Column(name = "program")
-    private String program;
-    
-    @Column(name = "bpdas")
-    private String bpdas;
-    
-    @Column(name = "provinsi")
-    private String provinsi;
-    
-    @Column(name = "fungsi_kawasan")
-    private String fungsiKawasan;
-    
-    @Column(name = "realisasi_luas")
-    private String realisasiLuas;
-    
+
+    @Column(name = "nomor")
+    private String nomor;
+
+    @Column(name = "kegiatan")
+    private String kegiatan;
+
+    @Column(name = "kontrak")
+    private String kontrak;
+
+    @Column(name = "tanggal")
+    private LocalDate tanggal;
+
+    @Column(name = "deskripsi", columnDefinition = "TEXT")
+    private String deskripsi;
+
+    @OneToMany(mappedBy = "serahTerima", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<SerahTerimaPdf> serahTerimaPdfs = new ArrayList<>();
+
     @Column(name = "status")
     private String status;
-    
-    @Column(name = "keterangan", columnDefinition = "TEXT")
-    private String keterangan;
+
 }

@@ -5,7 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.pepdas.serahterima.model.SerahTerimaPdf;
 
 @Data
 @NoArgsConstructor
@@ -13,17 +19,10 @@ import java.util.UUID;
 public class SerahTerimaDto {
     
 
-    private String program;
-    
-    private String bpdas;
-    
-    private String provinsi;
-    
-    private String fungsiKawasan;
-    
-    private String realisasiLuas;
-    
+    private String nomor;
+    private String kegiatan;
+    private String kontrak;
+    private LocalDate tanggal;
+    private String deskripsi;
     private String status;
-    
-    private String keterangan;
 }
