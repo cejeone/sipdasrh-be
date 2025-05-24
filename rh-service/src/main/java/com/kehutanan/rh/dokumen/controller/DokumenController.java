@@ -69,13 +69,6 @@ public class DokumenController {
         return ResponseEntity.ok(dokumenService.findById(id));
     }
 
-    // @GetMapping("/{dokumenId}/files/{fileId}/url")
-    // @Operation(summary = "Mendapatkan URL file dokumen")
-    // public ResponseEntity<String> getFileUrl(
-    //         @PathVariable UUID dokumenId,
-    //         @PathVariable UUID fileId) throws Exception {
-    //     return ResponseEntity.ok(dokumenService.getFileUrl(dokumenId, fileId));
-    // }
 
     @GetMapping("/{dokumenId}/files/{fileId}/download")
     public ResponseEntity<?> downloadFile(@PathVariable UUID dokumenId, @PathVariable UUID fileId) {
@@ -91,7 +84,7 @@ public class DokumenController {
 
 
     // Controller implementation
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @Operation(summary = "Membuat dokumen baru dengan multiple file")
     public ResponseEntity<Dokumen> create(@Valid @RequestBody DokumenDto dokumenDto) throws Exception {
 
@@ -100,7 +93,7 @@ public class DokumenController {
                         dokumenDto));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/{id}")
     @Operation(summary = "Memperbarui field di tabel Dokumen")
     public ResponseEntity<Dokumen> update(
             @PathVariable UUID id,
