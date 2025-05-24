@@ -29,6 +29,7 @@ public class Kegiatan {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Program program;
 
     @Column(name = "jenis_kegiatan", nullable = false)

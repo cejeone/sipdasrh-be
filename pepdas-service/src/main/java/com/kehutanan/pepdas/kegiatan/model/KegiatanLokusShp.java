@@ -24,7 +24,7 @@ public class KegiatanLokusShp {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kegiatan_lokus_id", nullable = false)
-    private KegiatanLokus   kegiatanLokus;
+    private Kegiatan   kegiatanLokus;
 
     @Column(nullable = false)
     private String namaFile;

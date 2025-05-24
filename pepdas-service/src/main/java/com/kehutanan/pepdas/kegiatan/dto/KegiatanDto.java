@@ -18,7 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanDto {
-    private UUID id;
     private String subDirektorat;
     private UUID programId;
     private String programNama;
