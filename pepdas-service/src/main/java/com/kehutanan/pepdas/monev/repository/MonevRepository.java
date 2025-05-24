@@ -9,10 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface MonevRepository extends JpaRepository<Monev, UUID>,JpaSpecificationExecutor<Monev> {
-    List<Monev> findByProgram(String program);
-    List<Monev> findByBpdas(String bpdas);
-    List<Monev> findByKeteranganContaining(String keterangan);
-    
-    // Combined search
-    List<Monev> findByProgramAndBpdas(String program, String bpdas);
+
 }

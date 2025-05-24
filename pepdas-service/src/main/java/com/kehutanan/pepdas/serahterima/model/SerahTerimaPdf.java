@@ -1,7 +1,7 @@
-package com.kehutanan.pepdas.kegiatan.model;
+package com.kehutanan.pepdas.serahterima.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "pepdas_kegiatan_lokus_shp")
+@Table(name = "pepdas_serah_terima_pdf")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanLokusShp {
+public class SerahTerimaPdf {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,8 +23,8 @@ public class KegiatanLokusShp {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_lokus_id", nullable = false)
-    private Kegiatan   kegiatanLokus;
+    @JoinColumn(name = "serah_terima_id", nullable = false)
+    private SerahTerima serahTerima;
 
     @Column(nullable = false)
     private String namaFile;

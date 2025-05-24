@@ -1,5 +1,6 @@
 package com.kehutanan.pepdas.program.controller;
 
+import com.kehutanan.pepdas.program.dto.ProgramDto;
 import com.kehutanan.pepdas.program.model.Program;
 import com.kehutanan.pepdas.program.service.ProgramService;
 
@@ -65,13 +66,13 @@ public class ProgramController {
     }
 
     @PostMapping
-    public ResponseEntity<Program> create(@RequestBody Program program) {
-        return ResponseEntity.ok(programService.save(program));
+    public ResponseEntity<Program> create(@RequestBody ProgramDto programDto) {
+        return ResponseEntity.ok(programService.save(programDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Program> update(@PathVariable UUID id, @RequestBody Program program) {
-        return ResponseEntity.ok(programService.update(id, program));
+    public ResponseEntity<Program> update(@PathVariable UUID id, @RequestBody ProgramDto programDto) {
+        return ResponseEntity.ok(programService.update(id, programDto));
     }
 
     @DeleteMapping("/{id}")

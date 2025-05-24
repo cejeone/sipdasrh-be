@@ -1,6 +1,7 @@
 package com.kehutanan.pepdas.kegiatan.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,32 +10,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for Kegiatan entity
+ */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanDto {
-    
     private String subDirektorat;
     private UUID programId;
-    private String programName; // For display purposes
+    private String programNama;
     private String jenisKegiatan;
-    private String refPo;
     private String namaKegiatan;
-    private String detailPola;
+    private String bpdas;
+    private String das;
+    
+    // Lokasi fields
+    private String lokusProvinsi;
+    private String lokusKabupatenKota;
+    private String lokusKecamatan;
+    private String lokusKelurahanDesa;
+    private String lokusAlamat;
+
+    // Detail fields
+    private String detailSkema;
     private Integer detailTahunKegiatan;
     private String detailSumberAnggaran;
-    private Integer detailTotalBibit;
-    private Integer detailTotalLuasHa;
-    private String detailPemangkuKawasan;
+    private String detailPenerimaManfaat;
     private String detailPelaksana;
+    
+
+    // Kontrak fields
     private String kontrakNomor;
     private Integer kontrakNilai;
     private String kontrakTipe;
-    private String kontrakPelaksana;
+    private String kontrakPenerimaManfaat;
     private LocalDate kontrakTanggalKontrak;
     private String kontrakStatus;
+
+    // Dokumentasi fields
     private String dokumentasiCatatanFoto;
     private String dokumentasiCatatanVideo;
 }
-
-

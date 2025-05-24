@@ -29,11 +29,14 @@ public class FileValidationUtil {
             "video/mp4", "video/mpeg", "video/quicktime", "video/x-msvideo");
     
     private static final List<String> SHP_CONTENT_TYPES = Arrays.asList(
-            "application/x-esri-shape", "application/shapefile", "application/x-shapefile");
+            "application/x-esri-shape", "application/shapefile", "application/x-shapefile", 
+            "application/octet-stream");
     
     
-    public void validateFileType(MultipartFile file,String type) {
+    public void validateFileType(MultipartFile file, String type) {
         String contentType = file.getContentType();
+        String filename = file.getOriginalFilename();
+        
         if (contentType == null) {
             throw new FileSizeLimitExceededException("Tipe konten file tidak dikenali");
         }
@@ -45,7 +48,7 @@ public class FileValidationUtil {
             throw new FileSizeLimitExceededException("File bukan PDF");
         } else if (type.equalsIgnoreCase("video") && !isVideoFile(contentType)) {
             throw new FileSizeLimitExceededException("File bukan video");
-        } else if (type.equalsIgnoreCase("shp") && !isShpFile(contentType)) {
+        } else if (type.equalsIgnoreCase("shp") && !isShpFile(contentType, filename)) {
             throw new FileSizeLimitExceededException("File bukan Shapefile");
         }
     }
@@ -100,6 +103,13 @@ public class FileValidationUtil {
     }
     
     public boolean isShpFile(String contentType) {
+        return SHP_CONTENT_TYPES.contains(contentType);
+    }
+
+    public boolean isShpFile(String contentType, String filename) {
+        if (filename != null && filename.toLowerCase().endsWith(".shp")) {
+            return true;
+        }
         return SHP_CONTENT_TYPES.contains(contentType);
     }
 }

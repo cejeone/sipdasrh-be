@@ -5,10 +5,15 @@ import com.kehutanan.pepdas.monev.model.Monev;
 import com.kehutanan.pepdas.monev.service.MonevService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.UUID;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -38,18 +43,19 @@ public class MonevController {
     public ResponseEntity<PagedModel<EntityModel<Monev>>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String program,
-            @RequestParam(required = false) List<String> bpdas) {
+            @RequestParam(required = false) String nomor,
+            @RequestParam(required = false) String ref_kegiatan,
+            @RequestParam(required = false) List<String> pelaksana) {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Monev> monevPage;
 
-        if ((program == null || program.isEmpty()) && (bpdas == null || bpdas.isEmpty())) {
+        if ((nomor == null || nomor.isEmpty()) && (ref_kegiatan == null || ref_kegiatan.isEmpty()) && (pelaksana == null || pelaksana.isEmpty())) {
             // No filters provided
             monevPage = monevService.findAll(pageable);
         } else {
             // Apply filters
-            monevPage = monevService.findByFilters(program, bpdas, pageable);
+            monevPage = monevService.findByFilters(nomor, ref_kegiatan, pelaksana, pageable);
         }
 
         PagedModel<EntityModel<Monev>> pagedModel = pagedResourcesAssembler.toModel(monevPage);
@@ -82,4 +88,38 @@ public class MonevController {
         monevService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    
+    @PostMapping(value = "/{id}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Unggah multiple PDFs Untuk Monev")
+    public ResponseEntity<?> uploadPdf(
+            @PathVariable UUID id,
+            @RequestPart("files") List<MultipartFile> files) {
+        try {
+            return ResponseEntity.ok(monevService.addFilesPdf(id, files));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal mengupload PDF: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}/pdfs")
+    @Operation(summary = "Menghapus PDF-PDF tertentu dari Monev")
+    public ResponseEntity<?> deletePdf(
+            @PathVariable UUID id,
+            @RequestBody List<UUID> pdfIds) throws Exception {
+        return ResponseEntity.ok(monevService.deleteFilesPdf(id, pdfIds));
+    }
+
+    @GetMapping("/{kegiatanId}/pdf/{pdfId}/download")
+    @Operation(summary = "Download PDF Monev")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID kegiatanId, @PathVariable UUID pdfId)
+            throws Exception {
+        return monevService.downloadFilePdf(kegiatanId, pdfId);
+
+    }
+
+
 }

@@ -76,7 +76,6 @@ public class BimtekService {
         }
         List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(bimtekId);
 
-
         return fotos;
     }
 
@@ -113,40 +112,40 @@ public class BimtekService {
         return bimtekRepository.save(existing);
     }
 
-@Transactional
-public void delete(UUID id) {
-    Bimtek bimtek = bimtekRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Bimtek tidak ditemukan dengan id: " + id));
-    
-    try {
-        // Delete all photos associated with the bimtek
-        List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
-        List<UUID> fotoIds = fotos.stream().map(BimtekFoto::getId).toList();
-        if (!fotoIds.isEmpty()) {
-            deleteFotos(id, fotoIds);
+    @Transactional
+    public void delete(UUID id) {
+        Bimtek bimtek = bimtekRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Bimtek tidak ditemukan dengan id: " + id));
+
+        try {
+            // Delete all photos associated with the bimtek
+            List<BimtekFoto> fotos = bimtekFotoRepository.findByBimtekId(id);
+            List<UUID> fotoIds = fotos.stream().map(BimtekFoto::getId).toList();
+            if (!fotoIds.isEmpty()) {
+                deleteFotos(id, fotoIds);
+            }
+
+            // Delete all videos associated with the bimtek
+            List<BimtekVideo> videos = bimtekVideoRepository.findByBimtekId(id);
+            List<UUID> videoIds = videos.stream().map(BimtekVideo::getId).toList();
+            if (!videoIds.isEmpty()) {
+                deleteVideos(id, videoIds);
+            }
+
+            // Delete all PDFs associated with the bimtek
+            List<BimtekPdf> pdfs = bimtekPdfRepository.findByBimtekId(id);
+            List<UUID> pdfIds = pdfs.stream().map(BimtekPdf::getId).toList();
+            if (!pdfIds.isEmpty()) {
+                deletePdfs(id, pdfIds);
+            }
+
+            // Finally delete the bimtek record itself
+            bimtekRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Gagal menghapus Bimtek dan file terkait: {}", e.getMessage(), e);
+            throw new RuntimeException("Gagal menghapus Bimtek dan file terkait: " + e.getMessage(), e);
         }
-        
-        // Delete all videos associated with the bimtek
-        List<BimtekVideo> videos = bimtekVideoRepository.findByBimtekId(id);
-        List<UUID> videoIds = videos.stream().map(BimtekVideo::getId).toList();
-        if (!videoIds.isEmpty()) {
-            deleteVideos(id, videoIds);
-        }
-        
-        // Delete all PDFs associated with the bimtek
-        List<BimtekPdf> pdfs = bimtekPdfRepository.findByBimtekId(id);
-        List<UUID> pdfIds = pdfs.stream().map(BimtekPdf::getId).toList();
-        if (!pdfIds.isEmpty()) {
-            deletePdfs(id, pdfIds);
-        }
-        
-        // Finally delete the bimtek record itself
-        bimtekRepository.deleteById(id);
-    } catch (Exception e) {
-        log.error("Gagal menghapus Bimtek dan file terkait: {}", e.getMessage(), e);
-        throw new RuntimeException("Gagal menghapus Bimtek dan file terkait: " + e.getMessage(), e);
     }
-}
 
     @Transactional
     public List<BimtekFoto> uploadFotos(UUID bimtekId, List<MultipartFile> files) throws Exception {
@@ -157,7 +156,7 @@ public void delete(UUID id) {
 
         for (MultipartFile file : files) {
             fileValidationUtil.validateFileType(file, "image");
-fileValidationUtil.validateFileSize(file);
+            fileValidationUtil.validateFileSize(file);
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             minioBimtekService.uploadFile(fileName, file.getInputStream(), file.getContentType());
@@ -380,28 +379,23 @@ fileValidationUtil.validateFileSize(file);
 
     public Page<Bimtek> findByFilters(String namaBimtek, String subjek, List<String> bpdas, Pageable pageable) {
         Specification<Bimtek> spec = Specification.where(null);
-        
+
         if (namaBimtek != null && !namaBimtek.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(
-                        criteriaBuilder.lower(root.get("namaBimtek")),
-                        "%" + namaBimtek.toLowerCase() + "%"
-                    ));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("namaBimtek")),
+                    "%" + namaBimtek.toLowerCase() + "%"));
         }
-        
+
         if (subjek != null && !subjek.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(
-                        criteriaBuilder.lower(root.get("subjek")),
-                        "%" + subjek.toLowerCase() + "%"
-                    ));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("subjek")),
+                    "%" + subjek.toLowerCase() + "%"));
         }
-        
+
         if (bpdas != null && !bpdas.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    root.get("bpdas").in(bpdas));
+            spec = spec.and((root, query, criteriaBuilder) -> root.get("bpdas").in(bpdas));
         }
-        
+
         return bimtekRepository.findAll(spec, pageable);
     }
 
