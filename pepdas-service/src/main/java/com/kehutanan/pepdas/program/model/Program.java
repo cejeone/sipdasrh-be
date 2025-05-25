@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kehutanan.pepdas.dokumen.model.DokumenFile;
 
@@ -20,24 +21,28 @@ public class Program {
     private UUID id;
     
     @Column(nullable = false)
+    private String direktorat;
+
+        
+    @Column( nullable = false)
     private String kategori;
     
     @Column(columnDefinition = "TEXT", nullable = false)
     private String nama;
     
-    @Column(name = "tahun_pelaksanaan", nullable = false)
-    private Integer tahunPelaksanaan;
-    
+    @Column(name = "tahun_rencana", nullable = false)
+    private Integer tahunRencana;
+
     @Column(name = "total_anggaran", precision = 19, scale = 2)
     private BigDecimal totalAnggaran;
     
-    @Column(name = "target_luas")
-    private Integer targetLuas;
     
     @Column(nullable = false)
     private String status;
 
-    @JsonManagedReference
+    @JsonBackReference
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaguAnggaran> files = new ArrayList<>();
+
+
 }

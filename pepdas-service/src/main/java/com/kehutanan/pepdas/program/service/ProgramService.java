@@ -37,27 +37,26 @@ public class ProgramService {
     @Transactional
     public Program save(ProgramDto programDto) {
         Program newProgram = new Program();
+        newProgram.setDirektorat(programDto.getDirektorat());
         newProgram.setKategori(programDto.getKategori());
         newProgram.setNama(programDto.getNama());
-        newProgram.setTahunPelaksanaan(programDto.getTahunPelaksanaan());
+        newProgram.setTahunRencana(programDto.getTahunRencana());
         newProgram.setTotalAnggaran(programDto.getTotalAnggaran());
-        newProgram.setTargetLuas(programDto.getTargetLuas());
         newProgram.setStatus(programDto.getStatus());
         return programRepository.save(newProgram);
     }
 
     @Transactional
     public Program update(UUID id, ProgramDto programDto) {
-        Program existingProgram = findById(id);
+        Program program = findById(id);
         
-        existingProgram.setKategori(programDto.getKategori());
-        existingProgram.setNama(programDto.getNama());
-        existingProgram.setTahunPelaksanaan(programDto.getTahunPelaksanaan());
-        existingProgram.setTotalAnggaran(programDto.getTotalAnggaran());
-        existingProgram.setTargetLuas(programDto.getTargetLuas());
-        existingProgram.setStatus(programDto.getStatus());
-        
-        return programRepository.save(existingProgram);
+        program.setDirektorat(programDto.getDirektorat());
+        program.setKategori(programDto.getKategori());
+        program.setNama(programDto.getNama());
+        program.setTahunRencana(programDto.getTahunRencana());
+        program.setTotalAnggaran(programDto.getTotalAnggaran());
+        program.setStatus(programDto.getStatus());
+        return programRepository.save(program);
     }
 
     @Transactional

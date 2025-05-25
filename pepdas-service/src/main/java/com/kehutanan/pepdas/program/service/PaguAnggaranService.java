@@ -77,6 +77,7 @@ public class PaguAnggaranService {
                 .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
 
         PaguAnggaran paguAnggaran = new PaguAnggaran();
+        paguAnggaran.setKategori(dto.getKategori());
         paguAnggaran.setSumberAnggaran(dto.getSumberAnggaran());
         paguAnggaran.setTahunAnggaran(dto.getTahunAnggaran());
         paguAnggaran.setPagu(dto.getPagu());
@@ -92,7 +93,7 @@ public class PaguAnggaranService {
         PaguAnggaran existing = findById(id);
         Program program = programRepository.findById(dto.getProgramId())
                 .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + dto.getProgramId()));
-
+        existing.setKategori(dto.getKategori());
         existing.setSumberAnggaran(dto.getSumberAnggaran());
         existing.setTahunAnggaran(dto.getTahunAnggaran());
         existing.setPagu(dto.getPagu());

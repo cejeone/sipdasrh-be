@@ -22,6 +22,10 @@ public class Dokumen {
     
     @Column(nullable = false)
     private String namaDokumen;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "dokumen", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DokumenFile> files = new ArrayList<>();
     
     private String status;
     
@@ -30,7 +34,5 @@ public class Dokumen {
     
     private LocalDateTime uploadedAt;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "dokumen", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DokumenFile> files = new ArrayList<>();
+
 }

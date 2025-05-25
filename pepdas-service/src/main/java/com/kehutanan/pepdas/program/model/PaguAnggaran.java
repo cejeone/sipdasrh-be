@@ -10,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "pepdas_pagu_anggaran")
 @Data
+@JsonIgnoreProperties({"program"})
 @NoArgsConstructor
 public class PaguAnggaran {
     
@@ -17,10 +18,12 @@ public class PaguAnggaran {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
+    private String kategori;
     private String sumberAnggaran;
     private Integer tahunAnggaran;
     private BigDecimal pagu;
     private String status;
+    @Column(columnDefinition = "TEXT")
     private String keterangan;
     
     @ManyToOne(fetch = FetchType.LAZY)

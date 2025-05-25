@@ -91,7 +91,7 @@ public class DokumenController {
 
 
     // Controller implementation
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @Operation(summary = "Membuat dokumen baru dengan multiple file")
     public ResponseEntity<Dokumen> create(@Valid @RequestBody DokumenDto dokumenDto) throws Exception {
 
@@ -100,7 +100,7 @@ public class DokumenController {
                         dokumenDto));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping
     @Operation(summary = "Memperbarui field di tabel Dokumen")
     public ResponseEntity<Dokumen> update(
             @PathVariable UUID id,

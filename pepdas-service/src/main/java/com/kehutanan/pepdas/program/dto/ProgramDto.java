@@ -11,11 +11,10 @@ import jakarta.persistence.GenerationType;
 
 @Data
 public class ProgramDto {
-    private UUID id;
+    private String direktorat;
     private String kategori;
     private String nama;
-    private Integer tahunPelaksanaan;
+    private Integer tahunRencana;
     private BigDecimal totalAnggaran;
-    private Integer targetLuas;
     private String status;
 }
