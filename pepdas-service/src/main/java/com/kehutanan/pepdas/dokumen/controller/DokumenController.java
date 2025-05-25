@@ -100,7 +100,7 @@ public class DokumenController {
                         dokumenDto));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Operation(summary = "Memperbarui field di tabel Dokumen")
     public ResponseEntity<Dokumen> update(
             @PathVariable UUID id,
