@@ -120,11 +120,11 @@ public class SerahTerimaController {
         return ResponseEntity.ok(serahTerimaService.deleteFilesPdf(id, pdfIds));
     }
 
-    @GetMapping("/{kegiatanId}/pdf/{pdfId}/download")
+    @GetMapping("/{serahTerimaId}/pdf/{pdfId}/download")
     @Operation(summary = "Download PDF Serah Terima")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID kegiatanId, @PathVariable UUID pdfId)
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID serahTerimaId, @PathVariable UUID pdfId)
             throws Exception {
-        return serahTerimaService.downloadFilePdf(kegiatanId, pdfId);
+        return serahTerimaService.downloadFilePdf(serahTerimaId, pdfId);
 
     }
 }
