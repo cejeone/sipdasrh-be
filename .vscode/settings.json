@@ -1,4 +1,24 @@
 {
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": true,
+    "java.project.sourcePaths": [
+        "superadmin-service/src/main/java",
+        "rh-service/src/main/java",
+        "pepdas-service/src/main/java"
+    ],
+    "java.project.resourcePaths": [
+        "superadmin-service/src/main/resources",
+        "rh-service/src/main/resources",
+        "pepdas-service/src/main/resources"
+    ],
+    "java.project.referencedLibraries": [],
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    // "java.configuration.runtimes": [
+    //     {
+    //         "name": "JavaSE-17",
+    //         "path": "/path/to/your/jdk-17",
+    //         "default": true
+    //     }
+    // ]
 }
