@@ -32,11 +32,11 @@ public class Spas {
     @Column(name = "alamat", length = 255)
     private String alamat;
 
-    @Column(name = "lintang")
-    private String lintang;
+    @Column(name = "lintang", precision = 11, scale = 6)  // Increase precision for latitude
+    private BigDecimal lintang;
 
-    @Column(name = "bujur")
-    private String bujur;
+    @Column(name = "bujur", precision = 11, scale = 6)    // Increase precision for longitude
+    private BigDecimal bujur;
 
     @ManyToOne
     @JoinColumn(name = "bpdas_id", referencedColumnName = "id")

@@ -134,11 +134,21 @@ public class SpasController {
             newSpas.setAlamat(alamat);
             
             if (lintang != null && !lintang.isEmpty()) {
-                newSpas.setLintang(lintang);
+                BigDecimal lintangValue = new BigDecimal(lintang);
+                // Latitude should be between -90 and 90
+                if (lintangValue.compareTo(new BigDecimal("-90")) < 0 || lintangValue.compareTo(new BigDecimal("90")) > 0) {
+                    throw new IllegalArgumentException("Latitude must be between -90 and 90");
+                }
+                newSpas.setLintang(lintangValue);
             }
-            
+
             if (bujur != null && !bujur.isEmpty()) {
-                newSpas.setBujur(bujur);
+                BigDecimal bujurValue = new BigDecimal(bujur);
+                // Longitude should be between -180 and 180
+                if (bujurValue.compareTo(new BigDecimal("-180")) < 0 || bujurValue.compareTo(new BigDecimal("180")) > 0) {
+                    throw new IllegalArgumentException("Longitude must be between -180 and 180");
+                }
+                newSpas.setBujur(bujurValue);
             }
             
             // Set related entities
@@ -202,16 +212,23 @@ public class SpasController {
             existingSpas.setAlamat(alamat);
             
             if (lintang != null && !lintang.isEmpty()) {
-                existingSpas.setLintang(lintang);
-            } else {
-                existingSpas.setLintang(null);
+                BigDecimal lintangValue = new BigDecimal(lintang);
+                // Latitude should be between -90 and 90
+                if (lintangValue.compareTo(new BigDecimal("-90")) < 0 || lintangValue.compareTo(new BigDecimal("90")) > 0) {
+                    throw new IllegalArgumentException("Latitude must be between -90 and 90");
+                }
+                existingSpas.setLintang(lintangValue);
             }
-            
+
             if (bujur != null && !bujur.isEmpty()) {
-                existingSpas.setBujur(bujur);
-            } else {
-                existingSpas.setBujur(null);
+                BigDecimal bujurValue = new BigDecimal(bujur);
+                // Longitude should be between -180 and 180
+                if (bujurValue.compareTo(new BigDecimal("-180")) < 0 || bujurValue.compareTo(new BigDecimal("180")) > 0) {
+                    throw new IllegalArgumentException("Longitude must be between -180 and 180");
+                }
+                existingSpas.setBujur(bujurValue);
             }
+
             
             // Set related entities
             existingSpas.setBpdas(bpdasService.findById(Long.parseLong(bpdasId)));
