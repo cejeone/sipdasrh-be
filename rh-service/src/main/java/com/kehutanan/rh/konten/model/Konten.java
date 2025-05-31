@@ -1,57 +1,64 @@
 package com.kehutanan.rh.konten.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.rh.master.model.Lov;
 
-import lombok.Data;
-
+/**
+ * Entity class representing the trx_rh_konten table
+ * This table stores content information in the forestry management system
+ */
 @Data
 @Entity
-@Table(name = "rh_konten")
+@Table(name = "trx_rh_konten")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Konten {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "tipe", nullable = false)
-    private String tipe;
+    @ManyToOne
+    @JoinColumn(name = "tipe_id", referencedColumnName = "id")
+    private Lov tipe;
 
-    @Column(name = "judul", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov status;
+
+    @Column(name = "judul")
     private String judul;
 
-    @Column(name = "konten", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "konten", columnDefinition = "TEXT")
     private String konten;
 
     @ElementCollection
     @CollectionTable(
-        name = "rh_konten_kata_kunci",
+        name = "trx_rh_konten_kata_kunci",
         joinColumns = @JoinColumn(name = "rh_konten_id")
     )
     @Column(name = "kata_kunci")
     private List<String> kataKunci;
 
-    @Column(name = "waktu_awal_tayang", nullable = false)
+
+    @Column(name = "waktu_awal_tayang")
     private LocalDateTime waktuAwalTayang;
 
-    @Column(name = "waktu_akhir_tayang", nullable = false)
+    @Column(name = "waktu_akhir_tayang")
     private LocalDateTime waktuAkhirTayang;
 
-    @Column(name = "status", nullable = false)
-    private String status;
-
-    @JsonManagedReference
     @OneToMany(mappedBy = "konten", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<KontenGambar> kontenGambars = new ArrayList<>();
 
     
-    @JsonManagedReference
     @OneToMany(mappedBy = "konten", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<KontenGambarUtama> kontenGambarUtamas = new ArrayList<>();
-
-
 }

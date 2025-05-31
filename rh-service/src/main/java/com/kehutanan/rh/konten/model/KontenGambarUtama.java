@@ -10,29 +10,32 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_konten_gambar_utama")
+@Table(name = "trx_rh_konten_gambar_utama")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KontenGambarUtama {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
+    
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rh_konten", nullable = false)
+    @JoinColumn(name = "konten_id", referencedColumnName = "id")
     private Konten konten;
-
-    @Column(nullable = false)
+    
     private String namaFile;
-
+    
     private String namaAsli;
 
+    private String pathFile;
+    
     private Double ukuranMb;
-
+    
     private String contentType;
-
+    
     private LocalDateTime uploadedAt;
 
+    private String viewUrl;
+
+    private String downloadUrl;
 }

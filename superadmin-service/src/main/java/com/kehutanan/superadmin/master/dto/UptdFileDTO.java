@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDTO implements Serializable {
+public class UptdFileDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private UUID id;
@@ -32,7 +32,7 @@ public class FileDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private String uploadedAt;
     
-    public FileDTO(UptdRantekPdf pdf) {
+    public UptdFileDTO(UptdRantekPdf pdf) {
         this.id = pdf.getId();
         this.namaAsli = pdf.getNamaAsli();
         this.namaFile = pdf.getNamaFile();
@@ -46,7 +46,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdDokumentasiFoto foto) {
+    public UptdFileDTO(UptdDokumentasiFoto foto) {
         this.id = foto.getId();
         this.namaAsli = foto.getNamaAsli();
         this.namaFile = foto.getNamaFile();
@@ -60,7 +60,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdDokumentasiVideo video) {
+    public UptdFileDTO(UptdDokumentasiVideo video) {
         this.id = video.getId();
         this.namaAsli = video.getNamaAsli();
         this.namaFile = video.getNamaFile();
@@ -74,7 +74,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdPetaShp shp) {
+    public UptdFileDTO(UptdPetaShp shp) {
         this.id = shp.getId();
         this.namaAsli = shp.getNamaAsli();
         this.namaFile = shp.getNamaFile();

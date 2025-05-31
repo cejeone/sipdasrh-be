@@ -58,10 +58,10 @@ public class UptdDTO implements Serializable {
     private String kelurahanDesaNama;
     
     // Lists for file references
-    private List<FileDTO> uptdPdfList = new ArrayList<>();
-    private List<FileDTO> uptdFotoList = new ArrayList<>();
-    private List<FileDTO> uptdVideoList = new ArrayList<>();
-    private List<FileDTO> uptdShpList = new ArrayList<>();
+    private List<UptdFileDTO> uptdPdfList = new ArrayList<>();
+    private List<UptdFileDTO> uptdFotoList = new ArrayList<>();
+    private List<UptdFileDTO> uptdVideoList = new ArrayList<>();
+    private List<UptdFileDTO> uptdShpList = new ArrayList<>();
     
     // Constructor to convert from Entity
     public UptdDTO(Uptd entity) {
@@ -120,25 +120,25 @@ public class UptdDTO implements Serializable {
         // Convert file lists
         if (entity.getUptdRantekPdfs() != null) {
             for (UptdRantekPdf pdf : entity.getUptdRantekPdfs()) {
-                this.uptdPdfList.add(new FileDTO(pdf));
+                this.uptdPdfList.add(new UptdFileDTO(pdf));
             }
         }
         
         if (entity.getUptdDokumentasiFotos() != null) {
             for (UptdDokumentasiFoto foto : entity.getUptdDokumentasiFotos()) {
-                this.uptdFotoList.add(new FileDTO(foto));
+                this.uptdFotoList.add(new UptdFileDTO(foto));
             }
         }
         
         if (entity.getUptdDokumentasiVideos() != null) {
             for (UptdDokumentasiVideo video : entity.getUptdDokumentasiVideos()) {
-                this.uptdVideoList.add(new FileDTO(video));
+                this.uptdVideoList.add(new UptdFileDTO(video));
             }
         }
         
         if (entity.getUptdPetaShps() != null) {
             for (UptdPetaShp shp : entity.getUptdPetaShps()) {
-                this.uptdShpList.add(new FileDTO(shp));
+                this.uptdShpList.add(new UptdFileDTO(shp));
             }
         }
     }

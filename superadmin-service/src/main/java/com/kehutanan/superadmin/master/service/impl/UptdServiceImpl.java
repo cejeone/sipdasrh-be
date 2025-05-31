@@ -75,12 +75,15 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
+     @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd save(Uptd uptd) {
         return repository.save(uptd);
     }
 
     @Override
-    @CachePut(value = "uptdCache", key = "#id")
+     @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd update(Long id, Uptd uptd) {
         return repository.save(uptd);
     }
@@ -565,7 +568,8 @@ public class UptdServiceImpl implements UptdService {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("namaUptd")), searchPattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("alamat")), searchPattern),
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("catatan")), searchPattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.join("bpdas").get("namaBpdas")), searchPattern)));
+                    criteriaBuilder.like(criteriaBuilder.lower(root.join("bpdas").get("namaBpdas")), searchPattern)
+                    ));
         }
 
         Page<Uptd> page = repository.findAll(spec, pageable);
