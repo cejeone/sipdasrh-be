@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kehutanan.superadmin.master.model.UptdFoto;
-import com.kehutanan.superadmin.master.model.UptdPdf;
-import com.kehutanan.superadmin.master.model.UptdShp;
-import com.kehutanan.superadmin.master.model.UptdVideo;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiFoto;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiVideo;
+import com.kehutanan.superadmin.master.model.UptdPetaShp;
+import com.kehutanan.superadmin.master.model.UptdRantekPdf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +32,7 @@ public class FileDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private String uploadedAt;
     
-    public FileDTO(UptdPdf pdf) {
+    public FileDTO(UptdRantekPdf pdf) {
         this.id = pdf.getId();
         this.namaAsli = pdf.getNamaAsli();
         this.namaFile = pdf.getNamaFile();
@@ -46,7 +46,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdFoto foto) {
+    public FileDTO(UptdDokumentasiFoto foto) {
         this.id = foto.getId();
         this.namaAsli = foto.getNamaAsli();
         this.namaFile = foto.getNamaFile();
@@ -60,7 +60,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdVideo video) {
+    public FileDTO(UptdDokumentasiVideo video) {
         this.id = video.getId();
         this.namaAsli = video.getNamaAsli();
         this.namaFile = video.getNamaFile();
@@ -74,7 +74,7 @@ public class FileDTO implements Serializable {
         }
     }
     
-    public FileDTO(UptdShp shp) {
+    public FileDTO(UptdPetaShp shp) {
         this.id = shp.getId();
         this.namaAsli = shp.getNamaAsli();
         this.namaFile = shp.getNamaFile();

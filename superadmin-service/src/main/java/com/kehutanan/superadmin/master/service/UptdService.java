@@ -1,22 +1,16 @@
 package com.kehutanan.superadmin.master.service;
 
-import com.kehutanan.superadmin.master.dto.UptdDTO;
-import com.kehutanan.superadmin.master.model.Uptd;
-import com.kehutanan.superadmin.master.model.UptdFoto;
-import com.kehutanan.superadmin.master.model.UptdPdf;
-import com.kehutanan.superadmin.master.model.UptdVideo;
-import com.kehutanan.superadmin.master.model.UptdShp;
+import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import com.kehutanan.superadmin.master.dto.UptdDTO;
+import com.kehutanan.superadmin.master.dto.UptdPageDTO;
+import com.kehutanan.superadmin.master.model.Uptd;
 
 public interface UptdService {
     
-    Page<Uptd> findAll(Pageable pageable);
     
     List<Uptd> findAll();
     
@@ -30,7 +24,6 @@ public interface UptdService {
     
     void deleteById(Long id);
     
-    Page<Uptd> findByFilters(String namaUptd, Long bpdasId, Long provinsiId, Long kabupatenKotaId, Long kecamatanId, Long kelurahanDesaId, Pageable pageable);
 
     Uptd uploadUptdFoto(Long id, List<MultipartFile> foto);
     
@@ -47,4 +40,11 @@ public interface UptdService {
     Uptd deleteUptdVideo(Long id, List<String> uuidVideo);
     
     Uptd deleteUptdShp(Long id, List<String> uuidShp);
+
+    UptdPageDTO findAllWithCache(Pageable pageable, String baseUrl);
+
+    UptdPageDTO findByFiltersWithCache(String namaBpdas, String namaUptd, List<String> bpdasList,
+            Pageable pageable, String baseUrl);
+
+    UptdPageDTO searchWithCache(String keyWord, Pageable pageable, String string);
 }

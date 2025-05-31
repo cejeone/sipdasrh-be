@@ -1,14 +1,12 @@
 package com.kehutanan.superadmin.master.service.impl;
 
-import com.kehutanan.superadmin.master.repository.UptdRepository;
-import com.kehutanan.superadmin.util.FileValidationUtil;
-import com.kehutanan.superadmin.master.service.UptdService;
-import com.kehutanan.superadmin.master.dto.UptdDTO;
-import com.kehutanan.superadmin.master.model.Uptd;
-import com.kehutanan.superadmin.master.model.UptdFoto;
-import com.kehutanan.superadmin.master.model.UptdPdf;
-import com.kehutanan.superadmin.master.model.UptdVideo;
-import com.kehutanan.superadmin.master.model.UptdShp;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,19 +15,26 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.superadmin.common.service.MinioStorageService;
-import jakarta.persistence.EntityNotFoundException;
+import com.kehutanan.superadmin.master.dto.UptdDTO;
+import com.kehutanan.superadmin.master.dto.UptdPageDTO;
+import com.kehutanan.superadmin.master.model.Uptd;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiFoto;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiVideo;
+import com.kehutanan.superadmin.master.model.UptdPetaShp;
+import com.kehutanan.superadmin.master.model.UptdRantekPdf;
+import com.kehutanan.superadmin.master.repository.UptdRepository;
+import com.kehutanan.superadmin.master.service.UptdService;
+import com.kehutanan.superadmin.util.FileValidationUtil;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UptdServiceImpl implements UptdService {
@@ -47,11 +52,6 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    public Page<Uptd> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
-    @Override
     public List<Uptd> findAll() {
         return repository.findAll();
     }
@@ -63,7 +63,7 @@ public class UptdServiceImpl implements UptdService {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
-        UptdDTO uptdDTO =  new UptdDTO(uptd);
+        UptdDTO uptdDTO = new UptdDTO(uptd);
 
         return uptdDTO;
     }
@@ -86,15 +86,16 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public void deleteById(Long id) {
         // Find the entity first to get all associated files
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
         // Delete all PDF files from MinIO storage
-        if (uptd.getUptdPdfList() != null) {
-            for (UptdPdf pdf : uptd.getUptdPdfList()) {
+        if (uptd.getUptdRantekPdfs() != null) {
+            for (UptdRantekPdf pdf : uptd.getUptdRantekPdfs()) {
                 try {
                     minioStorageService.deleteFile("", pdf.getPathFile());
                 } catch (Exception e) {
@@ -105,8 +106,8 @@ public class UptdServiceImpl implements UptdService {
         }
 
         // Delete all photo files from MinIO storage
-        if (uptd.getUptdFotoList() != null) {
-            for (UptdFoto foto : uptd.getUptdFotoList()) {
+        if (uptd.getUptdDokumentasiFotos() != null) {
+            for (UptdDokumentasiFoto foto : uptd.getUptdDokumentasiFotos()) {
                 try {
                     minioStorageService.deleteFile("", foto.getPathFile());
                 } catch (Exception e) {
@@ -116,8 +117,8 @@ public class UptdServiceImpl implements UptdService {
         }
 
         // Delete all video files from MinIO storage
-        if (uptd.getUptdVideoList() != null) {
-            for (UptdVideo video : uptd.getUptdVideoList()) {
+        if (uptd.getUptdDokumentasiVideos() != null) {
+            for (UptdDokumentasiVideo video : uptd.getUptdDokumentasiVideos()) {
                 try {
                     minioStorageService.deleteFile("", video.getPathFile());
                 } catch (Exception e) {
@@ -127,8 +128,8 @@ public class UptdServiceImpl implements UptdService {
         }
 
         // Delete all SHP files from MinIO storage
-        if (uptd.getUptdShpList() != null) {
-            for (UptdShp shp : uptd.getUptdShpList()) {
+        if (uptd.getUptdPetaShps() != null) {
+            for (UptdPetaShp shp : uptd.getUptdPetaShps()) {
                 try {
                     minioStorageService.deleteFile("", shp.getPathFile());
                 } catch (Exception e) {
@@ -142,52 +143,8 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    public Page<Uptd> findByFilters(String namaUptd, Long bpdasId, Long provinsiId, Long kabupatenKotaId,
-            Long kecamatanId, Long kelurahanDesaId, Pageable pageable) {
-        Specification<Uptd> spec = Specification.where(null);
-
-        // Add case-insensitive LIKE filter for namaUptd if provided
-        if (namaUptd != null && !namaUptd.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("namaUptd")),
-                    "%" + namaUptd.toLowerCase() + "%"));
-        }
-
-        // Add equals filter for bpdasId if provided
-        if (bpdasId != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.get("bpdas").get("id"), bpdasId));
-        }
-
-        // Add equals filter for provinsiId if provided
-        if (provinsiId != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.get("provinsi").get("id"), provinsiId));
-        }
-
-        // Add equals filter for kabupatenKotaId if provided
-        if (kabupatenKotaId != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.get("kabupatenKota").get("id"), kabupatenKotaId));
-        }
-
-        // Add equals filter for kecamatanId if provided
-        if (kecamatanId != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.get("kecamatan").get("id"), kecamatanId));
-        }
-
-        // Add equals filter for kelurahanDesaId if provided
-        if (kelurahanDesaId != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.get("kelurahanDesa").get("id"), kelurahanDesaId));
-        }
-
-        return repository.findAll(spec, pageable);
-    }
-
-    @Override
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdFoto(Long id, List<MultipartFile> files) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
@@ -201,7 +158,7 @@ public class UptdServiceImpl implements UptdService {
             String folderName = FOLDER_PREFIX + uptd.getId() + "/foto/";
             String filePath = folderName + fileName;
 
-            UptdFoto uptdFoto = new UptdFoto();
+            UptdDokumentasiFoto uptdFoto = new UptdDokumentasiFoto();
             uptdFoto.setId(idfile);
             uptdFoto.setUptd(uptd);
             uptdFoto.setNamaAsli(file.getOriginalFilename());
@@ -221,12 +178,12 @@ public class UptdServiceImpl implements UptdService {
             uptdFoto.setContentType(file.getContentType());
             uptdFoto.setUploadedAt(LocalDateTime.now());
 
-            uptd.getUptdFotoList().add(uptdFoto);
+            uptd.getUptdDokumentasiFotos().add(uptdFoto);
 
             try {
                 minioStorageService.uploadFile(folderName, fileName, file.getInputStream(), file.getContentType());
             } catch (Exception e) {
-                uptd.getUptdFotoList().removeIf(foto -> foto.getId().equals(idfile));
+                uptd.getUptdDokumentasiFotos().removeIf(foto -> foto.getId().equals(idfile));
                 throw new RuntimeException("Failed to upload file to storage: " + e.getMessage(), e);
             }
         }
@@ -235,7 +192,8 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdPdf(Long id, List<MultipartFile> files) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
@@ -249,7 +207,7 @@ public class UptdServiceImpl implements UptdService {
             String folderName = FOLDER_PREFIX + uptd.getId() + "/pdf/";
             String filePath = folderName + fileName;
 
-            UptdPdf uptdPdf = new UptdPdf();
+            UptdRantekPdf uptdPdf = new UptdRantekPdf();
             uptdPdf.setId(idfile);
             uptdPdf.setUptd(uptd);
             uptdPdf.setNamaAsli(file.getOriginalFilename());
@@ -269,12 +227,12 @@ public class UptdServiceImpl implements UptdService {
             uptdPdf.setContentType(file.getContentType());
             uptdPdf.setUploadedAt(LocalDateTime.now());
 
-            uptd.getUptdPdfList().add(uptdPdf);
+            uptd.getUptdRantekPdfs().add(uptdPdf);
 
             try {
                 minioStorageService.uploadFile(folderName, fileName, file.getInputStream(), file.getContentType());
             } catch (Exception e) {
-                uptd.getUptdPdfList().removeIf(pdf -> pdf.getId().equals(idfile));
+                uptd.getUptdRantekPdfs().removeIf(pdf -> pdf.getId().equals(idfile));
                 throw new RuntimeException("Failed to upload file to storage: " + e.getMessage(), e);
             }
         }
@@ -283,7 +241,8 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdVideo(Long id, List<MultipartFile> files) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
@@ -297,7 +256,7 @@ public class UptdServiceImpl implements UptdService {
             String folderName = FOLDER_PREFIX + uptd.getId() + "/video/";
             String filePath = folderName + fileName;
 
-            UptdVideo uptdVideo = new UptdVideo();
+            UptdDokumentasiVideo uptdVideo = new UptdDokumentasiVideo();
             uptdVideo.setId(idfile);
             uptdVideo.setUptd(uptd);
             uptdVideo.setNamaAsli(file.getOriginalFilename());
@@ -317,12 +276,12 @@ public class UptdServiceImpl implements UptdService {
             uptdVideo.setContentType(file.getContentType());
             uptdVideo.setUploadedAt(LocalDateTime.now());
 
-            uptd.getUptdVideoList().add(uptdVideo);
+            uptd.getUptdDokumentasiVideos().add(uptdVideo);
 
             try {
                 minioStorageService.uploadFile(folderName, fileName, file.getInputStream(), file.getContentType());
             } catch (Exception e) {
-                uptd.getUptdVideoList().removeIf(video -> video.getId().equals(idfile));
+                uptd.getUptdDokumentasiVideos().removeIf(video -> video.getId().equals(idfile));
                 throw new RuntimeException("Failed to upload file to storage: " + e.getMessage(), e);
             }
         }
@@ -331,7 +290,8 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdShp(Long id, List<MultipartFile> files) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
@@ -345,7 +305,7 @@ public class UptdServiceImpl implements UptdService {
             String folderName = FOLDER_PREFIX + uptd.getId() + "/shp/";
             String filePath = folderName + fileName;
 
-            UptdShp uptdShp = new UptdShp();
+            UptdPetaShp uptdShp = new UptdPetaShp();
             uptdShp.setId(idfile);
             uptdShp.setUptd(uptd);
             uptdShp.setNamaAsli(file.getOriginalFilename());
@@ -365,12 +325,12 @@ public class UptdServiceImpl implements UptdService {
             uptdShp.setContentType(file.getContentType());
             uptdShp.setUploadedAt(LocalDateTime.now());
 
-            uptd.getUptdShpList().add(uptdShp);
+            uptd.getUptdPetaShps().add(uptdShp);
 
             try {
                 minioStorageService.uploadFile(folderName, fileName, file.getInputStream(), file.getContentType());
             } catch (Exception e) {
-                uptd.getUptdShpList().removeIf(shp -> shp.getId().equals(idfile));
+                uptd.getUptdPetaShps().removeIf(shp -> shp.getId().equals(idfile));
                 throw new RuntimeException("Failed to upload file to storage: " + e.getMessage(), e);
             }
         }
@@ -380,12 +340,13 @@ public class UptdServiceImpl implements UptdService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdFoto(Long id, List<String> uuidFoto) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
-        uptd.getUptdFotoList().removeIf(file -> {
+        uptd.getUptdDokumentasiFotos().removeIf(file -> {
             if (uuidFoto.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
@@ -403,12 +364,13 @@ public class UptdServiceImpl implements UptdService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdPdf(Long id, List<String> uuidPdf) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
-        uptd.getUptdPdfList().removeIf(file -> {
+        uptd.getUptdRantekPdfs().removeIf(file -> {
             if (uuidPdf.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
@@ -426,12 +388,13 @@ public class UptdServiceImpl implements UptdService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdVideo(Long id, List<String> uuidVideo) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
-        uptd.getUptdVideoList().removeIf(file -> {
+        uptd.getUptdDokumentasiVideos().removeIf(file -> {
             if (uuidVideo.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
@@ -449,12 +412,13 @@ public class UptdServiceImpl implements UptdService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = { "uptdCache", "uptdPageCache", "uptdFilterCache",
+            "uptdSearchCache" }, allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdShp(Long id, List<String> uuidShp) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
-        uptd.getUptdShpList().removeIf(file -> {
+        uptd.getUptdPetaShps().removeIf(file -> {
             if (uuidShp.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
@@ -468,6 +432,201 @@ public class UptdServiceImpl implements UptdService {
             }
         });
         return repository.save(uptd);
+    }
+
+    @Override
+    @Cacheable(value = "uptdPageCache", key = "#pageable.pageNumber + '_' + #pageable.pageSize + '_' + #pageable.sort")
+    public UptdPageDTO findAllWithCache(Pageable pageable, String baseUrl) {
+        Page<Uptd> page = repository.findAll(pageable);
+
+        // Create PageMetadata for HATEOAS
+        PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalElements(),
+                page.getTotalPages());
+
+        // Create links for pagination
+        List<Link> links = new ArrayList<>();
+
+        // Self link
+        links.add(Link.of(createPageUrl(baseUrl, page.getNumber(), page.getSize()), "self"));
+
+        // First page link
+        links.add(Link.of(createPageUrl(baseUrl, 0, page.getSize()), "first"));
+
+        // Previous page link (if not first page)
+        if (page.getNumber() > 0) {
+            links.add(Link.of(createPageUrl(baseUrl, page.getNumber() - 1, page.getSize()), "prev"));
+        }
+
+        // Next page link (if not last page)
+        if (page.getNumber() < page.getTotalPages() - 1) {
+            links.add(Link.of(createPageUrl(baseUrl, page.getNumber() + 1, page.getSize()), "next"));
+        }
+
+        // Last page link
+        if (page.getTotalPages() > 0) {
+            links.add(Link.of(createPageUrl(baseUrl, page.getTotalPages() - 1, page.getSize()), "last"));
+        }
+
+        return new UptdPageDTO(page, pageMetadata, links);
+    }
+
+    @Override
+    @Cacheable(value = "uptdFilterCache", key = "{#namaBpdas, #namaUptd, #bpdasList, #pageable.pageNumber, #pageable.pageSize, #pageable.sort}")
+    public UptdPageDTO findByFiltersWithCache(String namaBpdas, String namaUptd, List<String> bpdasList,
+            Pageable pageable, String baseUrl) {
+
+        // Create specification based on filters
+        Specification<Uptd> spec = Specification.where(null);
+
+        // Add case-insensitive LIKE filter for namaUptd if provided
+        if (namaBpdas != null && !namaBpdas.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("bpdas").get("namaBpdas")),
+                    "%" + namaBpdas.toLowerCase() + "%"));
+        }
+
+        // Add case-insensitive LIKE filter for namaUptd if provided
+        if (namaUptd != null && !namaUptd.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("namaUptd")),
+                    "%" + namaUptd.toLowerCase() + "%"));
+        }
+
+        if (bpdasList != null && !bpdasList.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> root.get("bpdas").get("id").in(bpdasList));
+        }
+
+        // Execute query with filters
+        Page<Uptd> page = repository.findAll(spec, pageable);
+
+        // Create PageMetadata for HATEOAS
+        PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalElements(),
+                page.getTotalPages());
+
+        // Create links for pagination
+        List<Link> links = new ArrayList<>();
+
+        // Base URL with filters
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl);
+
+        // Add all filter parameters to URL
+        if (namaBpdas != null && !namaBpdas.isEmpty()) {
+            builder.queryParam("namaBpdas", namaBpdas);
+        }
+        if (namaUptd != null && !namaUptd.isEmpty()) {
+            builder.queryParam("namaUptd", namaUptd);
+        }
+        if (bpdasList != null && !bpdasList.isEmpty()) {
+            for (String bpdasId : bpdasList) {
+                builder.queryParam("bpdasList", bpdasId);
+            }
+        }
+
+        String filterBaseUrl = builder.build().toUriString();
+
+        // Self link
+        links.add(Link.of(createFilterPageUrl(filterBaseUrl, page.getNumber(), page.getSize()), "self"));
+
+        // First page link
+        links.add(Link.of(createFilterPageUrl(filterBaseUrl, 0, page.getSize()), "first"));
+
+        // Previous page link (if not first page)
+        if (page.getNumber() > 0) {
+            links.add(Link.of(createFilterPageUrl(filterBaseUrl, page.getNumber() - 1, page.getSize()), "prev"));
+        }
+
+        // Next page link (if not last page)
+        if (page.getNumber() < page.getTotalPages() - 1) {
+            links.add(Link.of(createFilterPageUrl(filterBaseUrl, page.getNumber() + 1, page.getSize()), "next"));
+        }
+
+        // Last page link
+        if (page.getTotalPages() > 0) {
+            links.add(Link.of(createFilterPageUrl(filterBaseUrl, page.getTotalPages() - 1, page.getSize()), "last"));
+        }
+
+        return new UptdPageDTO(page, pageMetadata, links);
+    }
+
+    @Override
+    @Cacheable(value = "uptdSearchCache", key = "{#keyWord, #pageable.pageNumber, #pageable.pageSize, #pageable.sort}")
+    public UptdPageDTO searchWithCache(String keyWord, Pageable pageable, String baseUrl) {
+        Specification<Uptd> spec = Specification.where(null);
+
+        if (keyWord != null && !keyWord.isEmpty()) {
+            String searchPattern = "%" + keyWord.toLowerCase() + "%";
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("namaUptd")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("alamat")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("catatan")), searchPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.join("bpdas").get("namaBpdas")), searchPattern)));
+        }
+
+        Page<Uptd> page = repository.findAll(spec, pageable);
+
+        // Create PageMetadata for HATEOAS
+        PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalElements(),
+                page.getTotalPages());
+
+        // Create links for pagination
+        List<Link> links = new ArrayList<>();
+
+        // Base URL with search parameter
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl);
+
+        // Add search keyword parameter to URL
+        if (keyWord != null && !keyWord.isEmpty()) {
+            builder.queryParam("keyWord", keyWord);
+        }
+
+        String searchBaseUrl = builder.build().toUriString();
+
+        // Self link
+        links.add(Link.of(createFilterPageUrl(searchBaseUrl, page.getNumber(), page.getSize()), "self"));
+
+        // First page link
+        links.add(Link.of(createFilterPageUrl(searchBaseUrl, 0, page.getSize()), "first"));
+
+        // Previous page link (if not first page)
+        if (page.getNumber() > 0) {
+            links.add(Link.of(createFilterPageUrl(searchBaseUrl, page.getNumber() - 1, page.getSize()), "prev"));
+        }
+
+        // Next page link (if not last page)
+        if (page.getNumber() < page.getTotalPages() - 1) {
+            links.add(Link.of(createFilterPageUrl(searchBaseUrl, page.getNumber() + 1, page.getSize()), "next"));
+        }
+
+        // Last page link
+        if (page.getTotalPages() > 0) {
+            links.add(Link.of(createFilterPageUrl(searchBaseUrl, page.getTotalPages() - 1, page.getSize()), "last"));
+        }
+
+        return new UptdPageDTO(page, pageMetadata, links);
+    }
+
+    private String createPageUrl(String baseUrl, int page, int size) {
+        return UriComponentsBuilder.fromUriString(baseUrl)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .build()
+                .toUriString();
+    }
+
+    private String createFilterPageUrl(String filterBaseUrl, int page, int size) {
+        // Check if the URL already has query parameters
+        String connector = filterBaseUrl.contains("?") ? "&" : "?";
+
+        return filterBaseUrl + connector + "page=" + page + "&size=" + size;
     }
 
 }

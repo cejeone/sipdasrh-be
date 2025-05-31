@@ -1,16 +1,60 @@
-
 package com.kehutanan.rh.dokumen.dto;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.kehutanan.rh.dokumen.model.Dokumen;
+import com.kehutanan.rh.dokumen.model.DokumenFile;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class DokumenDto {
-    private String tipe;
+@NoArgsConstructor
+@AllArgsConstructor
+public class DokumenDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private Long id;
     private String namaDokumen;
-    private String status; 
+    private Double ukuranDokumen;
     private String keterangan;
-    private LocalDateTime uploadedAt;
+    
+    // Related entity IDs and names
+    private Long tipeId;
+    private String tipeNama;
+    private Long statusId;
+    private String statusNama;
+    
+    // Lists for file references
+    private List<FileDTO> dokumenFiles = new ArrayList<>();
+    
+    // Constructor to convert from Entity
+    public DokumenDTO(Dokumen entity) {
+        this.id = entity.getId();
+        this.namaDokumen = entity.getNamaDokumen();
+        this.ukuranDokumen = entity.getUkuranDokumen();
+        this.keterangan = entity.getKeterangan();
+        
+        // Set related entity IDs and names
+        if (entity.getTipe() != null) {
+            this.tipeId = entity.getTipe().getId();
+            this.tipeNama = entity.getTipe().getNilai();
+        }
+        
+        if (entity.getStatus() != null) {
+            this.statusId = entity.getStatus().getId();
+            this.statusNama = entity.getStatus().getNilai();
+        }
+        
+        // Convert file lists
+        if (entity.getDokumenFiles() != null) {
+            for (DokumenFile file : entity.getDokumenFiles()) {
+                this.dokumenFiles.add(new FileDTO(file));
+            }
+        }
+    }
 }

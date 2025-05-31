@@ -7,10 +7,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kehutanan.superadmin.master.model.Uptd;
-import com.kehutanan.superadmin.master.model.UptdFoto;
-import com.kehutanan.superadmin.master.model.UptdPdf;
-import com.kehutanan.superadmin.master.model.UptdShp;
-import com.kehutanan.superadmin.master.model.UptdVideo;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiFoto;
+import com.kehutanan.superadmin.master.model.UptdDokumentasiVideo;
+import com.kehutanan.superadmin.master.model.UptdPetaShp;
+import com.kehutanan.superadmin.master.model.UptdRantekPdf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -118,26 +118,26 @@ public class UptdDTO implements Serializable {
         }
         
         // Convert file lists
-        if (entity.getUptdPdfList() != null) {
-            for (UptdPdf pdf : entity.getUptdPdfList()) {
+        if (entity.getUptdRantekPdfs() != null) {
+            for (UptdRantekPdf pdf : entity.getUptdRantekPdfs()) {
                 this.uptdPdfList.add(new FileDTO(pdf));
             }
         }
         
-        if (entity.getUptdFotoList() != null) {
-            for (UptdFoto foto : entity.getUptdFotoList()) {
+        if (entity.getUptdDokumentasiFotos() != null) {
+            for (UptdDokumentasiFoto foto : entity.getUptdDokumentasiFotos()) {
                 this.uptdFotoList.add(new FileDTO(foto));
             }
         }
         
-        if (entity.getUptdVideoList() != null) {
-            for (UptdVideo video : entity.getUptdVideoList()) {
+        if (entity.getUptdDokumentasiVideos() != null) {
+            for (UptdDokumentasiVideo video : entity.getUptdDokumentasiVideos()) {
                 this.uptdVideoList.add(new FileDTO(video));
             }
         }
         
-        if (entity.getUptdShpList() != null) {
-            for (UptdShp shp : entity.getUptdShpList()) {
+        if (entity.getUptdPetaShps() != null) {
+            for (UptdPetaShp shp : entity.getUptdPetaShps()) {
                 this.uptdShpList.add(new FileDTO(shp));
             }
         }

@@ -1,5 +1,6 @@
 package com.kehutanan.superadmin.master.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,8 +16,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "mst_uptd_video")
-public class UptdVideo {
+@Table(name = "mst_uptd_foto")
+public class UptdDokumentasiFoto implements Serializable {
     
     @Id
     private UUID id;

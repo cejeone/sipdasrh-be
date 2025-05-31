@@ -65,13 +65,13 @@ public class Uptd implements Serializable{
     private String nomorTeleponKontak;
 
     @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UptdPdf> uptdPdfList = new ArrayList<>();
+    private List<UptdRantekPdf> uptdRantekPdfs = new ArrayList<>();
 
     @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UptdFoto> uptdFotoList = new ArrayList<>();
+    private List<UptdDokumentasiFoto> uptdDokumentasiFotos = new ArrayList<>();
 
     @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UptdVideo> uptdVideoList = new ArrayList<>();
+    private List<UptdDokumentasiVideo> uptdDokumentasiVideos = new ArrayList<>();
 
     @Column(name = "catatan_dokumen", columnDefinition = "TEXT")
     private String catatanDokumen;
@@ -89,7 +89,7 @@ public class Uptd implements Serializable{
     private BigDecimal luas;
 
     @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UptdShp> uptdShpList = new ArrayList<>();
+    private List<UptdPetaShp> uptdPetaShps = new ArrayList<>();
 
     @Column(name = "nama_uptd", length = 255)
     private String namaUptd;

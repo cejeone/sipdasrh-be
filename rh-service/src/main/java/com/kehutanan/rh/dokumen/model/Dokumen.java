@@ -1,36 +1,48 @@
 package com.kehutanan.rh.dokumen.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+import com.kehutanan.rh.master.model.Lov;
+
+import jakarta.persistence.*;
+
+/**
+ * Entity class representing the trx_rh_dokumen table
+ * This table stores document information in the forestry management system
+ */
 @Data
 @Entity
-@Table(name = "rh_dokumen")
+@Table(name = "trx_rh_dokumen")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Dokumen {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    @Column(nullable = false)
-    private String tipe;
-    
-    @Column(nullable = false)
-    private String namaDokumen;
-    
-    private String status;
-    
-    @Column(columnDefinition = "TEXT")
-    private String keterangan;
-    
-    private LocalDateTime uploadedAt;
 
-    @JsonManagedReference
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "tipe_id", referencedColumnName = "id")
+    private Lov tipe;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov status;
+
+    @Column(name = "nama_dokumen", length = 255)
+    private String namaDokumen;
+
     @OneToMany(mappedBy = "dokumen", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DokumenFile> files = new ArrayList<>();
+    private List<DokumenFile> dokumenFiles = new ArrayList<>();
+
+    @Column(name = "ukuran_dokumen")
+    private Double ukuranDokumen;
+
+    @Column(name = "keterangan", columnDefinition = "TEXT")
+    private String keterangan;
 }

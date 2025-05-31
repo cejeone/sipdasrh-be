@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kehutanan.superadmin.master.dto.UptdDTO;
 import com.kehutanan.superadmin.master.dto.UptdDeleteFilesRequest;
+import com.kehutanan.superadmin.master.dto.UptdPageDTO;
 import com.kehutanan.superadmin.master.model.Bpdas;
 import com.kehutanan.superadmin.master.model.KabupatenKota;
 import com.kehutanan.superadmin.master.model.Kecamatan;
@@ -44,6 +46,7 @@ import com.kehutanan.superadmin.master.service.UptdService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/uptd")
@@ -65,6 +68,7 @@ public class UptdController {
             KabupatenKotaService kabupatenKotaService,
             KecamatanService kecamatanService,
             KelurahanDesaService kelurahanDesaService,
+            @RequestParam(required = false) List<String> bpdas,
             PagedResourcesAssembler<Uptd> pagedResourcesAssembler) {
         this.service = service;
         this.bpdasService = bpdasService;
@@ -76,33 +80,40 @@ public class UptdController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<Uptd>>> getAllUptd(
+    public ResponseEntity<UptdPageDTO> getAllUptd(
+            @RequestParam(required = false) String namaBpdas,
             @RequestParam(required = false) String namaUptd,
-            @RequestParam(required = false) Long bpdasId,
-            @RequestParam(required = false) Long provinsiId,
-            @RequestParam(required = false) Long kabupatenKotaId,
-            @RequestParam(required = false) Long kecamatanId,
-            @RequestParam(required = false) Long kelurahanDesaId,
+            @RequestParam(required = false) List<String> bpdasList,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Uptd> uptdPage;
+        UptdPageDTO uptdPage;
+
+        String baseUrl = request.getRequestURL().toString();
 
         // Check if any filter is provided
         if ((namaUptd != null && !namaUptd.isEmpty()) ||
-                (bpdasId != null) ||
-                (provinsiId != null) ||
-                (kabupatenKotaId != null) ||
-                (kecamatanId != null) ||
-                (kelurahanDesaId != null)) {
-            uptdPage = service.findByFilters(namaUptd, bpdasId, provinsiId, kabupatenKotaId, kecamatanId,
-                    kelurahanDesaId, pageable);
+                (namaBpdas != null) ||
+                (bpdasList != null)) {
+            uptdPage = service.findByFiltersWithCache(namaBpdas, namaUptd, bpdasList, pageable, baseUrl);
         } else {
-            uptdPage = service.findAll(pageable);
+            uptdPage = service.findAllWithCache(pageable, baseUrl);
         }
 
-        PagedModel<EntityModel<Uptd>> pagedModel = pagedResourcesAssembler.toModel(uptdPage);
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(uptdPage);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Uptd by namaBpdas and namaUptd")
+    public ResponseEntity<UptdPageDTO> searchUptd(
+            @RequestParam(required = false) String keyWord,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Pageable pageable = PageRequest.of(page, size);
+        UptdPageDTO uptdPage = service.searchWithCache(keyWord,pageable, request.getRequestURL().toString());
+        return ResponseEntity.ok(uptdPage);
     }
 
     @GetMapping("/{id}")
