@@ -1,5 +1,6 @@
 package com.kehutanan.superadmin.master.service;
 
+import com.kehutanan.superadmin.master.dto.UptdDTO;
 import com.kehutanan.superadmin.master.model.Uptd;
 import com.kehutanan.superadmin.master.model.UptdFoto;
 import com.kehutanan.superadmin.master.model.UptdPdf;
@@ -19,6 +20,8 @@ public interface UptdService {
     
     List<Uptd> findAll();
     
+    UptdDTO findDTOById(Long id);
+
     Uptd findById(Long id);
     
     Uptd save(Uptd uptd);

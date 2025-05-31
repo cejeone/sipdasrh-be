@@ -3,6 +3,7 @@ package com.kehutanan.superadmin.master.service.impl;
 import com.kehutanan.superadmin.master.repository.UptdRepository;
 import com.kehutanan.superadmin.util.FileValidationUtil;
 import com.kehutanan.superadmin.master.service.UptdService;
+import com.kehutanan.superadmin.master.dto.UptdDTO;
 import com.kehutanan.superadmin.master.model.Uptd;
 import com.kehutanan.superadmin.master.model.UptdFoto;
 import com.kehutanan.superadmin.master.model.UptdPdf;
@@ -56,7 +57,18 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @Cacheable(value = "uptdCache", key = "#id")
+    @Cacheable(value = "uptdCache", key = "#id")
+    public UptdDTO findDTOById(Long id) {
+
+        Uptd uptd = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
+
+        UptdDTO uptdDTO =  new UptdDTO(uptd);
+
+        return uptdDTO;
+    }
+
+    @Override
     public Uptd findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
@@ -68,18 +80,18 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @CachePut(value = "uptdCache", key = "#id")
+    @CachePut(value = "uptdCache", key = "#id")
     public Uptd update(Long id, Uptd uptd) {
         return repository.save(uptd);
     }
 
     @Override
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public void deleteById(Long id) {
         // Find the entity first to get all associated files
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
-        
+
         // Delete all PDF files from MinIO storage
         if (uptd.getUptdPdfList() != null) {
             for (UptdPdf pdf : uptd.getUptdPdfList()) {
@@ -91,7 +103,7 @@ public class UptdServiceImpl implements UptdService {
                 }
             }
         }
-        
+
         // Delete all photo files from MinIO storage
         if (uptd.getUptdFotoList() != null) {
             for (UptdFoto foto : uptd.getUptdFotoList()) {
@@ -102,7 +114,7 @@ public class UptdServiceImpl implements UptdService {
                 }
             }
         }
-        
+
         // Delete all video files from MinIO storage
         if (uptd.getUptdVideoList() != null) {
             for (UptdVideo video : uptd.getUptdVideoList()) {
@@ -113,7 +125,7 @@ public class UptdServiceImpl implements UptdService {
                 }
             }
         }
-        
+
         // Delete all SHP files from MinIO storage
         if (uptd.getUptdShpList() != null) {
             for (UptdShp shp : uptd.getUptdShpList()) {
@@ -124,7 +136,7 @@ public class UptdServiceImpl implements UptdService {
                 }
             }
         }
-        
+
         // Finally delete the entity from the database
         repository.deleteById(id);
     }
@@ -175,9 +187,10 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdFoto(Long id, List<MultipartFile> files) {
-        Uptd uptd = findById(id);
+        Uptd uptd = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
         for (MultipartFile file : files) {
             fileValidationUtil.validateFileType(file, "image");
@@ -196,7 +209,7 @@ public class UptdServiceImpl implements UptdService {
             uptdFoto.setPathFile(filePath);
             String encodedPath;
             try {
-                 encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
+                encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Nama File tidak sesuai: " + e.getMessage(), e);
             }
@@ -222,9 +235,10 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdPdf(Long id, List<MultipartFile> files) {
-        Uptd uptd = findById(id);
+        Uptd uptd = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
         for (MultipartFile file : files) {
             fileValidationUtil.validateFileType(file, "pdf");
@@ -243,7 +257,7 @@ public class UptdServiceImpl implements UptdService {
             uptdPdf.setPathFile(filePath);
             String encodedPath;
             try {
-                 encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
+                encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Nama File tidak sesuai: " + e.getMessage(), e);
             }
@@ -269,9 +283,10 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdVideo(Long id, List<MultipartFile> files) {
-        Uptd uptd = findById(id);
+        Uptd uptd = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
         for (MultipartFile file : files) {
             fileValidationUtil.validateFileType(file, "video");
@@ -290,7 +305,7 @@ public class UptdServiceImpl implements UptdService {
             uptdVideo.setPathFile(filePath);
             String encodedPath;
             try {
-                 encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
+                encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Nama File tidak sesuai: " + e.getMessage(), e);
             }
@@ -316,9 +331,10 @@ public class UptdServiceImpl implements UptdService {
     }
 
     @Override
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd uploadUptdShp(Long id, List<MultipartFile> files) {
-        Uptd uptd = findById(id);
+        Uptd uptd = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
 
         for (MultipartFile file : files) {
             fileValidationUtil.validateFileType(file, "shp");
@@ -337,7 +353,7 @@ public class UptdServiceImpl implements UptdService {
             uptdShp.setPathFile(filePath);
             String encodedPath;
             try {
-                 encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
+                encodedPath = URLEncoder.encode(filePath, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Nama File tidak sesuai: " + e.getMessage(), e);
             }
@@ -364,13 +380,13 @@ public class UptdServiceImpl implements UptdService {
 
     @Override
     @Transactional
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdFoto(Long id, List<String> uuidFoto) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
-           
+
         uptd.getUptdFotoList().removeIf(file -> {
-            if(uuidFoto.contains(file.getId().toString())) {
+            if (uuidFoto.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
                     minioStorageService.deleteFile("", file.getPathFile());
@@ -380,20 +396,20 @@ public class UptdServiceImpl implements UptdService {
                 }
             } else {
                 return false; // Keep this photo in the list
-            } 
+            }
         });
         return repository.save(uptd);
     }
 
     @Override
     @Transactional
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdPdf(Long id, List<String> uuidPdf) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
-           
+
         uptd.getUptdPdfList().removeIf(file -> {
-            if(uuidPdf.contains(file.getId().toString())) {
+            if (uuidPdf.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
                     minioStorageService.deleteFile("", file.getPathFile());
@@ -403,20 +419,20 @@ public class UptdServiceImpl implements UptdService {
                 }
             } else {
                 return false; // Keep this PDF in the list
-            } 
+            }
         });
         return repository.save(uptd);
     }
 
     @Override
     @Transactional
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdVideo(Long id, List<String> uuidVideo) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
-           
+
         uptd.getUptdVideoList().removeIf(file -> {
-            if(uuidVideo.contains(file.getId().toString())) {
+            if (uuidVideo.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
                     minioStorageService.deleteFile("", file.getPathFile());
@@ -426,20 +442,20 @@ public class UptdServiceImpl implements UptdService {
                 }
             } else {
                 return false; // Keep this video in the list
-            } 
+            }
         });
         return repository.save(uptd);
     }
 
     @Override
     @Transactional
-    // @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "uptdCache", allEntries = true, beforeInvocation = true)
     public Uptd deleteUptdShp(Long id, List<String> uuidShp) {
         Uptd uptd = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Uptd not found with id: " + id));
-           
+
         uptd.getUptdShpList().removeIf(file -> {
-            if(uuidShp.contains(file.getId().toString())) {
+            if (uuidShp.contains(file.getId().toString())) {
                 try {
                     // Delete file from MinIO storage
                     minioStorageService.deleteFile("", file.getPathFile());
@@ -449,8 +465,9 @@ public class UptdServiceImpl implements UptdService {
                 }
             } else {
                 return false; // Keep this SHP in the list
-            } 
+            }
         });
         return repository.save(uptd);
     }
+
 }

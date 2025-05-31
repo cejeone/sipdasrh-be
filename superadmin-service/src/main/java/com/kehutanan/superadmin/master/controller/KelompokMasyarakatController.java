@@ -7,6 +7,7 @@ import com.kehutanan.superadmin.master.service.KabupatenKotaService;
 import com.kehutanan.superadmin.master.service.KecamatanService;
 import com.kehutanan.superadmin.master.service.KelurahanDesaService;
 import com.kehutanan.superadmin.master.model.Provinsi;
+import com.kehutanan.superadmin.master.dto.KelompokMasyarakatDTO;
 import com.kehutanan.superadmin.master.model.KabupatenKota;
 import com.kehutanan.superadmin.master.model.Kecamatan;
 import com.kehutanan.superadmin.master.model.KelurahanDesa;
@@ -94,9 +95,9 @@ public class KelompokMasyarakatController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<KelompokMasyarakat> getKelompokMasyarakatById(@PathVariable Long id) {
+    public ResponseEntity<KelompokMasyarakatDTO> getKelompokMasyarakatById(@PathVariable Long id) {
         try {
-            KelompokMasyarakat kelompokMasyarakat = service.findById(id);
+            KelompokMasyarakatDTO kelompokMasyarakat = service.findDtoById(id);
             return ResponseEntity.ok(kelompokMasyarakat);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -162,7 +163,7 @@ public class KelompokMasyarakatController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<KelompokMasyarakat> updateKelompokMasyarakat(
+    public ResponseEntity<KelompokMasyarakatDTO> updateKelompokMasyarakat(
             @PathVariable Long id,
             @RequestPart String namaKelompokMasyarakat,
             @RequestPart(required = false) String nomorSkPenetapan,
@@ -214,7 +215,7 @@ public class KelompokMasyarakatController {
                 existingKelompokMasyarakat.setKelurahanDesa(kelurahanDesa);
             }
 
-            KelompokMasyarakat updatedKelompokMasyarakat = service.update(id, existingKelompokMasyarakat);
+            KelompokMasyarakatDTO updatedKelompokMasyarakat = service.updateWithDto(id, existingKelompokMasyarakat);
             return ResponseEntity.ok(updatedKelompokMasyarakat);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

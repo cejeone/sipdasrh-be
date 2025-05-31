@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kehutanan.superadmin.master.dto.UptdDTO;
 import com.kehutanan.superadmin.master.dto.UptdDeleteFilesRequest;
 import com.kehutanan.superadmin.master.model.Bpdas;
 import com.kehutanan.superadmin.master.model.KabupatenKota;
@@ -105,10 +106,10 @@ public class UptdController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Uptd> getUptdById(@PathVariable Long id) {
+    public ResponseEntity<UptdDTO> getUptdById(@PathVariable Long id) {
         try {
-            Uptd uptd = service.findById(id);
-            return ResponseEntity.ok(uptd);
+            UptdDTO uptdTDto = service.findDTOById(id);
+            return ResponseEntity.ok(uptdTDto);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

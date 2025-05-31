@@ -28,8 +28,6 @@ public class Uptd implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     @Column(name = "alamat", length = 255)
     private String alamat;
 
@@ -90,10 +88,8 @@ public class Uptd implements Serializable{
     @Column(name = "luas", precision = 15, scale = 2)     // Increase precision for area
     private BigDecimal luas;
 
-
     @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UptdShp> uptdShpList = new ArrayList<>();
-
 
     @Column(name = "nama_uptd", length = 255)
     private String namaUptd;

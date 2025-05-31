@@ -1,5 +1,6 @@
 package com.kehutanan.superadmin.master.service;
 
+import com.kehutanan.superadmin.master.dto.KelompokMasyarakatDTO;
 import com.kehutanan.superadmin.master.model.KelompokMasyarakat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +15,13 @@ public interface KelompokMasyarakatService {
     List<KelompokMasyarakat> findAll();
     
     KelompokMasyarakat findById(Long id);
+
+    KelompokMasyarakatDTO findDtoById(Long id);
     
     KelompokMasyarakat save(KelompokMasyarakat kelompokMasyarakat);
     
     KelompokMasyarakat update(Long id, KelompokMasyarakat kelompokMasyarakat);
+    KelompokMasyarakatDTO updateWithDto(Long id, KelompokMasyarakat kelompokMasyarakat);
     
     void deleteById(Long id);
     

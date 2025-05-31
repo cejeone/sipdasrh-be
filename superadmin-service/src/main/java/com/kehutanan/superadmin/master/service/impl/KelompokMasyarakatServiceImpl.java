@@ -2,6 +2,7 @@ package com.kehutanan.superadmin.master.service.impl;
 
 import com.kehutanan.superadmin.master.repository.KelompokMasyarakatRepository;
 import com.kehutanan.superadmin.master.service.KelompokMasyarakatService;
+import com.kehutanan.superadmin.master.dto.KelompokMasyarakatDTO;
 import com.kehutanan.superadmin.master.model.KelompokMasyarakat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,10 +40,22 @@ public class KelompokMasyarakatServiceImpl implements KelompokMasyarakatService 
     }
 
     @Override
-    @Cacheable(value = "kelompokMasyarakatCache", key = "#id")
+
     public KelompokMasyarakat findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("KelompokMasyarakat not found with id: " + id));
+    }
+
+    @Override
+    @Cacheable(value = "kelompokMasyarakatCache", key = "#id")
+    public KelompokMasyarakatDTO findDtoById(Long id) {
+        KelompokMasyarakat kelompokMasyarakat = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("KelompokMasyarakat not found with id: " + id));
+
+        KelompokMasyarakatDTO dto = new KelompokMasyarakatDTO(kelompokMasyarakat);
+
+        return dto;
+
     }
 
     @Override
@@ -57,16 +70,25 @@ public class KelompokMasyarakatServiceImpl implements KelompokMasyarakatService 
     }
 
     @Override
+    @CachePut(value = "kelompokMasyarakatCache", key = "#id")
+    public KelompokMasyarakatDTO updateWithDto(Long id, KelompokMasyarakat kelompokMasyarakat) {
+        repository.save(kelompokMasyarakat);
+        KelompokMasyarakatDTO dto = new KelompokMasyarakatDTO(kelompokMasyarakat);
+
+        return dto;
+    }
+
+    @Override
     @CacheEvict(value = "kelompokMasyarakatCache", allEntries = true, beforeInvocation = true)
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
 
     @Override
-    public Page<KelompokMasyarakat> findByFilters(String namaKelompokMasyarakat, String nomorSkPenetapan, 
-            LocalDate tanggalSkPenetapan, Long provinsiId, Long kabupatenKotaId, Long kecamatanId, 
+    public Page<KelompokMasyarakat> findByFilters(String namaKelompokMasyarakat, String nomorSkPenetapan,
+            LocalDate tanggalSkPenetapan, Long provinsiId, Long kabupatenKotaId, Long kecamatanId,
             Long kelurahanDesaId, Pageable pageable) {
-        
+
         Specification<KelompokMasyarakat> spec = Specification.where(null);
 
         // Add case-insensitive LIKE filter for namaKelompokMasyarakat if provided
@@ -115,4 +137,5 @@ public class KelompokMasyarakatServiceImpl implements KelompokMasyarakatService 
 
         return repository.findAll(spec, pageable);
     }
+
 }

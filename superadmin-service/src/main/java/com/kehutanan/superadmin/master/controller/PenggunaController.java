@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 
 import com.kehutanan.superadmin.master.service.LovService;
 import com.kehutanan.superadmin.master.model.Peran;
+import com.kehutanan.superadmin.master.dto.PenggunaDeleteFilesRequest;
+import com.kehutanan.superadmin.master.dto.UptdDeleteFilesRequest;
 import com.kehutanan.superadmin.master.model.Lov;
 
 import java.util.List;
@@ -190,12 +192,16 @@ public class PenggunaController {
     }
 
     @DeleteMapping(value = "/{id}/file")
-    @Operation(summary = "Delete multiple photos for Pengguna")
+    @Operation(summary = "Delete  photos for Pengguna")
     public ResponseEntity<?> deleteProfileFotos(
             @PathVariable Long id,
-            @RequestBody List<String> uuidFotoProfiles) {
+            @RequestBody(required = false) PenggunaDeleteFilesRequest deleteFilesRequest) {
         try {
-            Pengguna pengguna = service.deletePenggunaFoto(id, uuidFotoProfiles);
+             if (deleteFilesRequest.getPenggunaFotoIds() != null && !deleteFilesRequest.getPenggunaFotoIds().isEmpty()) {
+                service.deletePenggunaFoto(id, deleteFilesRequest.getPenggunaFotoIds());
+             }
+
+             Pengguna pengguna = service.findById(id);
             return ResponseEntity.ok(pengguna);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
