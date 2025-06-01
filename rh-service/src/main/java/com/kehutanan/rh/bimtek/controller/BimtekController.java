@@ -1,256 +1,279 @@
 package com.kehutanan.rh.bimtek.controller;
 
-import com.kehutanan.rh.bimtek.dto.BimtekDto;
-import com.kehutanan.rh.bimtek.model.Bimtek;
-import com.kehutanan.rh.bimtek.model.BimtekFoto;
-import com.kehutanan.rh.bimtek.model.BimtekPdf;
-import com.kehutanan.rh.bimtek.model.BimtekVideo;
-import com.kehutanan.rh.bimtek.service.BimtekService;
-import com.kehutanan.rh.dokumen.model.Dokumen;
-import com.kehutanan.rh.dokumen.service.DokumenService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
-import org.apache.commons.io.IOUtils;
+import com.kehutanan.rh.bimtek.dto.BimtekDTO;
+import com.kehutanan.rh.bimtek.dto.BimtekDeleteFilesRequest;
+import com.kehutanan.rh.bimtek.dto.BimtekPageDTO;
+import com.kehutanan.rh.bimtek.model.Bimtek;
+import com.kehutanan.rh.bimtek.service.BimtekService;
+import com.kehutanan.rh.master.model.Bpdas;
+import com.kehutanan.rh.master.service.BpdasService;
+import com.kehutanan.rh.program.model.Program;
+import com.kehutanan.rh.program.service.ProgramService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/bimtek")
-@Tag(name = "Bimtek", description = "API untuk manajemen Bimbingan Teknis")
-@RequiredArgsConstructor
 public class BimtekController {
 
-    private final BimtekService bimtekService;
+    private final BimtekService service;
+    private final BpdasService bpdasService;
+    private final ProgramService programService;
     private final PagedResourcesAssembler<Bimtek> pagedResourcesAssembler;
 
+    @Autowired
+    public BimtekController(
+            BimtekService service,
+            BpdasService bpdasService,
+            ProgramService programService,
+            PagedResourcesAssembler<Bimtek> pagedResourcesAssembler) {
+        this.service = service;
+        this.bpdasService = bpdasService;
+        this.programService = programService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
+
     @GetMapping
-    @Operation(summary = "Mendapatkan semua bimtek dengan pagination dan filter")
-    public ResponseEntity<PagedModel<EntityModel<Bimtek>>> getAll(
+    public ResponseEntity<BimtekPageDTO> getAllBimtek(
             @RequestParam(required = false) String namaBimtek,
-            @RequestParam(required = false) String subjek,
-            @RequestParam(required = false) List<String> bpdas,
+            @RequestParam(required = false) List<String> bpdasList,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Bimtek> bimtekPage;
-        
-        // Use filtered search if any filter parameter is provided, otherwise get all
-        if (namaBimtek != null || subjek != null || (bpdas != null && !bpdas.isEmpty())) {
-            bimtekPage = bimtekService.findByFilters(namaBimtek, subjek, bpdas, pageable);
+        BimtekPageDTO bimtekPage;
+
+        String baseUrl = request.getRequestURL().toString();
+
+        // Check if any filter is provided
+        if ((namaBimtek != null && !namaBimtek.isEmpty()) ||
+                (bpdasList != null && !bpdasList.isEmpty())) {
+            bimtekPage = service.findByFiltersWithCache(namaBimtek, bpdasList, pageable, baseUrl);
         } else {
-            bimtekPage = bimtekService.findAll(pageable);
+            bimtekPage = service.findAllWithCache(pageable, baseUrl);
         }
-        
-        PagedModel<EntityModel<Bimtek>> pagedModel = pagedResourcesAssembler.toModel(bimtekPage);
-        return ResponseEntity.ok(pagedModel);
+
+        return ResponseEntity.ok(bimtekPage);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Bimtek by keyword")
+    public ResponseEntity<BimtekPageDTO> searchBimtek(
+            @RequestParam(required = false) String keyWord,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Pageable pageable = PageRequest.of(page, size);
+        BimtekPageDTO bimtekPage = service.searchWithCache(keyWord, pageable, request.getRequestURL().toString());
+        return ResponseEntity.ok(bimtekPage);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Mendapatkan data bimtek berdasarkan ID")
-    public ResponseEntity<Bimtek> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(bimtekService.findById(id));
+    public ResponseEntity<Bimtek> getBimtekById(@PathVariable Long id) {
+        try {
+            Bimtek bimtek = service.findById(id);
+            return ResponseEntity.ok(bimtek);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PostMapping
-    @Operation(summary = "Membuat data bimtek baru")
-    public ResponseEntity<Bimtek> create(@Valid @RequestBody BimtekDto bimtekDto) {
-        return ResponseEntity.ok(bimtekService.create(bimtekDto));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Bimtek> createBimtek(
+            @RequestPart String namaBimtek,
+            @RequestPart(required = false) String subjek,
+            @RequestPart(required = false) String tempat,
+            @RequestPart(required = false) String tanggal,
+            @RequestPart(required = false) String audience,
+            @RequestPart(required = false) String evaluasi,
+            @RequestPart(required = false) String catatan,
+            @RequestPart(required = false) String programId,
+            @RequestPart(required = false) String bpdasId) {
+
+        try {
+            Bimtek newBimtek = new Bimtek();
+            newBimtek.setNamaBimtek(namaBimtek);
+            newBimtek.setSubjek(subjek);
+            newBimtek.setTempat(tempat);
+
+            if (tanggal != null && !tanggal.isEmpty()) {
+                // Assuming tanggal is in ISO format (yyyy-MM-dd)
+                newBimtek.setTanggal(LocalDate.parse(tanggal));
+            }
+
+            newBimtek.setAudience(audience);
+            newBimtek.setEvaluasi(evaluasi);
+            newBimtek.setCatatan(catatan);
+
+            // Set relations if IDs are provided
+            if (programId != null && !programId.isEmpty()) {
+                Long programIdLong = Long.parseLong(programId);
+                Program program = programService.findById(programIdLong);
+                newBimtek.setProgram(program);
+            }
+
+            if (bpdasId != null && !bpdasId.isEmpty()) {
+                Long bpdasIdLong = Long.parseLong(bpdasId);
+                Bpdas bpdas = bpdasService.findById(bpdasIdLong);
+                newBimtek.setBpdasId(bpdas);
+            }
+
+            Bimtek savedBimtek = service.save(newBimtek);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBimtek);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            // Add detailed logging for troubleshooting
+            e.printStackTrace(); // Log stack trace to console
+
+            // Return more specific error details in response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null); // Consider sending a structured error response instead of null
+        }
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Memperbarui data bimtek")
-    public ResponseEntity<Bimtek> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody BimtekDto bimtekDto) {
-        return ResponseEntity.ok(bimtekService.update(id, bimtekDto));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Bimtek> updateBimtek(
+            @PathVariable Long id,
+            @RequestPart String namaBimtek,
+            @RequestPart(required = false) String subjek,
+            @RequestPart(required = false) String tempat,
+            @RequestPart(required = false) String tanggal,
+            @RequestPart(required = false) String audience,
+            @RequestPart(required = false) String evaluasi,
+            @RequestPart(required = false) String catatan,
+            @RequestPart(required = false) String programId,
+            @RequestPart(required = false) String bpdasId) {
+
+        try {
+            Bimtek existingBimtek = service.findById(id);
+
+            existingBimtek.setNamaBimtek(namaBimtek);
+            existingBimtek.setSubjek(subjek);
+            existingBimtek.setTempat(tempat);
+
+            if (tanggal != null && !tanggal.isEmpty()) {
+                existingBimtek.setTanggal(LocalDate.parse(tanggal));
+            }
+
+            existingBimtek.setAudience(audience);
+            existingBimtek.setEvaluasi(evaluasi);
+            existingBimtek.setCatatan(catatan);
+
+            // Update relations if IDs are provided
+            if (programId != null && !programId.isEmpty()) {
+                Long programIdLong = Long.parseLong(programId);
+                Program program = programService.findById(programIdLong);
+                existingBimtek.setProgram(program);
+            }
+
+            if (bpdasId != null && !bpdasId.isEmpty()) {
+                Long bpdasIdLong = Long.parseLong(bpdasId);
+                Bpdas bpdas = bpdasService.findById(bpdasIdLong);
+                existingBimtek.setBpdasId(bpdas);
+            }
+
+            Bimtek updatedBimtek = service.update(id, existingBimtek);
+            return ResponseEntity.ok(updatedBimtek);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Menghapus data bimtek")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        bimtekService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping(value = "/{id}/fotos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple photos for a Bimtek")
-    public ResponseEntity<?> uploadFotos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
+    public ResponseEntity<Void> deleteBimtek(@PathVariable Long id) {
         try {
-            List<BimtekFoto> uploadedFotos = bimtekService.uploadFotos(id, files);
-            return ResponseEntity.ok(uploadedFotos);
+            service.findById(id); // Check if exists
+            service.deleteById(id);
+            return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload foto: " + e.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}/files")
-    @Operation(summary = "Menghapus foto-foto tertentu dari Bimtek")
-    public ResponseEntity<Bimtek> deleteFiles(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> fotoIds) throws Exception {
-        return ResponseEntity.ok(bimtekService.deleteFotos(id, fotoIds));
-    }
-
-    @GetMapping("/{bimtekId}/fotos/{fotoId}/view")
-    @Operation(summary = "Menampilkan foto Bimtek")
-    public ResponseEntity<byte[]> viewFoto(
-            @PathVariable UUID bimtekId, @PathVariable UUID fotoId) {
-
+    @PostMapping(value = "/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload multiple files for Bimtek")
+    public ResponseEntity<?> uploadFiles(
+            @PathVariable Long id,
+            @RequestPart(value = "bimtekPdfs", required = false) List<MultipartFile> bimtekPdfs,
+            @RequestPart(value = "bimtekFotos", required = false) List<MultipartFile> bimtekFotos,
+            @RequestPart(value = "bimtekVideos", required = false) List<MultipartFile> bimtekVideos) {
         try {
-            // Dapatkan foto dari service
-            byte[] imageData = bimtekService.viewFoto(bimtekId, fotoId);
-
-            // Dapatkan informasi foto untuk contentType
-            BimtekFoto foto = bimtekService.getFotoById(fotoId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(foto.getContentType()))
-                    .body(imageData);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-    }
-
-    @PostMapping(value = "/{id}/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple videos for a Bimtek")
-    public ResponseEntity<?> uploadVideos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<BimtekVideo> uploadedVideos = bimtekService.uploadVideos(id, files);
-            return ResponseEntity.ok(uploadedVideos);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload video: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}/videos")
-    @Operation(summary = "Menghapus video-video tertentu dari Bimtek")
-    public ResponseEntity<Bimtek> deleteVideos(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> videoIds) throws Exception {
-        return ResponseEntity.ok(bimtekService.deleteVideos(id, videoIds));
-    }
-
-    @GetMapping("/{bimtekId}/videos/{videoId}/view")
-    @Operation(summary = "Menampilkan video Bimtek")
-    public ResponseEntity<StreamingResponseBody> viewVideo(
-            @PathVariable UUID bimtekId,
-            @PathVariable UUID videoId,
-            @RequestHeader(value = "Range", required = false) String rangeHeader) {
-
-        try {
-            // Dapatkan informasi video untuk contentType
-            BimtekVideo video = bimtekService.getVideoById(videoId);
-
-            // Validasi video tersebut milik bimtek yang dimaksud
-            if (!video.getBimtek().getId().equals(bimtekId)) {
-                return ResponseEntity.notFound().build();
+            if (bimtekPdfs != null) {
+                service.uploadBimtekPdf(id, bimtekPdfs);
+            }
+            if (bimtekFotos != null) {
+                service.uploadBimtekFoto(id, bimtekFotos);
+            }
+            if (bimtekVideos != null) {
+                service.uploadBimtekVideo(id, bimtekVideos);
             }
 
-            // Create a streaming response that reads from the MinIO/storage
-            StreamingResponseBody responseBody = outputStream -> {
-                try (InputStream videoStream = bimtekService.getVideoStream(bimtekId, videoId)) {
-                    IOUtils.copy(videoStream, outputStream);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            };
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.parseMediaType(video.getContentType()))
-                    // Add content-disposition with filename for better browser handling
-                    .header("Content-Disposition", "inline; filename=\"" + video.getNamaAsli() + "\"")
-                    // Add accept-ranges header to indicate server supports range requests
-                    .header("Accept-Ranges", "bytes")
-                    .body(responseBody);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PostMapping(value = "/{id}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple PDFs for a Bimtek")
-    public ResponseEntity<?> uploadPdfs(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<BimtekPdf> uploadedPdfs = bimtekService.uploadPdfs(id, files);
-            return ResponseEntity.ok(uploadedPdfs);
+            Bimtek bimtek = service.findById(id);
+            return ResponseEntity.ok(bimtek);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload PDF: " + e.getMessage());
+                    .body("Gagal mengupload file: " + e.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}/pdfs")
-    @Operation(summary = "Menghapus PDF-PDF tertentu dari Bimtek")
-    public ResponseEntity<Bimtek> deletePdfs(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> pdfIds) throws Exception {
-        return ResponseEntity.ok(bimtekService.deletePdfs(id, pdfIds));
-    }
-
-    @GetMapping("/{bimtekId}/pdfs/{pdfId}/download")
-    @Operation(summary = "Download PDF Bimtek")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable UUID bimtekId, @PathVariable UUID pdfId) {
+    @DeleteMapping(value = "/{id}/files")
+    @Operation(summary = "Delete multiple files for Bimtek")
+    public ResponseEntity<?> deleteFiles(
+            @PathVariable Long id,
+            @RequestBody(required = false) BimtekDeleteFilesRequest filesRequest) {
         try {
-            // Dapatkan data PDF dari service
-            byte[] pdfData = bimtekService.viewPdf(bimtekId, pdfId);
-
-            // Dapatkan informasi PDF untuk contentType
-            BimtekPdf pdf = bimtekService.getPdfById(pdfId);
-
-            // Validasi PDF tersebut milik bimtek yang dimaksud
-            if (!pdf.getBimtek().getId().equals(bimtekId)) {
-                return ResponseEntity.notFound().build();
+            // Handle each file type list if provided
+            if (filesRequest.getBimtekPdfIds() != null && !filesRequest.getBimtekPdfIds().isEmpty()) {
+                service.deleteBimtekPdf(id, filesRequest.getBimtekPdfIds());
             }
 
-            // Buat response dengan header Content-Type yang sesuai
-            // Gunakan "attachment" untuk menandakan browser harus mendownload file
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(pdf.getContentType()))
-                    .header("Content-Disposition", "attachment; filename=\"" + pdf.getNamaAsli() + "\"")
-                    .body(pdfData);
+            if (filesRequest.getBimtekFotoIds() != null && !filesRequest.getBimtekFotoIds().isEmpty()) {
+                service.deleteBimtekFoto(id, filesRequest.getBimtekFotoIds());
+            }
+
+            if (filesRequest.getBimtekVideoIds() != null && !filesRequest.getBimtekVideoIds().isEmpty()) {
+                service.deleteBimtekVideo(id, filesRequest.getBimtekVideoIds());
+            }
+
+            // Fetch and return the updated Bimtek entity
+            Bimtek bimtek = service.findById(id);
+            return ResponseEntity.ok(bimtek);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Gagal menghapus file: " + e.getMessage());
         }
     }
-
 }

@@ -4,59 +4,66 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.rh.master.model.Bpdas;
+import com.kehutanan.rh.master.model.UptdDokumentasiVideo;
+import com.kehutanan.rh.program.model.Program;
 
 @Data
 @Entity
-@Table(name = "rh_bimtek")
+@Table(name = "trx_rh_bimtek")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Bimtek {
+public class Bimtek implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "nama_bimtek", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "program_id", referencedColumnName = "id")
+    @JsonBackReference
+    private Program program;
+
+    @ManyToOne
+    @JoinColumn(name = "bpdas_id", referencedColumnName = "id")
+    private Bpdas bpdasId;
+
+    @Column(name = "nama_bimtek")
     private String namaBimtek;
 
-    @Column(nullable = false)
+    @Column(name = "subjek", columnDefinition = "TEXT")
     private String subjek;
 
-    @Column(nullable = false)
-    private String program;
-
-    @Column(nullable = false)
-    private String bpdas;
-
-    @Column(nullable = false)
+    @Column(name = "tempat", columnDefinition = "TEXT")
     private String tempat;
 
-    @Column(nullable = false)
+    @Column(name = "tanggal")
     private LocalDate tanggal;
 
-    @Column(nullable = false)
+    @Column(name = "audience", columnDefinition = "TEXT")
     private String audience;
 
+    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BimtekPdf> bimtekPdfs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BimtekVideo> bimtekVideos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BimtekFoto> bimtekFotos = new ArrayList<>();
+
+    @Column(name = "evaluasi", columnDefinition = "TEXT")
     private String evaluasi;
 
-    @Column(columnDefinition = "TEXT")
-    private String keterangan;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BimtekFoto> fotos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<BimtekVideo> videos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "bimtek", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<BimtekPdf> pdfs = new ArrayList<>();
+    @Column(name = "catatan", columnDefinition = "TEXT")
+    private String catatan;
 }
