@@ -1,7 +1,5 @@
 package com.kehutanan.rh.serahterima.controller;
 
-import com.kehutanan.rh.monev.model.Monev;
-import com.kehutanan.rh.monev.service.MonevService;
 import com.kehutanan.rh.serahterima.dto.SerahTerimaDto;
 import com.kehutanan.rh.serahterima.model.SerahTerima;
 import com.kehutanan.rh.serahterima.service.SerahTerimaService;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
