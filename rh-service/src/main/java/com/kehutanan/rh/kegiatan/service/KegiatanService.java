@@ -15,7 +15,6 @@ import com.kehutanan.rh.kegiatan.model.KegiatanSerahTerimaPdf;
 import com.kehutanan.rh.kegiatan.repository.KegiatanRancanganTeknisVideoRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanRepository;
 import com.kehutanan.rh.program.model.Program;
-import com.kehutanan.rh.program.repository.ProgramRepository;
 import com.kehutanan.rh.util.FileValidationUtil;
 import com.kehutanan.rh.kegiatan.repository.KegiatanDokumentasiFotoRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanDokumentasiVideoRepository;
@@ -55,7 +54,6 @@ public class KegiatanService {
     private final KegiatanRancanganTeknisVideoRepository kegiatanRancanganTeknisVideoRepository;
 
     private final FileValidationUtil fileValidationUtil;
-    private final ProgramRepository programRepository;
     private final KegiatanRepository kegiatanRepository;
     private final KegiatanRancanganTeknisFotoRepository kegiatanRancanganTeknisFotoRepository;
     private final KegiatanRancanganTeknisPdfRepository kegiatanRancanganTeknisPdfRepository;
@@ -113,7 +111,7 @@ public class KegiatanService {
     private KegiatanDtoDetail mapToDto(Kegiatan kegiatan) {
         KegiatanDtoDetail dto = new KegiatanDtoDetail();
         dto.setId(kegiatan.getId());
-        dto.setProgramId(kegiatan.getProgram().getId());
+        // dto.setProgramId(kegiatan.getProgram().getId());
         dto.setProgramName(kegiatan.getProgram().getNama());
         dto.setSubDirektorat(kegiatan.getSubDirektorat());
         dto.setJenisKegiatan(kegiatan.getJenisKegiatan());
@@ -301,7 +299,7 @@ public class KegiatanService {
         dto.setSubDirektorat(kegiatan.getSubDirektorat());
 
        
-            dto.setProgramId(kegiatan.getProgram().getId());
+            // dto.setProgramId(kegiatan.getProgram().getId());
             dto.setProgramName(kegiatan.getProgram().getNama());
       
 
@@ -333,12 +331,12 @@ public class KegiatanService {
 
         kegiatan.setSubDirektorat(dto.getSubDirektorat());
 
-        if (dto.getProgramId() != null) {
-            Program program = programRepository.findById(dto.getProgramId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Program tidak ditemukan dengan id: " + dto.getProgramId()));
-            kegiatan.setProgram(program);
-        }
+        // if (dto.getProgramId() != null) {
+        //     Program program = programRepository.findById(dto.getProgramId())
+        //             .orElseThrow(() -> new EntityNotFoundException(
+        //                     "Program tidak ditemukan dengan id: " + dto.getProgramId()));
+        //     kegiatan.setProgram(program);
+        // }
 
         kegiatan.setJenisKegiatan(dto.getJenisKegiatan());
         kegiatan.setRefPo(dto.getRefPo());
@@ -366,12 +364,12 @@ public class KegiatanService {
     private void updateEntityFromDto(Kegiatan kegiatan, KegiatanDto dto) {
         kegiatan.setSubDirektorat(dto.getSubDirektorat());
 
-        if (dto.getProgramId() != null) {
-            Program program = programRepository.findById(dto.getProgramId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Program tidak ditemukan dengan id: " + dto.getProgramId()));
-            kegiatan.setProgram(program);
-        }
+        // if (dto.getProgramId() != null) {
+        //     Program program = programRepository.findById(dto.getProgramId())
+        //             .orElseThrow(() -> new EntityNotFoundException(
+        //                     "Program tidak ditemukan dengan id: " + dto.getProgramId()));
+        //     kegiatan.setProgram(program);
+        // }
 
         kegiatan.setJenisKegiatan(dto.getJenisKegiatan());
         kegiatan.setRefPo(dto.getRefPo());

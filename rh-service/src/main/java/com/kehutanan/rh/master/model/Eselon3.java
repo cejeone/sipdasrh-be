@@ -1,0 +1,35 @@
+package com.kehutanan.rh.master.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import jakarta.persistence.*;
+
+@Data
+@Entity
+@Table(name = "mst_eselon_3")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Eselon3 {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "nama", length = 255)
+    private String nama;
+
+    @Column(name = "pejabat", length = 255)
+    private String pejabat;
+
+    @Column(name = "tugas_dan_fungsi", columnDefinition = "TEXT")
+    private String tugasDanFungsi;
+
+    @Column(name = "keterangan", columnDefinition = "TEXT")
+    private String keterangan;
+
+    @ManyToOne
+    @JoinColumn(name = "eselon_2_id", referencedColumnName = "id")
+    private Eselon2 eselon2;
+}

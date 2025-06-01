@@ -1,9 +1,8 @@
 package com.kehutanan.rh.master.service;
 
+import com.kehutanan.rh.master.model.Lov;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import com.kehutanan.rh.master.model.Lov;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
 package com.kehutanan.rh.program.repository;
 
-import com.kehutanan.rh.program.model.Program;
+import com.kehutanan.rh.program.model.ProgramSkema;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProgramRepository extends JpaRepository<Program, Long>, JpaSpecificationExecutor<Program> {
+public interface ProgramSkemaRepository extends JpaRepository<ProgramSkema, Long>, JpaSpecificationExecutor<ProgramSkema> {
 
 }
