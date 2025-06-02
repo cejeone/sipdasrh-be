@@ -87,6 +87,7 @@ public class BpdasController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Bpdas> createBpdas(
+            @RequestPart String kodeBpdas,
             @RequestPart String namaBpdas,
             @RequestPart(required = false) String alamat,
             @RequestPart(required = false) String telepon,
@@ -97,6 +98,7 @@ public class BpdasController {
 
         try {
             Bpdas newBpdas = new Bpdas();
+            newBpdas.setKodeBpdas(kodeBpdas);
             newBpdas.setNamaBpdas(namaBpdas);
             newBpdas.setAlamat(alamat);
             newBpdas.setTelepon(telepon);
@@ -136,6 +138,7 @@ public class BpdasController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Bpdas> updateBpdas(
             @PathVariable Long id,
+            @RequestPart String kodeBpdas,
             @RequestPart String namaBpdas,
             @RequestPart(required = false) String alamat,
             @RequestPart(required = false) String telepon,
@@ -148,6 +151,7 @@ public class BpdasController {
             Bpdas existingBpdas = service.findById(id);
             
             // Update the existing bpdas with new values
+            existingBpdas.setKodeBpdas(kodeBpdas);
             existingBpdas.setNamaBpdas(namaBpdas);
             existingBpdas.setAlamat(alamat);
             existingBpdas.setTelepon(telepon);

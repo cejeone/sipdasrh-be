@@ -21,6 +21,9 @@ public class Bpth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "kode_bpth", length = 255)
+    private String kodeBpth;
+
     @Column(name = "nama_bpth", length = 255)
     private String namaBpth;
 

@@ -21,6 +21,9 @@ public class Bpdas {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "kode_bpdas", length = 255)
+    private String kodeBpdas;
+
     @Column(name = "nama_bpdas", length = 255)
     private String namaBpdas;
 

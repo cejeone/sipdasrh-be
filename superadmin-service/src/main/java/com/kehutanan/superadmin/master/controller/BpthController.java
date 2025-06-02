@@ -88,6 +88,7 @@ public class BpthController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Bpth> createBpth(
+            @RequestPart String kodeBpth,
             @RequestPart String namaBpth,
             @RequestPart(required = false) String alamat,
             @RequestPart(required = false) String telepon,
@@ -98,6 +99,7 @@ public class BpthController {
 
         try {
             Bpth newBpth = new Bpth();
+            newBpth.setKodeBpth(kodeBpth);
             newBpth.setNamaBpth(namaBpth);
             newBpth.setAlamat(alamat);
             newBpth.setTelepon(telepon);
@@ -137,6 +139,7 @@ public class BpthController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Bpth> updateBpth(
             @PathVariable Long id,
+            @RequestPart String kodeBpth,
             @RequestPart String namaBpth,
             @RequestPart(required = false) String alamat,
             @RequestPart(required = false) String telepon,
@@ -149,6 +152,7 @@ public class BpthController {
             Bpth existingBpth = service.findById(id);
             
             // Update the existing bpth with new values
+            existingBpth.setKodeBpth(kodeBpth);
             existingBpth.setNamaBpth(namaBpth);
             existingBpth.setAlamat(alamat);
             existingBpth.setTelepon(telepon);
