@@ -18,23 +18,27 @@ import java.util.UUID;
 public class KegiatanLokusShp {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
+    
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_lokus_id", nullable = false)
-    private Kegiatan   kegiatanLokus;
-
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    private Kegiatan kegiatan;
+    
     private String namaFile;
-
+    
     private String namaAsli;
 
+    private String pathFile;
+    
     private Double ukuranMb;
-
+    
     private String contentType;
-
+    
     private LocalDateTime uploadedAt;
+
+    private String viewUrl;
+
+    private String downloadUrl;
 
 }

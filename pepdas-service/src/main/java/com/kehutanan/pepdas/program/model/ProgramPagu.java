@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "pepdas_pagu_anggaran")
+@Table(name = "trx_pepdas_program_pagu")
 @Data
 @JsonIgnoreProperties({"program"})
 @NoArgsConstructor

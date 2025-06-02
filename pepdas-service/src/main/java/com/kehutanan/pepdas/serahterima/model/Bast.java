@@ -1,11 +1,8 @@
-package com.kehutanan.pepdas.monev.model;
+package com.kehutanan.pepdas.serahterima.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +10,14 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kehutanan.pepdas.kegiatan.model.Kegiatan;
-import com.kehutanan.pepdas.kegiatan.model.KegiatanDokumentasiVideo;
+import com.kehutanan.pepdas.konten.model.KontenGambar;
 import com.kehutanan.pepdas.master.model.Lov;
+import com.kehutanan.pepdas.monev.model.MonevPdf;
 
 @Data
 @Entity
-@Table(name = "trx_pepdas_monev")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Monev implements Serializable {
+@Table(name = "trx_pepdas_bast")
+public class Bast {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,12 +27,8 @@ public class Monev implements Serializable {
     @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
     private Kegiatan kegiatan;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private Lov status;
-
-    @Column(name = "nomor")
-    private String nomor;
+    @Column(name = "nomor_bast")
+    private String nomorBast;
 
     @Column(name = "tanggal")
     private LocalDate tanggal;
@@ -44,7 +36,11 @@ public class Monev implements Serializable {
     @Column(name = "deskripsi", columnDefinition = "TEXT")
     private String deskripsi;
 
-    @OneToMany(mappedBy = "monev", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<MonevPdf> monevPdfs = new ArrayList<>();
+    @OneToMany(mappedBy = "bast", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BastPdf> bastPdfs = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov status;
+
 }
