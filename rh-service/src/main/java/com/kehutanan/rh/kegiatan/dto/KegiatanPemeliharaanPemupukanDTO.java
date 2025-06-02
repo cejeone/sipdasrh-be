@@ -38,7 +38,7 @@ public class KegiatanPemeliharaanPemupukanDTO implements Serializable {
     private String keterangan;
     
     // Constructor to convert from Entity
-    public KegiatanPemeliharaanPemupukanDTOx(KegiatanPemeliharaanPemupukan entity) {
+    public KegiatanPemeliharaanPemupukanDTO(KegiatanPemeliharaanPemupukan entity) {
         this.id = entity.getId();
         
         if (entity.getKegiatan() != null) {
