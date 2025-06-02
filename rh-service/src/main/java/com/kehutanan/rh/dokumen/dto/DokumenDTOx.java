@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DokumenDTO implements Serializable {
+public class DokumenDTOx implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Long id;
