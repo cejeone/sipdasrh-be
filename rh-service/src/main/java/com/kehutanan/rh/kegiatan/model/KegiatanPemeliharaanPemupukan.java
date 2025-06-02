@@ -1,6 +1,8 @@
 package com.kehutanan.rh.kegiatan.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kehutanan.rh.master.model.Lov;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,38 +13,37 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_kegiatan_pemeliharaan_pemupukan")
+@Table(name = "trx_rh_kegiatan_p12_pemupukan")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanPemeliharaanPemupukan {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    private String jenis;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    private Kegiatan kegiatan;
+
+    @ManyToOne
+    @JoinColumn(name = "jenis_id", referencedColumnName = "id")
+    private Lov jenisId;
+
+    @ManyToOne
+    @JoinColumn(name = "satuan_id", referencedColumnName = "id")
+    private Lov satuanId;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov statusId;
+
     @Column(name = "waktu_pemupukan")
     private LocalDate waktuPemupukan;
-    
+
     @Column(name = "jumlah_pupuk")
-    private Integer jumlahPupuk;
-    
-    private String satuan;
-    
-    @Column(name = "jumlah_hok_perempuan")
-    private Integer jumlahHokPerempuan;
-    
-    @Column(name = "jumlah_hok_laki_laki")
-    private Integer jumlahHokLakiLaki;
-    
+    private String jumlahPupuk;
+
     @Column(columnDefinition = "TEXT")
     private String keterangan;
-    
-    private String status;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_id", nullable = false)
-    @JsonBackReference
-    private Kegiatan kegiatan;
 }

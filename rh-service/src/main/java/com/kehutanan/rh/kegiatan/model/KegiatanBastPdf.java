@@ -12,29 +12,34 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_kegiatan_serah_terima_pdf")
+@Table(name = "trx_rh_kegiatan_p2_bast_pdf")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanSerahTerimaPdf {
+public class KegiatanBastPdf {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_serah_terima_id", nullable = false)
-    private KegiatanSerahTerima kegiatanSerahTerima;
-
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "kegiatan_bast_id", nullable = false)
+    private KegiatanBast kegiatanBast;
+    
     private String namaFile;
-
+    
     private String namaAsli;
 
+    private String pathFile;
+    
     private Double ukuranMb;
-
+    
     private String contentType;
-
+    
     private LocalDateTime uploadedAt;
+
+    private String viewUrl;
+
+    private String downloadUrl;
 
 }

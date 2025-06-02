@@ -12,26 +12,22 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_rh_kegiatan_fungsi_kawasan")
+@Table(name = "trx_rh_kegiatan_monev_kriteria")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanFungsiKawasan {
-
+public class KegiatanMonevKriteria {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
-    private Kegiatan kegiatan;
+    @JoinColumn(name = "kegiatan_monev_id", referencedColumnName = "id")
+    private KegiatanMonev kegiatanMonev;
     
     @ManyToOne
-    @JoinColumn(name = "fungsi_kawasan_id", referencedColumnName = "id")
-    private Lov fungsiKawasanId;
-    
-    @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private Lov statusId;
+    @JoinColumn(name = "aktivitas_id", referencedColumnName = "id")
+    private Lov aktivitasId;
     
     @Column(name = "target_luas")
     private Double targetLuas;
@@ -39,11 +35,5 @@ public class KegiatanFungsiKawasan {
     @Column(name = "realisasi_luas")
     private Double realisasiLuas;
     
-    @Column(name = "tahun_id")
-    private Integer tahunId;
-    
-    private String keterangan;
-
-
-
+    private String catatan;
 }

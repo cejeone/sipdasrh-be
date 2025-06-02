@@ -1,6 +1,8 @@
 package com.kehutanan.rh.kegiatan.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.kehutanan.rh.master.model.Lov;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,45 +13,54 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_kegiatan_pemeliharaan_sulaman")
+@Table(name = "trx_rh_kegiatan_p12_sulaman")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanPemeliharaanSulaman {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    private String kategori;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    private Kegiatan kegiatan;
+
+    @ManyToOne
+    @JoinColumn(name = "kategori_id", referencedColumnName = "id")
+    private Lov kategoriId;
+
+    @ManyToOne
+    @JoinColumn(name = "nama_bibit_id", referencedColumnName = "id")
+    private Lov namaBibitId;
+
+    @ManyToOne
+    @JoinColumn(name = "sumber_bibit_id", referencedColumnName = "id")
+    private Lov sumberBibitId;
+
+    @ManyToOne
+    @JoinColumn(name = "kondisi_tanaman_id", referencedColumnName = "id")
+    private Lov kondisiTanamanId;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov statusId;
+
     @Column(name = "waktu_penyulaman")
     private LocalDate waktuPenyulaman;
-    
-    @Column(name = "nama_bibit")
-    private String namaBibit;
-    
+
     @Column(name = "jumlah_bibit")
     private Integer jumlahBibit;
-    
-    @Column(name = "kondisi_tanaman")
-    private String kondisiTanaman;
-    
+
     @Column(name = "jumlah_tanaman_hidup")
     private Integer jumlahTanamanHidup;
-    
+
     @Column(name = "jumlah_hok_perempuan")
     private Integer jumlahHokPerempuan;
-    
+
     @Column(name = "jumlah_hok_laki_laki")
     private Integer jumlahHokLakiLaki;
-    
+
     @Column(columnDefinition = "TEXT")
     private String keterangan;
-    
-    private String status;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_id", nullable = false)
-    @JsonBackReference
-    private Kegiatan kegiatan;
 }

@@ -1,385 +1,454 @@
 package com.kehutanan.rh.kegiatan.controller;
 
-import com.kehutanan.rh.bimtek.model.Bimtek;
-import com.kehutanan.rh.bimtek.model.BimtekFoto;
-import com.kehutanan.rh.bimtek.model.BimtekPdf;
-import com.kehutanan.rh.kegiatan.dto.KegiatanDto;
-import com.kehutanan.rh.kegiatan.dto.KegiatanDtoDetail;
-import com.kehutanan.rh.kegiatan.model.Kegiatan;
-import com.kehutanan.rh.kegiatan.model.KegiatanDokumentasiFoto;
-import com.kehutanan.rh.kegiatan.model.KegiatanDokumentasiVideo;
-import com.kehutanan.rh.kegiatan.model.KegiatanKontrakPdf;
-import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisFoto;
-import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisPdf;
-import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisVideo;
-import com.kehutanan.rh.kegiatan.model.KegiatanSerahTerimaPdf;
-import com.kehutanan.rh.kegiatan.service.KegiatanService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
+import com.kehutanan.rh.kegiatan.dto.KegiatanDTO;
+import com.kehutanan.rh.kegiatan.dto.KegiatanDeleteFilesRequest;
+import com.kehutanan.rh.kegiatan.dto.KegiatanPageDTO;
+import com.kehutanan.rh.kegiatan.model.Kegiatan;
+import com.kehutanan.rh.kegiatan.service.KegiatanService;
+import com.kehutanan.rh.master.model.Eselon3;
+import com.kehutanan.rh.master.model.Lov;
+import com.kehutanan.rh.master.service.Eselon3Service;
+import com.kehutanan.rh.master.service.LovService;
+import com.kehutanan.rh.program.model.Program;
+import com.kehutanan.rh.program.service.ProgramService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@Slf4j
 @RequestMapping("/api/kegiatan")
-@Tag(name = "Kegiatan", description = "API untuk manajemen Kegiatan")
-@RequiredArgsConstructor
 public class KegiatanController {
 
-    private final KegiatanService kegiatanService;
+    private final KegiatanService service;
+    private final ProgramService programService;
+    private final Eselon3Service eselon3Service;
+    private final LovService lovService;
     private final PagedResourcesAssembler<Kegiatan> pagedResourcesAssembler;
 
+    @Autowired
+    public KegiatanController(
+            KegiatanService service,
+            ProgramService programService,
+            Eselon3Service eselon3Service,
+            LovService lovService,
+            PagedResourcesAssembler<Kegiatan> pagedResourcesAssembler) {
+        this.service = service;
+        this.programService = programService;
+        this.eselon3Service = eselon3Service;
+        this.lovService = lovService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
+    }
+
     @GetMapping
-    @Operation(summary = "Mendapatkan semua kegiatan dengan pagination dan filter")
-    public ResponseEntity<PagedModel<EntityModel<KegiatanDtoDetail>>> getAll(
+    public ResponseEntity<KegiatanPageDTO> getAllKegiatan(
+            @RequestParam(required = false) String namaProgram,
+            @RequestParam(required = false) String jenisKegiatan,
+            @RequestParam(required = false) List<String> jenis,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String programName,
-            @RequestParam(required = false) String namaKegiatan) {
-
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<KegiatanDtoDetail> kegiatanPage = kegiatanService.findAll(pageable, programName, namaKegiatan);
-        
-        PagedResourcesAssembler<KegiatanDtoDetail> dtoAssembler = 
-            new PagedResourcesAssembler<>(null, null);
-        
-        PagedModel<EntityModel<KegiatanDtoDetail>> pagedModel = 
-            dtoAssembler.toModel(kegiatanPage);
-            
-        return ResponseEntity.ok(pagedModel);
+        KegiatanPageDTO kegiatanPage;
+
+        String baseUrl = request.getRequestURL().toString();
+
+        // Check if any filter is provided
+        if ((namaProgram != null && !namaProgram.isEmpty()) ||
+                (jenisKegiatan != null && !jenisKegiatan.isEmpty()) ||
+                (jenis != null && !jenis.isEmpty())) {
+            kegiatanPage = service.findByFiltersWithCache(namaProgram, jenisKegiatan, jenis, pageable, baseUrl);
+        } else {
+            kegiatanPage = service.findAllWithCache(pageable, baseUrl);
+        }
+
+        return ResponseEntity.ok(kegiatanPage);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Kegiatan by keyword")
+    public ResponseEntity<KegiatanPageDTO> searchKegiatan(
+            @RequestParam(required = false) String keyWord,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Pageable pageable = PageRequest.of(page, size);
+        KegiatanPageDTO kegiatanPage = service.searchWithCache(keyWord, pageable, request.getRequestURL().toString());
+        return ResponseEntity.ok(kegiatanPage);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Mendapatkan data kegiatan berdasarkan ID")
-    public ResponseEntity<KegiatanDtoDetail> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(kegiatanService.findByIdDtoMin(id));
+    public ResponseEntity<KegiatanDTO> getKegiatanById(@PathVariable Long id) {
+        try {
+            KegiatanDTO kegiatanDTO = service.findDTOById(id);
+            return ResponseEntity.ok(kegiatanDTO);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PostMapping
-    @Operation(summary = "Membuat data kegiatan baru")
-    public ResponseEntity<KegiatanDto> create(@Valid @RequestBody KegiatanDto kegiatanDto) {
-        return ResponseEntity.ok(kegiatanService.create(kegiatanDto));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Kegiatan> createKegiatan(
+            @RequestPart String namaKegiatan,
+            @RequestPart(required = false) String pemangkuKawasan,
+            @RequestPart(required = false) String tahunKegiatan,
+            @RequestPart(required = false) String totalBibit,
+            @RequestPart(required = false) String totalLuas,
+            @RequestPart(required = false) String nomor,
+            @RequestPart(required = false) String nilai,
+            @RequestPart(required = false) String tanggalKontrak,
+            @RequestPart(required = false) String dokumentasiCatatanFoto,
+            @RequestPart(required = false) String dokumentasiCatatanVideo,
+            @RequestPart(required = false) String eselon3Id,
+            @RequestPart(required = false) String programId,
+            @RequestPart(required = false) String jenisKegiatanId,
+            @RequestPart(required = false) String referensiP0Id,
+            @RequestPart(required = false) String polaId,
+            @RequestPart(required = false) String sumberAnggaranId,
+            @RequestPart(required = false) String pelaksanaId,
+            @RequestPart(required = false) String tipeId,
+            @RequestPart(required = false) String penerimaManfaatId,
+            @RequestPart(required = false) String statusId) {
+
+        try {
+            Kegiatan newKegiatan = new Kegiatan();
+            newKegiatan.setNamaKegiatan(namaKegiatan);
+            newKegiatan.setPemangkuKawasan(pemangkuKawasan);
+
+            if (tahunKegiatan != null && !tahunKegiatan.isEmpty()) {
+                newKegiatan.setTahunKegiatan(Integer.parseInt(tahunKegiatan));
+            }
+
+            if (totalBibit != null && !totalBibit.isEmpty()) {
+                newKegiatan.setTotalBibit(Integer.parseInt(totalBibit));
+            }
+
+            if (totalLuas != null && !totalLuas.isEmpty()) {
+                newKegiatan.setTotalLuas(Double.parseDouble(totalLuas));
+            }
+
+            newKegiatan.setNomor(nomor);
+
+            if (nilai != null && !nilai.isEmpty()) {
+                newKegiatan.setNilai(Double.parseDouble(nilai));
+            }
+
+            newKegiatan.setTanggalKontrak(tanggalKontrak);
+            newKegiatan.setDokumentasiCatatanFoto(dokumentasiCatatanFoto);
+            newKegiatan.setDokumentasiCatatanVideo(dokumentasiCatatanVideo);
+
+            // Set related entities if IDs are provided
+            if (eselon3Id != null && !eselon3Id.isEmpty()) {
+                Long eselon3IdLong = Long.parseLong(eselon3Id);
+                Eselon3 eselon3 = eselon3Service.findById(eselon3IdLong);
+                newKegiatan.setEselon3(eselon3);
+            }
+
+            if (programId != null && !programId.isEmpty()) {
+                Long programIdLong = Long.parseLong(programId);
+                Program program = programService.findById(programIdLong);
+                newKegiatan.setProgram(program);
+            }
+
+            // Set Lov-type entities if IDs are provided
+            if (jenisKegiatanId != null && !jenisKegiatanId.isEmpty()) {
+                Long jenisKegiatanIdLong = Long.parseLong(jenisKegiatanId);
+                Lov jenisKegiatan = lovService.findById(jenisKegiatanIdLong);
+                newKegiatan.setJenisKegiatanId(jenisKegiatan);
+            }
+
+            if (referensiP0Id != null && !referensiP0Id.isEmpty()) {
+                Long refP0IdLong = Long.parseLong(referensiP0Id);
+                Lov refP0 = lovService.findById(refP0IdLong);
+                newKegiatan.setReferensiP0Id(refP0);
+            }
+
+            if (polaId != null && !polaId.isEmpty()) {
+                Long polaIdLong = Long.parseLong(polaId);
+                Lov pola = lovService.findById(polaIdLong);
+                newKegiatan.setPolaId(pola);
+            }
+
+            if (sumberAnggaranId != null && !sumberAnggaranId.isEmpty()) {
+                Long sumberAnggaranIdLong = Long.parseLong(sumberAnggaranId);
+                Lov sumberAnggaran = lovService.findById(sumberAnggaranIdLong);
+                newKegiatan.setSumberAnggaranId(sumberAnggaran);
+            }
+
+            if (pelaksanaId != null && !pelaksanaId.isEmpty()) {
+                Long pelaksanaIdLong = Long.parseLong(pelaksanaId);
+                Lov pelaksana = lovService.findById(pelaksanaIdLong);
+                newKegiatan.setPelaksanaId(pelaksana);
+            }
+
+            if (tipeId != null && !tipeId.isEmpty()) {
+                Long tipeIdLong = Long.parseLong(tipeId);
+                Lov tipe = lovService.findById(tipeIdLong);
+                newKegiatan.setTipeId(tipe);
+            }
+
+            if (penerimaManfaatId != null && !penerimaManfaatId.isEmpty()) {
+                Long penerimaManfaatIdLong = Long.parseLong(penerimaManfaatId);
+                Lov penerimaManfaat = lovService.findById(penerimaManfaatIdLong);
+                newKegiatan.setPenerimaManfaatId(penerimaManfaat);
+            }
+
+            if (statusId != null && !statusId.isEmpty()) {
+                Long statusIdLong = Long.parseLong(statusId);
+                Lov status = lovService.findById(statusIdLong);
+                newKegiatan.setStatusId(status);
+            }
+
+            Kegiatan savedKegiatan = service.save(newKegiatan);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedKegiatan);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            // Add detailed logging for troubleshooting
+            e.printStackTrace(); // Log stack trace to console
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Memperbarui data kegiatan")
-    public ResponseEntity<KegiatanDto> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody KegiatanDto kegiatanDto) {
-        return ResponseEntity.ok(kegiatanService.update(id, kegiatanDto));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Kegiatan> updateKegiatan(
+            @PathVariable Long id,
+            @RequestPart String namaKegiatan,
+            @RequestPart(required = false) String pemangkuKawasan,
+            @RequestPart(required = false) String tahunKegiatan,
+            @RequestPart(required = false) String totalBibit,
+            @RequestPart(required = false) String totalLuas,
+            @RequestPart(required = false) String nomor,
+            @RequestPart(required = false) String nilai,
+            @RequestPart(required = false) String tanggalKontrak,
+            @RequestPart(required = false) String dokumentasiCatatanFoto,
+            @RequestPart(required = false) String dokumentasiCatatanVideo,
+            @RequestPart(required = false) String eselon3Id,
+            @RequestPart(required = false) String programId,
+            @RequestPart(required = false) String jenisKegiatanId,
+            @RequestPart(required = false) String referensiP0Id,
+            @RequestPart(required = false) String polaId,
+            @RequestPart(required = false) String sumberAnggaranId,
+            @RequestPart(required = false) String pelaksanaId,
+            @RequestPart(required = false) String tipeId,
+            @RequestPart(required = false) String penerimaManfaatId,
+            @RequestPart(required = false) String statusId) {
+
+        try {
+            Kegiatan existingKegiatan = service.findById(id);
+
+            existingKegiatan.setNamaKegiatan(namaKegiatan);
+            existingKegiatan.setPemangkuKawasan(pemangkuKawasan);
+
+            if (tahunKegiatan != null && !tahunKegiatan.isEmpty()) {
+                existingKegiatan.setTahunKegiatan(Integer.parseInt(tahunKegiatan));
+            }
+
+            if (totalBibit != null && !totalBibit.isEmpty()) {
+                existingKegiatan.setTotalBibit(Integer.parseInt(totalBibit));
+            }
+
+            if (totalLuas != null && !totalLuas.isEmpty()) {
+                existingKegiatan.setTotalLuas(Double.parseDouble(totalLuas));
+            }
+
+            existingKegiatan.setNomor(nomor);
+
+            if (nilai != null && !nilai.isEmpty()) {
+                existingKegiatan.setNilai(Double.parseDouble(nilai));
+            }
+
+            existingKegiatan.setTanggalKontrak(tanggalKontrak);
+            existingKegiatan.setDokumentasiCatatanFoto(dokumentasiCatatanFoto);
+            existingKegiatan.setDokumentasiCatatanVideo(dokumentasiCatatanVideo);
+
+            // Update related entities if IDs are provided
+            if (eselon3Id != null && !eselon3Id.isEmpty()) {
+                Long eselon3IdLong = Long.parseLong(eselon3Id);
+                Eselon3 eselon3 = eselon3Service.findById(eselon3IdLong);
+                existingKegiatan.setEselon3(eselon3);
+            }
+
+            if (programId != null && !programId.isEmpty()) {
+                Long programIdLong = Long.parseLong(programId);
+                Program program = programService.findById(programIdLong);
+                existingKegiatan.setProgram(program);
+            }
+
+            // Update Lov-type entities if IDs are provided
+            if (jenisKegiatanId != null && !jenisKegiatanId.isEmpty()) {
+                Long jenisKegiatanIdLong = Long.parseLong(jenisKegiatanId);
+                Lov jenisKegiatan = lovService.findById(jenisKegiatanIdLong);
+                existingKegiatan.setJenisKegiatanId(jenisKegiatan);
+            }
+
+            if (referensiP0Id != null && !referensiP0Id.isEmpty()) {
+                Long refP0IdLong = Long.parseLong(referensiP0Id);
+                Lov refP0 = lovService.findById(refP0IdLong);
+                existingKegiatan.setReferensiP0Id(refP0);
+            }
+
+            if (polaId != null && !polaId.isEmpty()) {
+                Long polaIdLong = Long.parseLong(polaId);
+                Lov pola = lovService.findById(polaIdLong);
+                existingKegiatan.setPolaId(pola);
+            }
+
+            if (sumberAnggaranId != null && !sumberAnggaranId.isEmpty()) {
+                Long sumberAnggaranIdLong = Long.parseLong(sumberAnggaranId);
+                Lov sumberAnggaran = lovService.findById(sumberAnggaranIdLong);
+                existingKegiatan.setSumberAnggaranId(sumberAnggaran);
+            }
+
+            if (pelaksanaId != null && !pelaksanaId.isEmpty()) {
+                Long pelaksanaIdLong = Long.parseLong(pelaksanaId);
+                Lov pelaksana = lovService.findById(pelaksanaIdLong);
+                existingKegiatan.setPelaksanaId(pelaksana);
+            }
+
+            if (tipeId != null && !tipeId.isEmpty()) {
+                Long tipeIdLong = Long.parseLong(tipeId);
+                Lov tipe = lovService.findById(tipeIdLong);
+                existingKegiatan.setTipeId(tipe);
+            }
+
+            if (penerimaManfaatId != null && !penerimaManfaatId.isEmpty()) {
+                Long penerimaManfaatIdLong = Long.parseLong(penerimaManfaatId);
+                Lov penerimaManfaat = lovService.findById(penerimaManfaatIdLong);
+                existingKegiatan.setPenerimaManfaatId(penerimaManfaat);
+            }
+
+            if (statusId != null && !statusId.isEmpty()) {
+                Long statusIdLong = Long.parseLong(statusId);
+                Lov status = lovService.findById(statusIdLong);
+                existingKegiatan.setStatusId(status);
+            }
+
+            Kegiatan updatedKegiatan = service.update(id, existingKegiatan);
+            return ResponseEntity.ok(updatedKegiatan);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Menghapus data kegiatan")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        kegiatanService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteKegiatan(@PathVariable Long id) {
+        try {
+            service.findById(id); // Check if exists
+            service.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PostMapping(value = "/{id}/rancangan-teknis/fotos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple foto rancangan teknis untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadRancanganTeknisFotos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
+    @PostMapping(value = "/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload multiple files for Kegiatan")
+    public ResponseEntity<?> uploadFiles(
+            @PathVariable Long id,
+            @RequestPart(value = "rancanganTeknisPdfs", required = false) List<MultipartFile> rancanganTeknisPdfs,
+            @RequestPart(value = "rancanganTeknisFotos", required = false) List<MultipartFile> rancanganTeknisFotos,
+            @RequestPart(value = "rancanganTeknisVideos", required = false) List<MultipartFile> rancanganTeknisVideos,
+            @RequestPart(value = "kontrakPdfs", required = false) List<MultipartFile> kontrakPdfs,
+            @RequestPart(value = "dokumentasiFotos", required = false) List<MultipartFile> dokumentasiFotos,
+            @RequestPart(value = "dokumentasiVideos", required = false) List<MultipartFile> dokumentasiVideos) {
         try {
-            List<KegiatanRancanganTeknisFoto> uploadedFotos = kegiatanService.uploadKegiatanRancanganTeknisFotos(id,
-                    files);
-            return ResponseEntity.ok(uploadedFotos);
+            if (rancanganTeknisPdfs != null) {
+                service.uploadRancanganTeknisPdf(id, rancanganTeknisPdfs);
+            }
+            if (rancanganTeknisFotos != null) {
+                service.uploadRancanganTeknisFoto(id, rancanganTeknisFotos);
+            }
+            if (rancanganTeknisVideos != null) {
+                service.uploadRancanganTeknisVideo(id, rancanganTeknisVideos);
+            }
+            if (kontrakPdfs != null) {
+                service.uploadKontrakPdf(id, kontrakPdfs);
+            }
+            if (dokumentasiFotos != null) {
+                service.uploadDokumentasiFoto(id, dokumentasiFotos);
+            }
+            if (dokumentasiVideos != null) {
+                service.uploadDokumentasiVideo(id, dokumentasiVideos);
+            }
+
+            Kegiatan kegiatan = service.findById(id);
+            return ResponseEntity.ok(kegiatan);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload foto rancangan teknis: " + e.getMessage());
+                    .body("Gagal mengupload file: " + e.getMessage());
         }
     }
 
-    @PostMapping(value = "/{id}/rancangan-teknis/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple PDFs rancangan teknis untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadRancanganTeknisPdfs(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
+    @DeleteMapping(value = "/{id}/files")
+    @Operation(summary = "Delete multiple files for Kegiatan")
+    public ResponseEntity<?> deleteFiles(
+            @PathVariable Long id,
+            @RequestBody(required = false) KegiatanDeleteFilesRequest filesRequest) {
         try {
-            List<KegiatanRancanganTeknisPdf> uploadedPdfs = kegiatanService.uploadKegiatanRancanganTeknisPdfs(id,
-                    files);
-            return ResponseEntity.ok(uploadedPdfs);
+            // Handle each file type list if provided
+            if (filesRequest.getRancanganTeknisPdfIds() != null && !filesRequest.getRancanganTeknisPdfIds().isEmpty()) {
+                service.deleteRancanganTeknisPdf(id, filesRequest.getRancanganTeknisPdfIds());
+            }
+
+            if (filesRequest.getRancanganTeknisFotoIds() != null && !filesRequest.getRancanganTeknisFotoIds().isEmpty()) {
+                service.deleteRancanganTeknisFoto(id, filesRequest.getRancanganTeknisFotoIds());
+            }
+
+            if (filesRequest.getRancanganTeknisVideoIds() != null && !filesRequest.getRancanganTeknisVideoIds().isEmpty()) {
+                service.deleteRancanganTeknisVideo(id, filesRequest.getRancanganTeknisVideoIds());
+            }
+
+            if (filesRequest.getKontrakPdfIds() != null && !filesRequest.getKontrakPdfIds().isEmpty()) {
+                service.deleteKontrakPdf(id, filesRequest.getKontrakPdfIds());
+            }
+
+            if (filesRequest.getDokumentasiFotoIds() != null && !filesRequest.getDokumentasiFotoIds().isEmpty()) {
+                service.deleteDokumentasiFoto(id, filesRequest.getDokumentasiFotoIds());
+            }
+
+            if (filesRequest.getDokumentasiVideoIds() != null && !filesRequest.getDokumentasiVideoIds().isEmpty()) {
+                service.deleteDokumentasiVideo(id, filesRequest.getDokumentasiVideoIds());
+            }
+
+            // Fetch and return the updated Kegiatan entity
+            Kegiatan kegiatan = service.findById(id);
+            return ResponseEntity.ok(kegiatan);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload PDF: " + e.getMessage());
+                    .body("Gagal menghapus file: " + e.getMessage());
         }
-    }
-
-    @PostMapping(value = "/{id}/rancangan-teknis/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple Videos rancangan teknis untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadRancanganTeknisVideos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<KegiatanRancanganTeknisVideo> uploadedVideos = kegiatanService.uploadKegiatanRancanganTeknisVideos(id,
-                    files);
-            return ResponseEntity.ok(uploadedVideos);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload PDF: " + e.getMessage());
-        }
-    }
-
-    @PostMapping(value = "/{id}/kontrak/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple PDFs rancangan teknis untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadKontrakPdfs(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<KegiatanKontrakPdf> uploadedPdfs = kegiatanService.uploadKegiatanKontrakPdfs(id, files);
-            return ResponseEntity.ok(uploadedPdfs);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload PDF: " + e.getMessage());
-        }
-    }
-
-    @PostMapping(value = "/{id}/dokumentasi/fotos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple foto dokumentasi untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadDokumentasiFotos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<KegiatanDokumentasiFoto> uploadedFotos = kegiatanService.uploadKegiatanDokumentasiFotos(id,
-                    files);
-            return ResponseEntity.ok(uploadedFotos);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload foto rancangan teknis: " + e.getMessage());
-        }
-    }
-
-    @PostMapping(value = "/{id}/dokumentasi/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload multiple video dokumentasi untuk sebuah Kegiatan ")
-    public ResponseEntity<?> uploadDokumentasiVideos(
-            @PathVariable UUID id,
-            @RequestPart("files") List<MultipartFile> files) {
-        try {
-            List<KegiatanDokumentasiVideo> uploadedFotos = kegiatanService.uploadKegiatanDokumentasiVideos(id,
-                    files);
-            return ResponseEntity.ok(uploadedFotos);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengupload foto rancangan teknis: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/rancangan-teknis/fotos/{fotoId}/view")
-    @Operation(summary = "Menampilkan foto rancangan teknis kegiatan")
-    public ResponseEntity<byte[]> viewRancanganTeknisFoto(
-            @PathVariable UUID kegiatanId, @PathVariable UUID fotoId) {
-        try {
-            // Dapatkan foto dari service
-            byte[] imageData = kegiatanService.viewRancanganTeknisFoto(kegiatanId, fotoId);
-
-            // Dapatkan informasi foto untuk contentType
-            KegiatanRancanganTeknisFoto foto = kegiatanService.getRancanganTeknisFotoById(fotoId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(foto.getContentType()))
-                    .body(imageData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing rancangan teknis foto: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/rancangan-teknis/pdfs/{pdfId}/view")
-    @Operation(summary = "Menampilkan PDF rancangan teknis kegiatan")
-    public ResponseEntity<byte[]> viewRancanganTeknisPdf(
-            @PathVariable UUID kegiatanId, @PathVariable UUID pdfId) {
-        try {
-            // Dapatkan PDF dari service
-            byte[] pdfData = kegiatanService.viewRancanganTeknisPdf(kegiatanId, pdfId);
-
-            // Dapatkan informasi PDF untuk contentType
-            KegiatanRancanganTeknisPdf pdf = kegiatanService.getRancanganTeknisPdfById(pdfId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(pdf.getContentType()))
-                    .body(pdfData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing rancangan teknis PDF: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/rancangan-teknis/videos/{videoId}/view")
-    @Operation(summary = "Menampilkan video rancangan teknis kegiatan")
-    public ResponseEntity<byte[]> viewRancanganTeknisVideo(
-            @PathVariable UUID kegiatanId, @PathVariable UUID videoId) {
-        try {
-            // Dapatkan video dari service
-            byte[] videoData = kegiatanService.viewRancanganTeknisVideo(kegiatanId, videoId);
-
-            // Dapatkan informasi video untuk contentType
-            KegiatanRancanganTeknisVideo video = kegiatanService.getRancanganTeknisVideoById(videoId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(video.getContentType()))
-                    .body(videoData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing rancangan teknis video: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/kontrak/pdfs/{pdfId}/view")
-    @Operation(summary = "Menampilkan PDF kontrak kegiatan")
-    public ResponseEntity<byte[]> viewKontrakPdf(
-            @PathVariable UUID kegiatanId, @PathVariable UUID pdfId) {
-        try {
-            // Dapatkan PDF dari service
-            byte[] pdfData = kegiatanService.viewKontrakPdf(kegiatanId, pdfId);
-
-            // Dapatkan informasi PDF untuk contentType
-            KegiatanKontrakPdf pdf = kegiatanService.getKontrakPdfById(pdfId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(pdf.getContentType()))
-                    .body(pdfData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing kontrak PDF: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/dokumentasi/fotos/{fotoId}/view")
-    @Operation(summary = "Menampilkan foto dokumentasi kegiatan")
-    public ResponseEntity<byte[]> viewDokumentasiFoto(
-            @PathVariable UUID kegiatanId, @PathVariable UUID fotoId) {
-        try {
-            // Dapatkan foto dari service
-            byte[] imageData = kegiatanService.viewDokumentasiFoto(kegiatanId, fotoId);
-
-            // Dapatkan informasi foto untuk contentType
-            KegiatanDokumentasiFoto foto = kegiatanService.getDokumentasiFotoById(fotoId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(foto.getContentType()))
-                    .body(imageData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing dokumentasi foto: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{kegiatanId}/dokumentasi/videos/{videoId}/view")
-    @Operation(summary = "Menampilkan video dokumentasi kegiatan")
-    public ResponseEntity<byte[]> viewDokumentasiVideo(
-            @PathVariable UUID kegiatanId, @PathVariable UUID videoId) {
-        try {
-            // Dapatkan video dari service
-            byte[] videoData = kegiatanService.viewDokumentasiVideo(kegiatanId, videoId);
-
-            // Dapatkan informasi video untuk contentType
-            KegiatanDokumentasiVideo video = kegiatanService.getDokumentasiVideoById(videoId);
-
-            // Buat response dengan header Content-Type yang sesuai
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(video.getContentType()))
-                    .body(videoData);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error("Error viewing dokumentasi video: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @DeleteMapping("/{id}/rancangan-teknis/fotos")
-    @Operation(summary = "Menghapus foto-foto rancangan teknis dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteRancanganTeknisFotos(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> fotoIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteRancanganTeknisFotos(id, fotoIds));
-    }
-
-    @DeleteMapping("/{id}/rancangan-teknis/pdfs")
-    @Operation(summary = "Menghapus PDF rancangan teknis dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteRancanganTeknisPdfs(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> pdfIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteRancanganTeknisPdfs(id, pdfIds));
-    }
-
-    @DeleteMapping("/{id}/rancangan-teknis/videos")
-    @Operation(summary = "Menghapus video rancangan teknis dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteRancanganTeknisVideos(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> videoIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteRancanganTeknisVideos(id, videoIds));
-    }
-
-    @DeleteMapping("/{id}/kontrak/pdfs")
-    @Operation(summary = "Menghapus PDF kontrak dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteKontrakPdfs(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> pdfIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteKontrakPdfs(id, pdfIds));
-    }
-
-    @DeleteMapping("/{id}/dokumentasi/fotos")
-    @Operation(summary = "Menghapus foto-foto dokumentasi dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteDokumentasiFotos(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> fotoIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteDokumentasiFotos(id, fotoIds));
-    }
-
-    @DeleteMapping("/{id}/dokumentasi/videos")
-    @Operation(summary = "Menghapus video dokumentasi dari Kegiatan")
-    public ResponseEntity<KegiatanDto> deleteDokumentasiVideos(
-            @PathVariable UUID id,
-            @RequestBody List<UUID> videoIds) throws Exception {
-        return ResponseEntity.ok(kegiatanService.deleteDokumentasiVideos(id, videoIds));
     }
 }

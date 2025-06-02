@@ -1,7 +1,6 @@
 package com.kehutanan.rh.kegiatan.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kehutanan.rh.master.model.Lov;
 
@@ -10,44 +9,51 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_rh_kegiatan_monev")
+@Table(name = "trx_rh_kegiatan_p2_bast")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanMonev {
-
+public class KegiatanBast {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @ManyToOne
     @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    @JsonBackReference
     private Kegiatan kegiatan;
-
+    
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Lov statusId;
+    
+    @ManyToOne
+    @JoinColumn(name = "tahap_id", referencedColumnName = "id")
+    private Lov tahapId;
+    
+    private String tahun;
+    
+    @Column(name = "target_luas")
+    private String targetLuas;
+    
+    @Column(name = "realisasi_luas")
+    private String realisasiLuas;
+    
+    @Column(name = "jenis_tanaman_id")
+    private String jenisTanamanId;
+    
+    @Column(name = "kelompok_masyarakat_id")
+    private String kelompokMasyarakatId;
+    
 
-    @Column(name = "nomor")
-    private String nomor;
-
-    @Column(name = "tanggal")
-    private LocalDate tanggal;
-
-    @Column(columnDefinition = "TEXT")
-    private String deskripsi;
-
-    @OneToMany(mappedBy = "kegiatanMonev", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<KegiatanMonevKriteria> kriterias = new ArrayList<>();
-
-    @OneToMany(mappedBy = "kegiatanMonev", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kegiatanBast", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanMonevPdf> kegiatanMonevPdfs = new ArrayList<>();
+    private List<KegiatanBastPdf> kegiatanBastPdfs = new ArrayList<>();
 
 }

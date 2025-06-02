@@ -12,28 +12,33 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "rh_kegiatan_dokumentasi_video")
+@Table(name = "trx_rh_kegiatan_dokumentasi_video")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanDokumentasiVideo {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
 
+    @Id
+    private UUID id;
+    
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kegiatan_id", nullable = false)
+    @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
     private Kegiatan kegiatan;
-
-    @Column(nullable = false)
+    
     private String namaFile;
-
+    
     private String namaAsli;
 
+    private String pathFile;
+    
     private Double ukuranMb;
-
+    
     private String contentType;
-
+    
     private LocalDateTime uploadedAt;
+
+    private String viewUrl;
+
+    private String downloadUrl;
 }

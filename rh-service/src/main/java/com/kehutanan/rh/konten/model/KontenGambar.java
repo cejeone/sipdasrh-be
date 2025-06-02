@@ -13,9 +13,7 @@ import java.util.UUID;
 @Table(name = "trx_rh_konten_gambar")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KontenGambar {
-
-    
+public class KontenGambar {    
     @Id
     private UUID id;
     
