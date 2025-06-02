@@ -146,7 +146,7 @@ public class Kegiatan implements Serializable {
     @JsonManagedReference
     private List<KegiatanDokumentasiVideo> kegiatanDokumentasiVideos = new ArrayList<>();
 
-    @Column(name = "catatan_video", columnDefinition = "TEXT")
-    private String catatanVideo;
+    @Column(name = "dokumentasi_catatan_video", columnDefinition = "TEXT")
+    private String dokumentasiCatatanVideo;
 
 }
