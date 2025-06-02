@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanDTOx implements Serializable {
+public class KegiatanDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Long id;

@@ -14,7 +14,7 @@ import com.kehutanan.rh.kegiatan.model.KegiatanFungsiKawasan;
 import lombok.Data;
 
 @Data
-public class KegiatanFungsiKawasanPageDTOx implements Serializable {
+public class KegiatanFungsiKawasanPageDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private List<KegiatanFungsiKawasanDTO> content;
