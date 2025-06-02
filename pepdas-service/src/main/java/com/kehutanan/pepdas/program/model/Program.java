@@ -10,39 +10,42 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kehutanan.pepdas.dokumen.model.DokumenFile;
+import com.kehutanan.pepdas.master.model.Eselon1;
+import com.kehutanan.pepdas.master.model.Lov;
 
 @Data
 @Entity
-@Table(name = "pepdas_program")
-public class Program {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    @Column(nullable = false)
-    private String direktorat;
+@Table(name = "trx_pepdas_program")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Program implements Serializable {
 
-        
-    @Column( nullable = false)
-    private String kategori;
-    
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "eselon_1_id", referencedColumnName = "id")
+    private Eselon1 eselon1;
+
+    @ManyToOne
+    @JoinColumn(name = "kategori_id", referencedColumnName = "id")
+    private Lov kategori;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov status;
+
+    @Column(name = "nama", columnDefinition = "TEXT")
     private String nama;
-    
-    @Column(name = "tahun_rencana", nullable = false)
+
+    @Column(name = "tahun_rencana")
     private Integer tahunRencana;
 
-    @Column(name = "total_anggaran", precision = 19, scale = 2)
-    private BigDecimal totalAnggaran;
-    
-    
-    @Column(nullable = false)
-    private String status;
+    @Column(name = "total_anggaran")
+    private Double totalAnggaran;
 
-    @JsonBackReference
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaguAnggaran> files = new ArrayList<>();
-
+    private List<ProgramPagu> pagus;
 
 }

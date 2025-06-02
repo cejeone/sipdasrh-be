@@ -13,7 +13,7 @@ import com.kehutanan.pepdas.monev.model.MonevPdf;
 
 @Data
 @Entity
-@Table(name = "pepdas_serah_terima")
+@Table(name = "trx_pepdas_serah_terima")
 public class SerahTerima {
 
     @Id

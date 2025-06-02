@@ -12,8 +12,8 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>pepdas-service</artifactId>
+    <version>0.0.1</version>
     <name>PEPDAS Service</name>
     <description>PEPDAS microservice for managing resources</description>
 
@@ -79,6 +79,7 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
     </dependencies>
+
 
     <build>
         <plugins>

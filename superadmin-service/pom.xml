@@ -12,8 +12,8 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>superadmin</artifactId>
+    <version>0.0.1</version>
     <name>SUPERADMIN Service</name>
     <description>SUPERADMIN microservice for managing resources</description>
 

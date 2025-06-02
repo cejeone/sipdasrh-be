@@ -1,8 +1,13 @@
 package com.kehutanan.pepdas.dokumen.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kehutanan.pepdas.master.model.Lov;
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,29 +15,32 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "pepdas_dokumen")
+@Table(name = "trx_pepdas_dokumen")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Dokumen {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    @Column(nullable = false)
-    private String tipe;
-    
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "tipe_id", referencedColumnName = "id")
+    private Lov tipe;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov status;
+
+    @Column(name = "nama_dokumen", length = 255)
     private String namaDokumen;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "dokumen", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DokumenFile> files = new ArrayList<>();
-    
-    private String status;
-    
-    @Column(columnDefinition = "TEXT")
+    private List<DokumenFile> dokumenFiles = new ArrayList<>();
+
+    @Column(name = "ukuran_dokumen")
+    private Double ukuranDokumen;
+
+    @Column(name = "keterangan", columnDefinition = "TEXT")
     private String keterangan;
-    
-    private LocalDateTime uploadedAt;
-
-
 }
