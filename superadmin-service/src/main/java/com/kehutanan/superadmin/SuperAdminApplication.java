@@ -10,9 +10,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 @EnableCaching
 @OpenAPIDefinition(
     info = @Info(
-        title = "RH Service API",
+        title = "Super Admin Service API",
         version = "1.0",
-        description = "API Documentation for RH Service"
+        description = "API Documentation for Super Admin Service"
     )
 )
 public class SuperAdminApplication {
