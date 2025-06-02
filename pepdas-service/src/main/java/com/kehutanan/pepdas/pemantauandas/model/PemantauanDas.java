@@ -7,35 +7,42 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.kehutanan.pepdas.master.model.Bpdas;
+import com.kehutanan.pepdas.master.model.Das;
+import com.kehutanan.pepdas.master.model.Spas;
+
 @Data
 @Entity
-@Table(name = "pepdas_pemantauan_das")
+@Table(name =  "trx_pedpas_pemantauan_das")
 @NoArgsConstructor
 @AllArgsConstructor
 public class PemantauanDas {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    @Column(name = "bpdas", nullable = false)
-    private String bpdas;
-    
-    @Column(name = "das", nullable = false)
-    private String das;
-    
-    @Column(name = "spas_id", nullable = false)
-    private String spasId;
-    
-    @Column(name = "tanggal_waktu", nullable = false)
-    private LocalDateTime tanggalWaktu;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "bpdas_id", referencedColumnName = "id")
+    private Bpdas bpdas;
+
+    @ManyToOne
+    @JoinColumn(name = "das_id", referencedColumnName = "id")
+    private Das das;
+
+    @ManyToOne
+    @JoinColumn(name = "spas_id", referencedColumnName = "id")
+    private Spas spas;
+
+    @Column(name = "tanggal_dan_waktu")
+    private LocalDateTime tanggalDanWaktu;
+
     @Column(name = "nilai_tma")
-    private Double nilaiTma;
-    
+    private Integer nilaiTma;
+
     @Column(name = "nilai_curah_hujan")
-    private Double nilaiCurahHujan;
-    
+    private Integer nilaiCurahHujan;
+
     @Column(name = "tegangan_baterai")
-    private Double teganganBaterai;
+    private Integer teganganBaterai;
 }

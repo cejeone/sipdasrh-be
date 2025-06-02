@@ -10,29 +10,31 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "pepdas_konten_gambar")
+@Table(name = "trx_pepdas_konten_gambar")
 @NoArgsConstructor
 @AllArgsConstructor
-public class KontenGambar {
-
+public class KontenGambar {    
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
+    
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pepdas_konten", nullable = false)
+    @JoinColumn(name = "konten_id", referencedColumnName = "id")
     private Konten konten;
-
-    @Column(nullable = false)
+    
     private String namaFile;
-
+    
     private String namaAsli;
 
+    private String pathFile;
+    
     private Double ukuranMb;
-
+    
     private String contentType;
-
+    
     private LocalDateTime uploadedAt;
 
+    private String viewUrl;
+
+    private String downloadUrl;
 }
