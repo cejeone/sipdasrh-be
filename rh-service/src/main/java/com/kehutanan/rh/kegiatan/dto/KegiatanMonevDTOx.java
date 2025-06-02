@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KegiatanMonevDTO implements Serializable {
+public class KegiatanMonevDTOx implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Long id;

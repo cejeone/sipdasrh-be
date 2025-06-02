@@ -27,7 +27,7 @@ public class KegiatanFungsiKawasanDTO implements Serializable {
     private String keterangan;
     
     // Constructor to convert from Entity
-    public KegiatanFungsiKawasanDTO(KegiatanFungsiKawasan entity) {
+    public KegiatanFungsiKawasanDTOx(KegiatanFungsiKawasan entity) {
         this.id = entity.getId();
         
         if (entity.getKegiatan() != null) {
