@@ -23,6 +23,7 @@ public class KegiatanFungsiKawasan {
     
     @ManyToOne
     @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    @JsonBackReference
     private Kegiatan kegiatan;
     
     @ManyToOne

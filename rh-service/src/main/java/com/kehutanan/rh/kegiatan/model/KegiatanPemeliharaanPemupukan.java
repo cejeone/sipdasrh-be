@@ -24,6 +24,7 @@ public class KegiatanPemeliharaanPemupukan {
 
     @ManyToOne
     @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
+    @JsonBackReference
     private Kegiatan kegiatan;
 
     @ManyToOne

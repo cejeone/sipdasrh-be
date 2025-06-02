@@ -23,6 +23,7 @@ public class KegiatanMonevKriteria {
     
     @ManyToOne
     @JoinColumn(name = "kegiatan_monev_id", referencedColumnName = "id")
+    @JsonBackReference
     private KegiatanMonev kegiatanMonev;
     
     @ManyToOne
