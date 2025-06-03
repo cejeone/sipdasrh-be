@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "pepdas_kegiatan_rancangan_teknis_pdf")
+@Table(name = "trx_pepdas_kegiatan_rancangan_teknis_pdf")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanRancanganTeknisPdf {

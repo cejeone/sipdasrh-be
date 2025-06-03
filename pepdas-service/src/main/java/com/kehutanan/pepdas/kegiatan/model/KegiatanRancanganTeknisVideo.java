@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "pepdas_kegiatan_rancangan_teknis_video")
+@Table(name = "trx_pepdas_kegiatan_rancangan_teknis_video")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanRancanganTeknisVideo {
