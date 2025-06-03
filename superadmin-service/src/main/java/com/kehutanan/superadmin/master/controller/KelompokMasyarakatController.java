@@ -95,9 +95,9 @@ public class KelompokMasyarakatController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<KelompokMasyarakatDTO> getKelompokMasyarakatById(@PathVariable Long id) {
+    public ResponseEntity<KelompokMasyarakat> getKelompokMasyarakatById(@PathVariable Long id) {
         try {
-            KelompokMasyarakatDTO kelompokMasyarakat = service.findDtoById(id);
+            KelompokMasyarakat kelompokMasyarakat = service.findById(id);
             return ResponseEntity.ok(kelompokMasyarakat);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
