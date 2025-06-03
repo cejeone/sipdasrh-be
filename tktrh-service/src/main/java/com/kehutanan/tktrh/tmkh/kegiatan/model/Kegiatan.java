@@ -1,4 +1,4 @@
-package com.kehutanan.tktrh.ppkh.kegiatan.model;
+package com.kehutanan.tktrh.tmkh.kegiatan.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -15,6 +15,9 @@ import com.kehutanan.tktrh.master.model.KabupatenKota;
 import com.kehutanan.tktrh.master.model.Kecamatan;
 import com.kehutanan.tktrh.master.model.Lov;
 import com.kehutanan.tktrh.master.model.Provinsi;
+import com.kehutanan.tktrh.ppkh.kegiatan.model.KegiatanFungsiKawasan;
+import com.kehutanan.tktrh.ppkh.kegiatan.model.KegiatanRantekPdf;
+import com.kehutanan.tktrh.ppkh.kegiatan.model.KegiatanRencanaRealisasi;
 
 import jakarta.persistence.*;
 
@@ -24,21 +27,20 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "trx_ppkh_kegiatan")
+@Table(name = "trx_tmkh_kegiatan")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Kegiatan implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Informasi Umum Kegiatan
+
     @ManyToOne
     @JoinColumn(name = "program_id", referencedColumnName = "id")
     private Program program;
-
-    @ManyToOne
-    @JoinColumn(name = "sub_direktorat_id", referencedColumnName = "id")
-    private Eselon3 subDirektorat;
 
     @Column(name = "nama_kegiatan", columnDefinition = "TEXT")
     private String namaKegiatan;
@@ -59,8 +61,14 @@ public class Kegiatan implements Serializable {
     private Kecamatan kecamatan;
 
     @ManyToOne
+    @JoinColumn(name = "bpdas_id", referencedColumnName = "id")
+    private Bpdas bpdas;
+
+    @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Lov status;
+
+    // Perijinan
 
     @ManyToOne
     @JoinColumn(name = "pemegang_ijin_id", referencedColumnName = "id")
@@ -68,14 +76,14 @@ public class Kegiatan implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "peruntukan_id", referencedColumnName = "id")
-    private Lov peruntukanId;
-
+    private Lov peruntukan;
+   
     @Column(name = "nama_peruntukan", columnDefinition = "TEXT")
-    private String namaPeruntukan;
+    private Lov namaPeruntukan;
 
     @ManyToOne
     @JoinColumn(name = "jenis_ijin_id", referencedColumnName = "id")
-    private Lov jenisIjinId;
+    private Lov jenisIjin;
 
     @Column(name = "nomor_sk_perijinan")
     private String nomorSkPerijinan;
@@ -87,7 +95,7 @@ public class Kegiatan implements Serializable {
     private LocalDate tanggalBerakhirSkPerijinan;
 
     @Column(name = "luas_sesuai_sk_perijinan_ha")
-    private Integer luasSesuaiSkPerijinanHa;
+    private Double luasSesuaiSkPerijinanHa;
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -97,21 +105,46 @@ public class Kegiatan implements Serializable {
     @JsonManagedReference
     private List<KegiatanRiwayatSk> RiwayatSks = new ArrayList<>();
 
-    @Column(name = "nomor_sk_pak")
-    private String nomorSkPak;
+    // PBAK
 
-    @Column(name = "tanggal_sk_pak")
-    private LocalDate tanggalSkPak;
+    @Column(name = "nomor_sk_pbak")
+    private String nomorSkPbak;
 
-    @Column(name = "tanggal_berakhir_sk_pak")
-    private LocalDate tanggalBerakhirSkPak;
+    @Column(name = "tanggal_sk_pbak")
+    private LocalDate tanggalSkPbak;
 
-    @Column(name = "luas_yang_ditetapkan_sesuai_sk_pak_ha")
-    private Integer luasSesuaiSkPakHa;
+    @Column(name = "tanggal_berakhir_sk_pbak")
+    private LocalDate tanggalBerakhirSkPbak;
+
+    @Column(name = "luas_yang_ditetapkan_sesuai_sk_pbak")
+    private Double luasSesuaiSkPbakHa;
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanPakPdfShp> kegiatanPakPdfShps = new ArrayList<>();
+    private List<KegiatanPbakPdfShp> kegiatanPakPdfShps = new ArrayList<>();
+
+    // Lahan Pengganti
+
+    @Column(name = "nomor_sk_lahan_pengganti")
+    private String nomorSkLahanPengganti;
+
+    @Column(name = "tanggal_sk_lahan_pengganti")
+    private LocalDate tanggalSkLahanPengganti;
+
+    @Column(name = "tanggal_berakhir_sk_lahan_pengganti")
+    private LocalDate tanggalBerakhirSkLahanPengganti;
+
+    @Column(name = "luas_sk_lahan_pengganti")
+    private Double luasSkLahanPengganti;
+
+    @Column(name = "keterangan_lahan_pengganti", columnDefinition = "TEXT")
+    private String keteranganLahanPengganti;
+
+    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<KegiatanFungsiKawasanLahanPengganti> fungsiKawasanLahanPenggantis = new ArrayList<>();
+
+    // Rehabilitasi
 
     @Column(name = "nomor_sk_rehabilitasi")
     private String nomorSkRehabilitasi;
@@ -122,28 +155,39 @@ public class Kegiatan implements Serializable {
     @Column(name = "tanggal_berakhir_sk_rehabilitasi")
     private LocalDate tanggalBerakhirSkRehabilitasi;
 
-    @Column(name = "luas_sk_rehab_das")
-    private Integer luasSkRehabDas;
+    @Column(name = "luas_sk_rehab_das_ha")
+    private Double luasSkRehabilitasi;
 
     @ManyToOne
-    @JoinColumn(name = "bpdas_rehab", referencedColumnName = "id")
-    private Bpdas bpdasRehab;
+    @JoinColumn(name = "bpdas_rehab_id", referencedColumnName = "id")
+    private Bpdas bpdasRehabId;
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanFungsiKawasan> FungsiKawasans = new ArrayList<>();
+    private List<KegiatanFungsiKawasanRehab> fungsiKawasanRehabs = new ArrayList<>();
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanRantekPdf> kegiatanRantekPdfs = new ArrayList<>();
+    private List<KegiatanRehabPdf> kegiatanRehabPdfs = new ArrayList<>();
+
+    // Kinerja
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanRencanaRealisasi> rencanaRealisasis = new ArrayList<>();
+    private List<KegiatanRealisasiReboisasi> kegiatanRealisasiReboisasis = new ArrayList<>();
+
+    // Monev
 
     @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<KegiatanBastReboRehab> bastReboRehabs = new ArrayList<>();
+    private List<KegiatanMonev> kegiatanMonevs = new ArrayList<>();
+
+    // BAST
+
+
+    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<KegiatanBastRehabDas> bastReboRehabs = new ArrayList<>();
 
     @Column(name = "nomor_bast_ppkh_ke_dirjen")
     private String nomorBastPpkhKeDirjen;
@@ -167,13 +211,13 @@ public class Kegiatan implements Serializable {
     @JsonManagedReference
     private List<KegiatanBastZip> kegiatanBastZips = new ArrayList<>();
 
-    @Column(name = "nama_pic")
+    @Column(name = "nama")
     private String namaPic;
 
-    @Column(name = "nomor_pic")
+    @Column(name = "nomor")
     private String nomorPic;
 
-    @Column(name = "email_pic")
+    @Column(name = "email")
     private String emailPic;
 
 }

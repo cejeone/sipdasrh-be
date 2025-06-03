@@ -7,38 +7,47 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import com.kehutanan.tktrh.master.model.Bpdas;
 import com.kehutanan.tktrh.master.model.Lov;
+import com.kehutanan.tktrh.master.model.Provinsi;
 import com.kehutanan.tktrh.ppkh.program.model.Program;
 
 @Data
 @Entity
-@Table(name = "trx_ppkh_bast")
+@Table(name = "trx_rh_bast_pusat")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Bast {
-
+public class BastPusat {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @ManyToOne
     @JoinColumn(name = "program_id")
     private Program programId;
+    
+    @ManyToOne
+    @JoinColumn(name = "bpdas_id",referencedColumnName = "id")  
+    private Bpdas bpdasId;
 
-    @Column(name = "tahun")
-    private Integer tahun;
+    @ManyToOne
+    @JoinColumn(name = "provinsi_id", referencedColumnName = "id")
+    private Provinsi provinsiId;
 
     @ManyToOne
     @JoinColumn(name = "fungsi_kawasan_id", referencedColumnName = "id")
     private Lov fungsiKawasan;
 
-    private Integer luas;
+    private Integer targetLuas;
 
-    @Column(name = "tahapan_rantek")
-    private Integer tahapanRantek;
+    private Integer realisasiLuas;
 
     @ManyToOne
-    @JoinColumn(name = "status_serah_terima", referencedColumnName = "id")
-    private Lov statusSerahTerima;
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Lov statusId;
 
+    @Column(name = "keterangan", columnDefinition = "TEXT")
+    private String keterangan;
+    
 }

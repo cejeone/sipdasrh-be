@@ -1,4 +1,4 @@
-package com.kehutanan.tktrh.ppkh.kegiatan.model;
+package com.kehutanan.tktrh.tmkh.kegiatan.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class KegiatanRiwayatSk implements Serializable {
     @JoinColumn(name = "kegiatan_id", referencedColumnName = "id")
     private Kegiatan kegiatan;
 
-    @ManyToOne
+        @ManyToOne
     @JoinColumn(name = "jenis_perubahan", referencedColumnName = "id")
     private Lov jenisPerubahan;
 
