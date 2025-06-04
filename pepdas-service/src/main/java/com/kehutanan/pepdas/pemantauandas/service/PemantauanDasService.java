@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasDTO;
 import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasPageDTO;
 import com.kehutanan.pepdas.pemantauandas.model.PemantauanDas;
+import com.kehutanan.pepdas.pemantauandas.model.dto.PemantauanDasDTO;
 
 public interface PemantauanDasService {
     

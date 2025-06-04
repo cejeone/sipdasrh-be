@@ -28,9 +28,9 @@ import com.kehutanan.pepdas.master.model.Spas;
 import com.kehutanan.pepdas.master.service.BpdasService;
 import com.kehutanan.pepdas.master.service.DasService;
 import com.kehutanan.pepdas.master.service.SpasService;
-import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasDTO;
 import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasPageDTO;
 import com.kehutanan.pepdas.pemantauandas.model.PemantauanDas;
+import com.kehutanan.pepdas.pemantauandas.model.dto.PemantauanDasDTO;
 import com.kehutanan.pepdas.pemantauandas.service.PemantauanDasService;
 
 import io.swagger.v3.oas.annotations.Operation;

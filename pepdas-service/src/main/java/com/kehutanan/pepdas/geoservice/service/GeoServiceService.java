@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.pepdas.geoservice.dto.GeoServiceDTO;
 import com.kehutanan.pepdas.geoservice.dto.GeoServicePageDTO;
 import com.kehutanan.pepdas.geoservice.model.GeoService;
+import com.kehutanan.pepdas.geoservice.model.dto.GeoServiceDTO;
 
 public interface GeoServiceService {
 

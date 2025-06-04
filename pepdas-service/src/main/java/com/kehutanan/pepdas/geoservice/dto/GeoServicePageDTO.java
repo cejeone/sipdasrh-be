@@ -10,6 +10,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.pepdas.geoservice.model.GeoService;
+import com.kehutanan.pepdas.geoservice.model.dto.GeoServiceDTO;
+
 import lombok.Data;
 
 @Data

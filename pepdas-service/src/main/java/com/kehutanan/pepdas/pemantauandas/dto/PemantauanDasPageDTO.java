@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.pepdas.pemantauandas.model.PemantauanDas;
+import com.kehutanan.pepdas.pemantauandas.model.dto.PemantauanDasDTO;
 
 import lombok.Data;
 
