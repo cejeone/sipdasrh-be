@@ -109,7 +109,7 @@ public class KegiatanLokus implements Serializable {
     private Double anggaran;
 
     @OneToMany(mappedBy = "kegiatanLokus", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<KegiatanLokusProposalPdf> kegiatanLokusProposalPdfs = new ArrayList<>();
+    private List<KegiatanLokusProposalPdf> lokusProposalPdfs = new ArrayList<>();
 
     @Column(name = "keterangan", columnDefinition = "TEXT")
     private String keterangan;
@@ -139,9 +139,9 @@ public class KegiatanLokus implements Serializable {
     private String catatan;
 
     @OneToMany(mappedBy = "kegiatanLokus", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<KegiatanLokusLokasiPdf> kegiatanLokusLokasiPdfs = new ArrayList<>();
+    private List<KegiatanLokusLokasiPdf> lokusLokasiPdfs = new ArrayList<>();
 
     @OneToMany(mappedBy = "kegiatanLokus", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<KegiatanLokusLokasiPdf> kegiatanLokusLokasiPdfs2 = new ArrayList<>();
+    private List<KegiatanLokusBangunanPdf> lokusBangunanPdfs = new ArrayList<>();
 
 }
