@@ -1,4 +1,4 @@
-package com.kehutanan.rh.serahterima.service.impl;
+package com.kehutanan.tktrh.ppkh.serahterima.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.serahterima.dto.BastPusatDTO;
-import com.kehutanan.rh.serahterima.dto.BastPusatPageDTO;
-import com.kehutanan.rh.serahterima.model.BastPusat;
-import com.kehutanan.rh.serahterima.repository.BastPusatRepository;
-import com.kehutanan.rh.serahterima.service.BastPusatService;
+import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatDTO;
+import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatPageDTO;
+import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.repository.BastPusatRepository;
+import com.kehutanan.tktrh.ppkh.serahterima.service.BastPusatService;
 
 import jakarta.persistence.EntityNotFoundException;
 

@@ -1,4 +1,4 @@
-package com.kehutanan.rh.serahterima.controller;
+package com.kehutanan.tktrh.ppkh.serahterima.controller;
 
 import java.util.List;
 
@@ -21,18 +21,18 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rh.master.model.Bpdas;
-import com.kehutanan.rh.master.model.Lov;
-import com.kehutanan.rh.master.model.Provinsi;
-import com.kehutanan.rh.master.service.BpdasService;
-import com.kehutanan.rh.master.service.LovService;
-import com.kehutanan.rh.master.service.ProvinsiService;
-import com.kehutanan.rh.program.model.Program;
-import com.kehutanan.rh.program.service.ProgramService;
-import com.kehutanan.rh.serahterima.dto.BastPusatDTO;
-import com.kehutanan.rh.serahterima.dto.BastPusatPageDTO;
-import com.kehutanan.rh.serahterima.model.BastPusat;
-import com.kehutanan.rh.serahterima.service.BastPusatService;
+import com.kehutanan.tktrh.master.model.Bpdas;
+import com.kehutanan.tktrh.master.model.Lov;
+import com.kehutanan.tktrh.master.model.Provinsi;
+import com.kehutanan.tktrh.master.service.BpdasService;
+import com.kehutanan.tktrh.master.service.LovService;
+import com.kehutanan.tktrh.master.service.ProvinsiService;
+import com.kehutanan.tktrh.ppkh.program.model.Program;
+import com.kehutanan.tktrh.ppkh.program.service.ProgramService;
+import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatDTO;
+import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatPageDTO;
+import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.service.BastPusatService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;

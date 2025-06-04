@@ -24,7 +24,7 @@ public class BastPusat {
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "program_id")
+    @JoinColumn(name = "program_id",referencedColumnName = "id")  
     private Program programId;
     
     @ManyToOne

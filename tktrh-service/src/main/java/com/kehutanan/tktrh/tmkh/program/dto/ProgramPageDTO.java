@@ -1,4 +1,4 @@
-package com.kehutanan.tktrh.ppkh.serahterima.dto;
+package com.kehutanan.tktrh.tmkh.program.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,30 +9,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
-import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.tmkh.program.model.Program;
 
 import lombok.Data;
 
 @Data
-public class BastPusatPageDTO implements Serializable {
+public class ProgramPageDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private List<BastPusatDTO> content;
+    private List<ProgramDTO> content;
     private PageMetadata metadata;
     private Links links;
     
     /**
      * Default constructor required for JSON deserialization
      */
-    public BastPusatPageDTO() {
+    public ProgramPageDTO() {
         this.content = new ArrayList<>();
         this.metadata = new PageMetadata(0, 0, 0, 0);
         this.links = new Links();
     }
     
-    public BastPusatPageDTO(Page<BastPusat> page, PagedModel.PageMetadata pageMetadata, List<Link> links) {
+    public ProgramPageDTO(Page<Program> page, PagedModel.PageMetadata pageMetadata, List<Link> links) {
         this.content = page.getContent().stream()
-                .map(BastPusatDTO::new)
+                .map(ProgramDTO::new)
                 .collect(Collectors.toList());
         
         this.metadata = new PageMetadata(

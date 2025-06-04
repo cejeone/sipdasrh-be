@@ -1,6 +1,6 @@
-package com.kehutanan.rh.serahterima.repository;
+package com.kehutanan.tktrh.ppkh.serahterima.repository;
 
-import com.kehutanan.rh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

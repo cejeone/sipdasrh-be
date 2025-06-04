@@ -1,9 +1,9 @@
-package com.kehutanan.rh.serahterima.dto;
+package com.kehutanan.tktrh.ppkh.serahterima.dto;
 
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kehutanan.rh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
