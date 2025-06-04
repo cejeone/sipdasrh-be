@@ -19,7 +19,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  */
 @Data
 @Entity
-@Table(name = "trx_ppkh_program")
+@Table(name = "trx_tmkh_program")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Program implements Serializable {

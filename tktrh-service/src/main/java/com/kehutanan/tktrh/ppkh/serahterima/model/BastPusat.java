@@ -14,7 +14,7 @@ import com.kehutanan.tktrh.ppkh.program.model.Program;
 
 @Data
 @Entity
-@Table(name = "trx_rh_bast_pusat")
+@Table(name = "trx_ppkh_bast_pusat")
 @NoArgsConstructor
 @AllArgsConstructor
 public class BastPusat {

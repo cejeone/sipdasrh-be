@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_rh_kegiatan_monev_kriteria")
+@Table(name = "trx_tmkh_kegiatan_monev_kriteria")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanMonevKriteria {

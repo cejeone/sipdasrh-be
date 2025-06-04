@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_rh_monev_pusat")
+@Table(name = "trx_tmkh_monev_pusat")
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonevPusat {

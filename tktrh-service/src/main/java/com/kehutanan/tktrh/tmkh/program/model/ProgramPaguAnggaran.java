@@ -16,7 +16,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  */
 @Data
 @Entity
-@Table(name = "trx_ppkh_program_pagu_anggaran")
+@Table(name = "trx_tmkh_program_pagu_anggaran")
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProgramPaguAnggaran implements Serializable {

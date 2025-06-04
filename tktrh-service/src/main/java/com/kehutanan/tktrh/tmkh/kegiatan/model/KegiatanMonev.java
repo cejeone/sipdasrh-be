@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_rh_kegiatan_monev")
+@Table(name = "trx_tmkh_kegiatan_monev")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanMonev {

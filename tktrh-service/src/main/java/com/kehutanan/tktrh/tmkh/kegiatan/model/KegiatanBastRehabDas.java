@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "trx_ppkh_kegiatan_reboisasi_rehabilitasi")
+@Table(name = "trx_tmkh_kegiatan_rehabilitasi_das")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanBastRehabDas {
