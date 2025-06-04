@@ -15,9 +15,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.program.dto.ProgramSkemaDTO;
 import com.kehutanan.rh.program.dto.ProgramSkemaPageDTO;
 import com.kehutanan.rh.program.model.ProgramSkema;
+import com.kehutanan.rh.program.model.dto.ProgramSkemaDTO;
 import com.kehutanan.rh.program.repository.ProgramSkemaRepository;
 import com.kehutanan.rh.program.service.ProgramSkemaService;
 

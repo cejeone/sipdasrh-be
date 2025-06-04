@@ -2,9 +2,10 @@ package com.kehutanan.rh.program.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.rh.program.dto.ProgramDTO;
+import com.kehutanan.rh.program.model.dto.ProgramDTO;
 import com.kehutanan.rh.program.dto.ProgramPageDTO;
 import com.kehutanan.rh.program.model.Program;
 
@@ -28,4 +29,6 @@ public interface ProgramService {
             Pageable pageable, String baseUrl);
 
     ProgramPageDTO searchWithCache(String keyWord, Pageable pageable, String baseUrl);
+
+    Page<Program> findAll(Pageable pageable);
 }

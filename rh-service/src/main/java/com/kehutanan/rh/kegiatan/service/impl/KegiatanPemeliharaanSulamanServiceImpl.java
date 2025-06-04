@@ -1,6 +1,5 @@
 package com.kehutanan.rh.kegiatan.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanPemeliharaanSulamanDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanPemeliharaanSulamanPageDTO;
-import com.kehutanan.rh.kegiatan.model.Kegiatan;
 import com.kehutanan.rh.kegiatan.model.KegiatanPemeliharaanSulaman;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanPemeliharaanSulamanDTO;
 import com.kehutanan.rh.kegiatan.repository.KegiatanPemeliharaanSulamanRepository;
 import com.kehutanan.rh.kegiatan.repository.KegiatanRepository;
 import com.kehutanan.rh.kegiatan.service.KegiatanPemeliharaanSulamanService;
-import com.kehutanan.rh.master.model.Lov;
 import com.kehutanan.rh.master.repository.LovRepository;
 
 import jakarta.persistence.EntityNotFoundException;

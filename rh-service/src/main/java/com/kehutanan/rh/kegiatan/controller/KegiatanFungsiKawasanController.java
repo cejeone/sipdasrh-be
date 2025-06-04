@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanFungsiKawasanDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanFungsiKawasanPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanFungsiKawasan;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanFungsiKawasanDTO;
 import com.kehutanan.rh.kegiatan.service.KegiatanFungsiKawasanService;
 import com.kehutanan.rh.kegiatan.service.KegiatanService;
 import com.kehutanan.rh.master.model.Lov;

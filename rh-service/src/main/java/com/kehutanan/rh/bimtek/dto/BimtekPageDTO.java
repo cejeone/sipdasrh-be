@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.rh.bimtek.model.Bimtek;
+import com.kehutanan.rh.bimtek.model.dto.BimtekDTO;
 
 import lombok.Data;
 

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanFungsiKawasanDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanFungsiKawasanPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanFungsiKawasan;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanFungsiKawasanDTO;
 import com.kehutanan.rh.kegiatan.repository.KegiatanFungsiKawasanRepository;
 import com.kehutanan.rh.kegiatan.service.KegiatanFungsiKawasanService;
 

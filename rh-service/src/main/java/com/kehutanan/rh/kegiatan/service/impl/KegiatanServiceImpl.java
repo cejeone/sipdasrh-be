@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rh.common.service.MinioStorageService;
-import com.kehutanan.rh.kegiatan.dto.KegiatanDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanPageDTO;
 import com.kehutanan.rh.kegiatan.model.Kegiatan;
 import com.kehutanan.rh.kegiatan.model.KegiatanDokumentasiFoto;
@@ -32,6 +31,7 @@ import com.kehutanan.rh.kegiatan.model.KegiatanKontrakPdf;
 import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisFoto;
 import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisPdf;
 import com.kehutanan.rh.kegiatan.model.KegiatanRancanganTeknisVideo;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanDTO;
 import com.kehutanan.rh.kegiatan.repository.KegiatanRepository;
 import com.kehutanan.rh.kegiatan.service.KegiatanService;
 import com.kehutanan.rh.util.FileValidationUtil;

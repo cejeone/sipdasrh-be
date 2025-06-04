@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanMonevKriteriaDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanMonevKriteriaPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanMonev;
 import com.kehutanan.rh.kegiatan.model.KegiatanMonevKriteria;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanMonevKriteriaDTO;
 import com.kehutanan.rh.kegiatan.service.KegiatanMonevKriteriaService;
 import com.kehutanan.rh.kegiatan.service.KegiatanMonevService;
 import com.kehutanan.rh.master.model.Lov;

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rh.master.model.Lov;
-import com.kehutanan.rh.program.dto.ProgramDTO;
+import com.kehutanan.rh.program.model.dto.ProgramDTO;
 import com.kehutanan.rh.program.dto.ProgramPageDTO;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.repository.ProgramRepository;
@@ -259,5 +259,10 @@ public class ProgramServiceImpl implements ProgramService {
         String connector = filterBaseUrl.contains("?") ? "&" : "?";
 
         return filterBaseUrl + connector + "page=" + page + "&size=" + size;
+    }
+
+    @Override
+    public Page<Program> findAll(Pageable pageable) {
+       return repository.findAll(pageable);
     }
 }

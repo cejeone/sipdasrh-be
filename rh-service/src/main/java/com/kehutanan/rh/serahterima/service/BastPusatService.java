@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.rh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.rh.serahterima.model.BastPusat;
+import com.kehutanan.rh.serahterima.model.dto.BastPusatDTO;
 
 public interface BastPusatService {
     

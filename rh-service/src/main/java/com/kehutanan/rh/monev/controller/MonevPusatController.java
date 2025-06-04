@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kehutanan.rh.master.model.Bpdas;
 import com.kehutanan.rh.master.service.BpdasService;
-import com.kehutanan.rh.monev.dto.MonevPusatDTO;
 import com.kehutanan.rh.monev.dto.MonevPusatPageDTO;
 import com.kehutanan.rh.monev.model.MonevPusat;
+import com.kehutanan.rh.monev.model.dto.MonevPusatDTO;
 import com.kehutanan.rh.monev.service.MonevPusatService;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.service.ProgramService;

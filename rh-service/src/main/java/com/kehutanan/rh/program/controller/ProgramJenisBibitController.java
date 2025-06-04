@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kehutanan.rh.master.repository.LovRepository;
 import com.kehutanan.rh.master.service.LovService;
-import com.kehutanan.rh.program.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rh.program.dto.ProgramJenisBibitPageDTO;
 import com.kehutanan.rh.program.model.ProgramJenisBibit;
+import com.kehutanan.rh.program.model.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rh.program.repository.ProgramRepository;
 import com.kehutanan.rh.program.service.ProgramJenisBibitService;
 import com.kehutanan.rh.program.service.ProgramService;

@@ -15,9 +15,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.monev.dto.MonevPusatDTO;
 import com.kehutanan.rh.monev.dto.MonevPusatPageDTO;
 import com.kehutanan.rh.monev.model.MonevPusat;
+import com.kehutanan.rh.monev.model.dto.MonevPusatDTO;
 import com.kehutanan.rh.monev.repository.MonevPusatRepository;
 import com.kehutanan.rh.monev.service.MonevPusatService;
 

@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.rh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.rh.serahterima.model.BastPusat;
+import com.kehutanan.rh.serahterima.model.dto.BastPusatDTO;
 import com.kehutanan.rh.serahterima.repository.BastPusatRepository;
 import com.kehutanan.rh.serahterima.service.BastPusatService;
 

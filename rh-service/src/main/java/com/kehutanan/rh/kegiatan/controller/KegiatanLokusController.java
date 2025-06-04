@@ -1,6 +1,5 @@
 package com.kehutanan.rh.kegiatan.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +22,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanLokusDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanLokusDeleteFilesRequest;
 import com.kehutanan.rh.kegiatan.dto.KegiatanLokusPageDTO;
 import com.kehutanan.rh.kegiatan.model.Kegiatan;
 import com.kehutanan.rh.kegiatan.model.KegiatanLokus;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanLokusDTO;
 import com.kehutanan.rh.kegiatan.service.KegiatanLokusService;
 import com.kehutanan.rh.kegiatan.service.KegiatanService;
 import com.kehutanan.rh.master.model.KabupatenKota;

@@ -19,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanBastDTO;
+import com.kehutanan.rh.common.service.MinioStorageService;
 import com.kehutanan.rh.kegiatan.dto.KegiatanBastPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanBast;
 import com.kehutanan.rh.kegiatan.model.KegiatanBastPdf;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanBastDTO;
 import com.kehutanan.rh.kegiatan.repository.KegiatanBastRepository;
 import com.kehutanan.rh.kegiatan.service.KegiatanBastService;
 import com.kehutanan.rh.util.FileValidationUtil;
-import com.kehutanan.rh.common.service.MinioStorageService;
 
 import jakarta.persistence.EntityNotFoundException;
 

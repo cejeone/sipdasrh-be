@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.rh.program.model.ProgramJenisBibit;
+import com.kehutanan.rh.program.model.dto.ProgramJenisBibitDTO;
 
 import lombok.Data;
 

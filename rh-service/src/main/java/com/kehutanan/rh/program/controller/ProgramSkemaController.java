@@ -22,10 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kehutanan.rh.master.model.Lov;
 import com.kehutanan.rh.master.service.LovService;
-import com.kehutanan.rh.program.dto.ProgramSkemaDTO;
 import com.kehutanan.rh.program.dto.ProgramSkemaPageDTO;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.model.ProgramSkema;
+import com.kehutanan.rh.program.model.dto.ProgramSkemaDTO;
 import com.kehutanan.rh.program.service.ProgramService;
 import com.kehutanan.rh.program.service.ProgramSkemaService;
 
