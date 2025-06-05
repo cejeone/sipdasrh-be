@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.kegiatan.dto.KegiatanMonevDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanMonevDeleteFilesRequest;
 import com.kehutanan.rm.kegiatan.dto.KegiatanMonevPageDTO;
 import com.kehutanan.rm.kegiatan.model.Kegiatan;
 import com.kehutanan.rm.kegiatan.model.KegiatanMonev;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanMonevDTO;
 import com.kehutanan.rm.kegiatan.service.KegiatanMonevService;
 import com.kehutanan.rm.kegiatan.service.KegiatanService;
 import com.kehutanan.rm.master.model.Lov;

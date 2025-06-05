@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.bimtek.dto.BimtekDTO;
 import com.kehutanan.rm.bimtek.dto.BimtekDeleteFilesRequest;
 import com.kehutanan.rm.bimtek.dto.BimtekPageDTO;
 import com.kehutanan.rm.bimtek.model.Bimtek;

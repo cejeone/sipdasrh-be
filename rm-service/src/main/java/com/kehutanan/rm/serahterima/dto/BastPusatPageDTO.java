@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.rm.serahterima.model.BastPusat;
+import com.kehutanan.rm.serahterima.model.dto.BastPusatDTO;
 
 import lombok.Data;
 

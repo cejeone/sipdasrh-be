@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.kegiatan.dto.KegiatanDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanDeleteFilesRequest;
 import com.kehutanan.rm.kegiatan.dto.KegiatanPageDTO;
 import com.kehutanan.rm.kegiatan.model.Kegiatan;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanDTO;
 import com.kehutanan.rm.kegiatan.service.KegiatanService;
 import com.kehutanan.rm.master.model.Eselon3;
 import com.kehutanan.rm.master.model.Lov;

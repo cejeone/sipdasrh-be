@@ -20,11 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rm.common.service.MinioStorageService;
-import com.kehutanan.rm.kegiatan.dto.KegiatanMonevDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanMonevPageDTO;
-import com.kehutanan.rm.kegiatan.model.Kegiatan;
 import com.kehutanan.rm.kegiatan.model.KegiatanMonev;
 import com.kehutanan.rm.kegiatan.model.KegiatanMonevPdf;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanMonevDTO;
 import com.kehutanan.rm.kegiatan.repository.KegiatanMonevRepository;
 import com.kehutanan.rm.kegiatan.service.KegiatanMonevService;
 import com.kehutanan.rm.util.FileValidationUtil;

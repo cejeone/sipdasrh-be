@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rm.common.service.MinioStorageService;
-import com.kehutanan.rm.kegiatan.dto.KegiatanDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanPageDTO;
 import com.kehutanan.rm.kegiatan.model.Kegiatan;
 import com.kehutanan.rm.kegiatan.model.KegiatanDokumentasiFoto;
@@ -33,6 +30,7 @@ import com.kehutanan.rm.kegiatan.model.KegiatanLokusShp;
 import com.kehutanan.rm.kegiatan.model.KegiatanRancanganTeknisFoto;
 import com.kehutanan.rm.kegiatan.model.KegiatanRancanganTeknisPdf;
 import com.kehutanan.rm.kegiatan.model.KegiatanRancanganTeknisVideo;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanDTO;
 import com.kehutanan.rm.kegiatan.repository.KegiatanRepository;
 import com.kehutanan.rm.kegiatan.service.KegiatanService;
 import com.kehutanan.rm.util.FileValidationUtil;

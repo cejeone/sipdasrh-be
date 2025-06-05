@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.rm.kegiatan.model.KegiatanMonevKriteria;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanMonevKriteriaDTO;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import lombok.Data;

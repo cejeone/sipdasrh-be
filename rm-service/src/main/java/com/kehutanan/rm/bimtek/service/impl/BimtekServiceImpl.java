@@ -19,16 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rm.bimtek.dto.BimtekDTO;
 import com.kehutanan.rm.bimtek.dto.BimtekPageDTO;
 import com.kehutanan.rm.bimtek.model.Bimtek;
 import com.kehutanan.rm.bimtek.model.BimtekFoto;
 import com.kehutanan.rm.bimtek.model.BimtekPdf;
 import com.kehutanan.rm.bimtek.model.BimtekVideo;
+import com.kehutanan.rm.bimtek.model.dto.BimtekDTO;
 import com.kehutanan.rm.bimtek.repository.BimtekRepository;
 import com.kehutanan.rm.bimtek.service.BimtekService;
-import com.kehutanan.rm.util.FileValidationUtil;
 import com.kehutanan.rm.common.service.MinioStorageService;
+import com.kehutanan.rm.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 

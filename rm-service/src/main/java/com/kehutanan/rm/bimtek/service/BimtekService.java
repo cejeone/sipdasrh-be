@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.bimtek.dto.BimtekDTO;
 import com.kehutanan.rm.bimtek.dto.BimtekPageDTO;
 import com.kehutanan.rm.bimtek.model.Bimtek;
+import com.kehutanan.rm.bimtek.model.dto.BimtekDTO;
 
 public interface BimtekService {
     

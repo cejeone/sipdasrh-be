@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.rm.konten.model.Konten;
+import com.kehutanan.rm.konten.model.dto.KontenDTO;
 
 import lombok.Data;
 

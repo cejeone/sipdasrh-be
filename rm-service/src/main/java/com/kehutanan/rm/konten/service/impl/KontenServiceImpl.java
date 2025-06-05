@@ -23,17 +23,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rm.common.service.MinioStorageService;
-import com.kehutanan.rm.konten.dto.KontenDTO;
 import com.kehutanan.rm.konten.dto.KontenPageDTO;
 import com.kehutanan.rm.konten.model.Konten;
 import com.kehutanan.rm.konten.model.KontenGambar;
 import com.kehutanan.rm.konten.model.KontenGambarUtama;
+import com.kehutanan.rm.konten.model.dto.KontenDTO;
 import com.kehutanan.rm.konten.repository.KontenRepository;
 import com.kehutanan.rm.konten.service.KontenService;
 import com.kehutanan.rm.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class KontenServiceImpl implements KontenService {

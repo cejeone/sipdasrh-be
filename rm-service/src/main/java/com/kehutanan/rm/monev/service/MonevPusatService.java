@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.rm.monev.dto.MonevPusatDTO;
 import com.kehutanan.rm.monev.dto.MonevPusatPageDTO;
 import com.kehutanan.rm.monev.model.MonevPusat;
+import com.kehutanan.rm.monev.model.dto.MonevPusatDTO;
 
 public interface MonevPusatService {
     

@@ -37,7 +37,7 @@ public class PelakuUsaha {
     private String namaDirektur;
 
     @Column(name = "nomor_hp_direktur")
-    private String nomormpDirektur;
+    private String nomorHpDirektur;
 
     @Column(name = "alamat", columnDefinition = "TEXT")
     private String alamat;

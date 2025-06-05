@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rm.kegiatan.dto.KegiatanPemeliharaanPemupukanDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanPemeliharaanPemupukanPageDTO;
 import com.kehutanan.rm.kegiatan.model.Kegiatan;
 import com.kehutanan.rm.kegiatan.model.KegiatanPemeliharaanPemupukan;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanPemeliharaanPemupukanDTO;
 import com.kehutanan.rm.kegiatan.service.KegiatanPemeliharaanPemupukanService;
 import com.kehutanan.rm.kegiatan.service.KegiatanService;
 import com.kehutanan.rm.master.model.Lov;

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.konten.dto.KontenDTO;
 import com.kehutanan.rm.konten.dto.KontenPageDTO;
 import com.kehutanan.rm.konten.model.Konten;
+import com.kehutanan.rm.konten.model.dto.KontenDTO;
 
 public interface KontenService {
     

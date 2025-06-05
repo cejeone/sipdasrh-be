@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rm.dokumen.dto.DokumenDTO;
 import com.kehutanan.rm.dokumen.model.Dokumen;
+import com.kehutanan.rm.dokumen.model.dto.DokumenDTO;
 import com.kehutanan.rm.dokumen.service.DokumenService;
 import com.kehutanan.rm.master.model.Lov;
 import com.kehutanan.rm.master.service.LovService;

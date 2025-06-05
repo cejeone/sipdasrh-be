@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rm.kegiatan.dto.KegiatanMonevKriteriaDTO;
 import com.kehutanan.rm.kegiatan.dto.KegiatanMonevKriteriaPageDTO;
 import com.kehutanan.rm.kegiatan.model.KegiatanMonevKriteria;
+import com.kehutanan.rm.kegiatan.model.dto.KegiatanMonevKriteriaDTO;
 import com.kehutanan.rm.kegiatan.repository.KegiatanMonevKriteriaRepository;
 import com.kehutanan.rm.kegiatan.service.KegiatanMonevKriteriaService;
 
