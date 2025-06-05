@@ -3,11 +3,10 @@ package com.kehutanan.tktrh.ppkh.serahterima.service;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.model.dto.BastPusatDTO;
 
 public interface BastPusatService {
     

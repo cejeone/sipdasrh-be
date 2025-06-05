@@ -25,10 +25,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.tktrh.konten.dto.KontenDTO;
 import com.kehutanan.tktrh.konten.dto.KontenDeleteFilesRequest;
 import com.kehutanan.tktrh.konten.dto.KontenPageDTO;
 import com.kehutanan.tktrh.konten.model.Konten;
+import com.kehutanan.tktrh.konten.model.dto.KontenDTO;
 import com.kehutanan.tktrh.konten.service.KontenService;
 import com.kehutanan.tktrh.master.model.Lov;
 import com.kehutanan.tktrh.master.service.LovService;

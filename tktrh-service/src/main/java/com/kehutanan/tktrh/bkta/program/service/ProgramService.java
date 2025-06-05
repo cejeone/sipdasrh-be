@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.bkta.program.dto.ProgramDTO;
 import com.kehutanan.tktrh.bkta.program.dto.ProgramPageDTO;
 import com.kehutanan.tktrh.bkta.program.model.Program;
+import com.kehutanan.tktrh.bkta.program.model.dto.ProgramDTO;
 
 public interface ProgramService {
     

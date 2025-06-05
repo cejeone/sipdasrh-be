@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.tktrh.bkta.kegiatan.dto.KegiatanLokusDTO;
 import com.kehutanan.tktrh.bkta.kegiatan.dto.KegiatanLokusPageDTO;
 import com.kehutanan.tktrh.bkta.kegiatan.model.KegiatanLokus;
+import com.kehutanan.tktrh.bkta.kegiatan.model.dto.KegiatanLokusDTO;
 
 public interface KegiatanLokusService {
     

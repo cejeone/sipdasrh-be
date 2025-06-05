@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,9 +28,9 @@ import com.kehutanan.tktrh.master.service.LovService;
 import com.kehutanan.tktrh.master.service.ProvinsiService;
 import com.kehutanan.tktrh.ppkh.program.model.Program;
 import com.kehutanan.tktrh.ppkh.program.service.ProgramService;
-import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.model.dto.BastPusatDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.service.BastPusatService;
 
 import io.swagger.v3.oas.annotations.Operation;

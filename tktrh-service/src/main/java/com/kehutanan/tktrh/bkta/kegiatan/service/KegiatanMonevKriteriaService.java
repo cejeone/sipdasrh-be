@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.bkta.kegiatan.dto.KegiatanMonevKriteriaDTO;
 import com.kehutanan.tktrh.bkta.kegiatan.dto.KegiatanMonevKriteriaPageDTO;
 import com.kehutanan.tktrh.bkta.kegiatan.model.KegiatanMonevKriteria;
+import com.kehutanan.tktrh.bkta.kegiatan.model.dto.KegiatanMonevKriteriaDTO;
 
 public interface KegiatanMonevKriteriaService {
     

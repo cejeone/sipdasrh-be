@@ -1,15 +1,13 @@
 package com.kehutanan.tktrh.dokumen.service;
 
-import com.kehutanan.tktrh.dokumen.dto.DokumenDTO;
-import com.kehutanan.tktrh.dokumen.model.Dokumen;
-import com.kehutanan.tktrh.dokumen.model.DokumenFile;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import com.kehutanan.tktrh.dokumen.model.Dokumen;
+import com.kehutanan.tktrh.dokumen.model.dto.DokumenDTO;
 
 public interface DokumenService {
     

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.tktrh.perijinan.dto.PerijinanDTO;
 import com.kehutanan.tktrh.perijinan.dto.PerijinanPageDTO;
 import com.kehutanan.tktrh.perijinan.model.Perijinan;
+import com.kehutanan.tktrh.perijinan.model.dto.PerijinanDTO;
 
 public interface PerijinanService {
     

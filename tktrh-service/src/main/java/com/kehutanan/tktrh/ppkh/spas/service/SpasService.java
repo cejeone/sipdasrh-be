@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.ppkh.spas.dto.SpasDTO;
 import com.kehutanan.tktrh.ppkh.spas.dto.SpasPageDTO;
 import com.kehutanan.tktrh.ppkh.spas.model.Spas;
+import com.kehutanan.tktrh.ppkh.spas.model.dto.SpasDTO;
 
 public interface SpasService {
     

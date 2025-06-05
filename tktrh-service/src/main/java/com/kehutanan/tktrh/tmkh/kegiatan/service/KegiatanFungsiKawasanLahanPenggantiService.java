@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.tmkh.kegiatan.dto.KegiatanFungsiKawasanLahanPenggantiDTO;
 import com.kehutanan.tktrh.tmkh.kegiatan.dto.KegiatanFungsiKawasanLahanPenggantiPageDTO;
 import com.kehutanan.tktrh.tmkh.kegiatan.model.KegiatanFungsiKawasanLahanPengganti;
+import com.kehutanan.tktrh.tmkh.kegiatan.model.dto.KegiatanFungsiKawasanLahanPenggantiDTO;
 
 public interface KegiatanFungsiKawasanLahanPenggantiService {
     

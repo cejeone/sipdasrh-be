@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 
 import com.kehutanan.tktrh.ppkh.monev.model.Monev;
+import com.kehutanan.tktrh.ppkh.monev.model.dto.MonevDTO;
 
 import lombok.Data;
 

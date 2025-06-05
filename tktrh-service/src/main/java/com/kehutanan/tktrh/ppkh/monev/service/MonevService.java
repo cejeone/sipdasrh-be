@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.tktrh.ppkh.monev.dto.MonevDTO;
 import com.kehutanan.tktrh.ppkh.monev.dto.MonevPageDTO;
 import com.kehutanan.tktrh.ppkh.monev.model.Monev;
+import com.kehutanan.tktrh.ppkh.monev.model.dto.MonevDTO;
 
 public interface MonevService {
     

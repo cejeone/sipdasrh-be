@@ -76,10 +76,10 @@ public class Kegiatan implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "peruntukan_id", referencedColumnName = "id")
-    private Lov peruntukan;
+    private Lov peruntukanId;
    
     @Column(name = "nama_peruntukan", columnDefinition = "TEXT")
-    private Lov namaPeruntukan;
+    private String namaPeruntukan;
 
     @ManyToOne
     @JoinColumn(name = "jenis_ijin_id", referencedColumnName = "id")

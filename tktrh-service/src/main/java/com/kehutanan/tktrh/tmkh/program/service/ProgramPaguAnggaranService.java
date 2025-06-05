@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.tmkh.program.dto.ProgramPaguAnggaranDTO;
 import com.kehutanan.tktrh.tmkh.program.dto.ProgramPaguAnggaranPageDTO;
 import com.kehutanan.tktrh.tmkh.program.model.ProgramPaguAnggaran;
+import com.kehutanan.tktrh.tmkh.program.model.dto.ProgramPaguAnggaranDTO;
 
 public interface ProgramPaguAnggaranService {
     

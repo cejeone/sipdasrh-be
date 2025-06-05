@@ -20,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.tktrh.common.service.MinioStorageService;
-import com.kehutanan.tktrh.konten.dto.KontenDTO;
 import com.kehutanan.tktrh.konten.dto.KontenPageDTO;
 import com.kehutanan.tktrh.konten.model.Konten;
 import com.kehutanan.tktrh.konten.model.KontenGambar;
 import com.kehutanan.tktrh.konten.model.KontenGambarUtama;
+import com.kehutanan.tktrh.konten.model.dto.KontenDTO;
 import com.kehutanan.tktrh.konten.repository.KontenRepository;
 import com.kehutanan.tktrh.konten.service.KontenService;
 import com.kehutanan.tktrh.util.FileValidationUtil;

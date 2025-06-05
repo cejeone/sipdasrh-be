@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.bkta.io.dto.ImmediateOutcomeDTO;
 import com.kehutanan.tktrh.bkta.io.dto.ImmediateOutcomePageDTO;
 import com.kehutanan.tktrh.bkta.io.model.ImmediateOutcome;
+import com.kehutanan.tktrh.bkta.io.model.dto.ImmediateOutcomeDTO;
 
 public interface ImmediateOutcomeService {
     

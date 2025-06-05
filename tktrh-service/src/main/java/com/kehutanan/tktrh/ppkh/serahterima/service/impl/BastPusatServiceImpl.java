@@ -10,12 +10,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.model.BastPusat;
+import com.kehutanan.tktrh.ppkh.serahterima.model.dto.BastPusatDTO;
 import com.kehutanan.tktrh.ppkh.serahterima.repository.BastPusatRepository;
 import com.kehutanan.tktrh.ppkh.serahterima.service.BastPusatService;
 

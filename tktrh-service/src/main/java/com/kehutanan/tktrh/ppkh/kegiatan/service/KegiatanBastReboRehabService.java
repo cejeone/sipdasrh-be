@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.tktrh.ppkh.kegiatan.dto.KegiatanBastReboRehabDTO;
 import com.kehutanan.tktrh.ppkh.kegiatan.dto.KegiatanBastReboRehabPageDTO;
 import com.kehutanan.tktrh.ppkh.kegiatan.model.KegiatanBastReboRehab;
+import com.kehutanan.tktrh.ppkh.kegiatan.model.dto.KegiatanBastReboRehabDTO;
 
 public interface KegiatanBastReboRehabService {
     
