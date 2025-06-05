@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "trx_ppkh_kegiatan_pak_pdf_shp")
+@Table(name = "trx_ppkh_kegiatan_riwayat_sk_shp")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanRiwayatSkShp {

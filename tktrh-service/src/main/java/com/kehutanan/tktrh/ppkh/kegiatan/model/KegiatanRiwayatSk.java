@@ -22,7 +22,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  */
 @Data
 @Entity
-@Table(name = "trx_ppkh_riwayat_sk")
+@Table(name = "trx_ppkh_kegiatan_riwayat_sk")
 @NoArgsConstructor
 @AllArgsConstructor
 public class KegiatanRiwayatSk implements Serializable {
