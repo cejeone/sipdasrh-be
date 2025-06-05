@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.rm.program.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rm.program.dto.ProgramJenisBibitPageDTO;
 import com.kehutanan.rm.program.model.ProgramJenisBibit;
+import com.kehutanan.rm.program.model.dto.ProgramJenisBibitDTO;
 
 public interface ProgramJenisBibitService {
 

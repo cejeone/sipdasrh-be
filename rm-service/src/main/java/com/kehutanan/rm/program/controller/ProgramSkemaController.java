@@ -12,20 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.kehutanan.rm.master.model.Lov;
 import com.kehutanan.rm.master.service.LovService;
-import com.kehutanan.rm.program.dto.ProgramSkemaDTO;
 import com.kehutanan.rm.program.dto.ProgramSkemaPageDTO;
 import com.kehutanan.rm.program.model.Program;
 import com.kehutanan.rm.program.model.ProgramSkema;
+import com.kehutanan.rm.program.model.dto.ProgramSkemaDTO;
 import com.kehutanan.rm.program.service.ProgramService;
 import com.kehutanan.rm.program.service.ProgramSkemaService;
 

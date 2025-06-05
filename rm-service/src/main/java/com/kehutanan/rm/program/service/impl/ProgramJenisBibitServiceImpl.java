@@ -15,9 +15,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rm.program.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rm.program.dto.ProgramJenisBibitPageDTO;
 import com.kehutanan.rm.program.model.ProgramJenisBibit;
+import com.kehutanan.rm.program.model.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rm.program.repository.ProgramJenisBibitRepository;
 import com.kehutanan.rm.program.service.ProgramJenisBibitService;
 

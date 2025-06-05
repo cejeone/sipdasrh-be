@@ -20,12 +20,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rm.master.repository.LovRepository;
 import com.kehutanan.rm.master.service.LovService;
-import com.kehutanan.rm.program.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rm.program.dto.ProgramJenisBibitPageDTO;
 import com.kehutanan.rm.program.model.ProgramJenisBibit;
-import com.kehutanan.rm.program.repository.ProgramRepository;
+import com.kehutanan.rm.program.model.dto.ProgramJenisBibitDTO;
 import com.kehutanan.rm.program.service.ProgramJenisBibitService;
 import com.kehutanan.rm.program.service.ProgramService;
 

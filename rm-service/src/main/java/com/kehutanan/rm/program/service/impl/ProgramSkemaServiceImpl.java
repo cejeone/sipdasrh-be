@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,9 +12,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rm.program.dto.ProgramSkemaDTO;
 import com.kehutanan.rm.program.dto.ProgramSkemaPageDTO;
 import com.kehutanan.rm.program.model.ProgramSkema;
+import com.kehutanan.rm.program.model.dto.ProgramSkemaDTO;
 import com.kehutanan.rm.program.repository.ProgramSkemaRepository;
 import com.kehutanan.rm.program.service.ProgramSkemaService;
 

@@ -15,16 +15,13 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.rm.master.model.Lov;
-import com.kehutanan.rm.program.dto.ProgramDTO;
 import com.kehutanan.rm.program.dto.ProgramPageDTO;
 import com.kehutanan.rm.program.model.Program;
+import com.kehutanan.rm.program.model.dto.ProgramDTO;
 import com.kehutanan.rm.program.repository.ProgramRepository;
 import com.kehutanan.rm.program.service.ProgramService;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 
 @Service
 public class ProgramServiceImpl implements ProgramService {
