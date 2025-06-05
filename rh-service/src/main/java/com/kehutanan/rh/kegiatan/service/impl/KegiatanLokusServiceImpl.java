@@ -23,10 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.rh.common.service.MinioStorageService;
-import com.kehutanan.rh.kegiatan.dto.KegiatanLokusDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanLokusPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanLokus;
 import com.kehutanan.rh.kegiatan.model.KegiatanLokusShp;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanLokusDTO;
 import com.kehutanan.rh.kegiatan.repository.KegiatanLokusRepository;
 import com.kehutanan.rh.kegiatan.service.KegiatanLokusService;
 import com.kehutanan.rh.util.FileValidationUtil;

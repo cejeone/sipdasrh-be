@@ -29,9 +29,9 @@ import com.kehutanan.rh.master.service.LovService;
 import com.kehutanan.rh.master.service.ProvinsiService;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.service.ProgramService;
-import com.kehutanan.rh.serahterima.dto.BastPusatDTO;
 import com.kehutanan.rh.serahterima.dto.BastPusatPageDTO;
 import com.kehutanan.rh.serahterima.model.BastPusat;
+import com.kehutanan.rh.serahterima.model.dto.BastPusatDTO;
 import com.kehutanan.rh.serahterima.service.BastPusatService;
 
 import io.swagger.v3.oas.annotations.Operation;

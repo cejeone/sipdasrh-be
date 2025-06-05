@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.pepdas.kegiatan.dto.KegiatanDTO;
 import com.kehutanan.pepdas.kegiatan.dto.KegiatanDeleteFilesRequest;
 import com.kehutanan.pepdas.kegiatan.dto.KegiatanPageDTO;
 import com.kehutanan.pepdas.kegiatan.model.Kegiatan;
+import com.kehutanan.pepdas.kegiatan.model.dto.KegiatanDTO;
 import com.kehutanan.pepdas.kegiatan.service.KegiatanService;
 import com.kehutanan.pepdas.master.model.Bpdas;
 import com.kehutanan.pepdas.master.model.Das;

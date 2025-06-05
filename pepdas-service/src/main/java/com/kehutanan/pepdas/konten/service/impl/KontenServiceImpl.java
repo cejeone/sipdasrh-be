@@ -20,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.kehutanan.pepdas.common.service.MinioStorageService;
-import com.kehutanan.pepdas.konten.dto.KontenDTO;
 import com.kehutanan.pepdas.konten.dto.KontenPageDTO;
 import com.kehutanan.pepdas.konten.model.Konten;
 import com.kehutanan.pepdas.konten.model.KontenGambar;
 import com.kehutanan.pepdas.konten.model.KontenGambarUtama;
+import com.kehutanan.pepdas.konten.model.dto.KontenDTO;
 import com.kehutanan.pepdas.konten.repository.KontenRepository;
 import com.kehutanan.pepdas.konten.service.KontenService;
 import com.kehutanan.pepdas.util.FileValidationUtil;

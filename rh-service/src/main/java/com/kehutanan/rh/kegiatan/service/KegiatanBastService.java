@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanBastDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanBastPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanBast;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanBastDTO;
 
 public interface KegiatanBastService {
     

@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +28,7 @@ import com.kehutanan.pepdas.program.service.ProgramService;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
+@CacheConfig(cacheNames = "programs")
 public class ProgramServiceImpl implements ProgramService {
     
     private final ProgramRepository repository;
@@ -34,11 +39,13 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Cacheable(key = "'all'")
     public List<Program> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Cacheable(key = "#id")
     public ProgramDTO findDTOById(Long id) {
         Program program = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + id));
@@ -47,6 +54,7 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Cacheable(key = "#id")
     public Program findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Program not found with id: " + id));
@@ -54,12 +62,16 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     @Transactional
+    @CachePut(key = "#program.id")
+    @CacheEvict(key = "'all'")
     public Program save(Program program) {
         return repository.save(program);
     }
 
     @Override
     @Transactional
+    @CachePut(key = "#id")
+    @CacheEvict(key = "'all'")
     public Program update(Long id, Program program) {
         // Ensure the entity exists
         if (!repository.existsById(id)) {
@@ -71,6 +83,7 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     @Transactional
+    @CacheEvict(allEntries = true)
     public void deleteById(Long id) {
         // Check if exists
         if (!repository.existsById(id)) {
@@ -81,6 +94,7 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Cacheable(key = "'page_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public ProgramPageDTO findAllWithCache(Pageable pageable, String baseUrl) {
         Page<Program> page = repository.findAll(pageable);
         

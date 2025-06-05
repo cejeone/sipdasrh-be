@@ -1,7 +1,5 @@
 package com.kehutanan.pepdas.pemantauandas.service.impl;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasDTO;
 import com.kehutanan.pepdas.pemantauandas.dto.PemantauanDasPageDTO;
 import com.kehutanan.pepdas.pemantauandas.model.PemantauanDas;
+import com.kehutanan.pepdas.pemantauandas.model.dto.PemantauanDasDTO;
 import com.kehutanan.pepdas.pemantauandas.repository.PemantauanDasRepository;
 import com.kehutanan.pepdas.pemantauandas.service.PemantauanDasService;
 

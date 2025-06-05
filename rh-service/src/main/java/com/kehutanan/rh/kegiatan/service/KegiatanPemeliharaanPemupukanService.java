@@ -1,13 +1,12 @@
 package com.kehutanan.rh.kegiatan.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.kehutanan.rh.kegiatan.dto.KegiatanPemeliharaanPemupukanDTO;
 import com.kehutanan.rh.kegiatan.dto.KegiatanPemeliharaanPemupukanPageDTO;
 import com.kehutanan.rh.kegiatan.model.KegiatanPemeliharaanPemupukan;
+import com.kehutanan.rh.kegiatan.model.dto.KegiatanPemeliharaanPemupukanDTO;
 
 public interface KegiatanPemeliharaanPemupukanService {
     

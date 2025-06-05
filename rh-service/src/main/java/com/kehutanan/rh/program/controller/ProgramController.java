@@ -3,8 +3,12 @@ package com.kehutanan.rh.program.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,20 +17,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kehutanan.rh.program.dto.ProgramDTO;
+import com.kehutanan.rh.master.model.Eselon2;
+import com.kehutanan.rh.master.service.Eselon2Service;
+import com.kehutanan.rh.master.service.LovService;
 import com.kehutanan.rh.program.dto.ProgramPageDTO;
 import com.kehutanan.rh.program.model.Program;
 import com.kehutanan.rh.program.service.ProgramService;
-import com.kehutanan.rh.master.model.Eselon2;
-import com.kehutanan.rh.master.model.Lov;
-import com.kehutanan.rh.master.service.Eselon2Service;
-import com.kehutanan.rh.master.service.LovService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,12 +40,14 @@ public class ProgramController {
     private final ProgramService service;
     private final Eselon2Service eselon2Service;
     private final LovService lovService;
+    private final PagedResourcesAssembler<Program> pagedResourcesAssembler;
 
     @Autowired
-    public ProgramController(ProgramService service, Eselon2Service eselon2Service, LovService lovService) {
+    public ProgramController(ProgramService service, Eselon2Service eselon2Service, LovService lovService,PagedResourcesAssembler<Program> pagedResourcesAssembler) {
         this.service = service;
         this.eselon2Service = eselon2Service;
         this.lovService = lovService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping
@@ -67,6 +70,23 @@ public class ProgramController {
         }
 
         return ResponseEntity.ok(programPage);
+    }
+
+        @GetMapping("/s")
+    public ResponseEntity<PagedModel<EntityModel<Program>>> getAllProgramByHateoas(
+            @RequestParam(required = false) String nama,
+            @RequestParam(required = false) List<String> eselon,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Program> programPage = service.findAll(pageable);
+        
+
+        
+        PagedModel<EntityModel<Program>> pagedModel = pagedResourcesAssembler.toModel(programPage);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/search")

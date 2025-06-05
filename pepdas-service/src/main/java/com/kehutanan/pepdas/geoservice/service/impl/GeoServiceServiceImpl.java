@@ -10,15 +10,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.kehutanan.pepdas.geoservice.dto.GeoServiceDTO;
 import com.kehutanan.pepdas.geoservice.dto.GeoServicePageDTO;
 import com.kehutanan.pepdas.geoservice.model.GeoService;
+import com.kehutanan.pepdas.geoservice.model.dto.GeoServiceDTO;
 import com.kehutanan.pepdas.geoservice.repository.GeoServiceRepository;
 import com.kehutanan.pepdas.geoservice.service.GeoServiceService;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class GeoServiceServiceImpl implements GeoServiceService {
