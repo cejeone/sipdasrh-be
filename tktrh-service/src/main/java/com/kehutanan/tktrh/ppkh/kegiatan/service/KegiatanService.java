@@ -26,34 +26,18 @@ public interface KegiatanService {
     // File upload methods
     Kegiatan uploadPerijinanPdf(Long id, List<MultipartFile> perijinanPdf);
     
-    Kegiatan uploadRiwayatSk(Long id, List<MultipartFile> riwayatSk);
-    
     Kegiatan uploadPakPdfShp(Long id, List<MultipartFile> pakPdfShp);
     
-    Kegiatan uploadFungsiKawasan(Long id, List<MultipartFile> fungsiKawasan);
-    
     Kegiatan uploadRantekPdf(Long id, List<MultipartFile> rantekPdf);
-    
-    Kegiatan uploadRencanaRealisasi(Long id, List<MultipartFile> rencanaRealisasi);
-    
-    Kegiatan uploadBastReboRehab(Long id, List<MultipartFile> bastReboRehab);
     
     Kegiatan uploadBastZip(Long id, List<MultipartFile> bastZip);
     
     // File deletion methods
     Kegiatan deletePerijinanPdf(Long id, List<String> uuidPerijinanPdf);
     
-    Kegiatan deleteRiwayatSk(Long id, List<String> uuidRiwayatSk);
-    
     Kegiatan deletePakPdfShp(Long id, List<String> uuidPakPdfShp);
     
-    Kegiatan deleteFungsiKawasan(Long id, List<String> uuidFungsiKawasan);
-    
     Kegiatan deleteRantekPdf(Long id, List<String> uuidRantekPdf);
-    
-    Kegiatan deleteRencanaRealisasi(Long id, List<String> uuidRencanaRealisasi);
-    
-    Kegiatan deleteBastReboRehab(Long id, List<String> uuidBastReboRehab);
     
     Kegiatan deleteBastZip(Long id, List<String> uuidBastZip);
     

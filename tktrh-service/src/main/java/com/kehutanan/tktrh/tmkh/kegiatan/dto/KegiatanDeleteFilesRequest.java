@@ -13,11 +13,6 @@ public class KegiatanDeleteFilesRequest {
     private List<String> perijinanPdfIds;
     private List<String> riwayatSkIds;
     private List<String> pbakPdfShpIds;
-    private List<String> fungsiKawasanLahanPenggantiIds;
-    private List<String> fungsiKawasanRehabIds;
     private List<String> rehabPdfIds;
-    private List<String> realisasiReboisasiIds;
-    private List<String> monevIds;
-    private List<String> bastRehabDasIds;
     private List<String> bastZipIds;
 }

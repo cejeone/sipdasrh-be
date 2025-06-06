@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KegiatanDeleteFilesRequest {
     private List<String> perijinanPdfIds;
-    private List<String> riwayatSkIds;
     private List<String> pakPdfShpIds;
-    private List<String> fungsiKawasanIds;
     private List<String> rantekPdfIds;
-    private List<String> rencanaRealisasiIds;
-    private List<String> bastReboRehabIds;
     private List<String> bastZipIds;
 }
