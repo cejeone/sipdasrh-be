@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.info.Info;
         description = "API Documentation for PEPDAS Service"
     )
 )
-public class PepdasApplication {
+public class TktrhApplication {
     public static void main(String[] args) {
-        SpringApplication.run(PepdasApplication.class, args);
+        SpringApplication.run(TktrhApplication.class, args);
     }
 }

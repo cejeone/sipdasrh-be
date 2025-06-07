@@ -20,7 +20,7 @@ import com.kehutanan.tktrh.ppkh.serahterima.service.BastPusatService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("ppkhBastPusatServiceImpl")
 public class BastPusatServiceImpl implements BastPusatService {
     private final BastPusatRepository repository;
 

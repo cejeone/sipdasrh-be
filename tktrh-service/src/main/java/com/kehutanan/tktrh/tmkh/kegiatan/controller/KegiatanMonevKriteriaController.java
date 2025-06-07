@@ -33,8 +33,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RestController
-@RequestMapping("/api/kegiatan-monev-kriteria")
+@RestController("tmkhKegiatanMonevKriteriaController")
+@RequestMapping("/api/tmkh/kegiatan-monev-kriteria")
 public class KegiatanMonevKriteriaController {
 
     private final KegiatanMonevKriteriaService service;

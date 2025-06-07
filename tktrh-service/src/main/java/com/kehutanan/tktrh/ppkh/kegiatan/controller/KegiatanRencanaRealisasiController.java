@@ -25,7 +25,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/kegiatan-rencana-realisasi")
+@RequestMapping("/api/ppkh/kegiatan-rencana-realisasi")
 public class KegiatanRencanaRealisasiController {
 
     private final KegiatanRencanaRealisasiService service;

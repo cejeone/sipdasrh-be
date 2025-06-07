@@ -22,7 +22,7 @@ import com.kehutanan.tktrh.bkta.kegiatan.service.KegiatanMonevKriteriaService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("bktaKegiatanMonevKriteriaServiceImpl")
 public class KegiatanMonevKriteriaServiceImpl implements KegiatanMonevKriteriaService {
     
     private final KegiatanMonevKriteriaRepository repository;

@@ -33,8 +33,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RestController
-@RequestMapping("/api/monev-pusat")
+@RestController("bktaMonevPusatController") // Add unique name
+@RequestMapping("/api/bkta/monev-pusat")
 public class MonevPusatController {
 
     private final MonevPusatService monevPusatService;

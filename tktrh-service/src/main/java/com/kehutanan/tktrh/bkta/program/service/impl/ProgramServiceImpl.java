@@ -24,7 +24,7 @@ import com.kehutanan.tktrh.bkta.program.service.ProgramService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("bktaProgramServiceImpl")
 public class ProgramServiceImpl implements ProgramService {
     
     private final ProgramRepository repository;

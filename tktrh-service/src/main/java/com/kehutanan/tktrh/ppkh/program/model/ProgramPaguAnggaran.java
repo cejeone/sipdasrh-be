@@ -15,7 +15,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  * This table stores information about budget allocations for BKTA programs
  */
 @Data
-@Entity
+@Entity(name = "ppkhProgramPaguAnggaran")
 @Table(name = "trx_ppkh_program_pagu_anggaran")
 @NoArgsConstructor
 @AllArgsConstructor

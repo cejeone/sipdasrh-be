@@ -35,8 +35,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RestController
-@RequestMapping("/api/kegiatan-riwayat-sk")
+@RestController("ppkhKegiatanRiwayatSkController") // Add unique name
+@RequestMapping("/api/ppkh/kegiatan-riwayat-sk")
 public class KegiatanRiwayatSkController {
 
     private final KegiatanRiwayatSkService service;

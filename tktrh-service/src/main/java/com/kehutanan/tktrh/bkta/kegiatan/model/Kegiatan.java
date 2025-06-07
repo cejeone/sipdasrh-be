@@ -21,7 +21,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  * This table stores information about BKTA activities
  */
 @Data
-@Entity
+@Entity(name = "ppkhKegiatan")
 @Table(name = "trx_bkta_kegiatan")
 @NoArgsConstructor
 @AllArgsConstructor

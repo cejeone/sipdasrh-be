@@ -30,7 +30,7 @@ import com.kehutanan.tktrh.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("ppkhKegiatanRiwayatSkService")
 public class KegiatanRiwayatSkServiceImpl implements KegiatanRiwayatSkService {
     
     private final KegiatanRiwayatSkRepository repository;

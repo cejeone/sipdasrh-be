@@ -20,7 +20,7 @@ import com.kehutanan.tktrh.tmkh.monev.service.MonevPusatService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("tmkhMonevPusatServiceImpl")
 public class MonevPusatServiceImpl implements MonevPusatService {
     private final MonevPusatRepository repository;
 

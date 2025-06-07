@@ -13,7 +13,7 @@ import java.io.Serializable;
  * This table stores information about criteria for monitoring and evaluation of BKTA activities
  */
 @Data
-@Entity
+@Entity(name = "bktaKegiatanMonevKriteria")
 @Table(name = "trx_bkta_kegiatan_monev_kriteria")
 @NoArgsConstructor
 @AllArgsConstructor

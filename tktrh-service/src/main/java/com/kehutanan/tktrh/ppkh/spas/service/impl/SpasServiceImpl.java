@@ -21,7 +21,7 @@ import com.kehutanan.tktrh.ppkh.spas.service.SpasService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("ppkhSpasServiceImpl")
 public class SpasServiceImpl implements SpasService {
     
     private final SpasRepository repository;

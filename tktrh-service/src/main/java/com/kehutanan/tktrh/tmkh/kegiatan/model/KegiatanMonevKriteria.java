@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data
-@Entity
+@Entity(name = "tmkhKegiatanMonevKriteria")
 @Table(name = "trx_tmkh_kegiatan_monev_kriteria")
 @NoArgsConstructor
 @AllArgsConstructor

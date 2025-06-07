@@ -21,8 +21,7 @@ import com.kehutanan.tktrh.tmkh.program.repository.ProgramRepository;
 import com.kehutanan.tktrh.tmkh.program.service.ProgramService;
 
 import jakarta.persistence.EntityNotFoundException;
-
-@Service
+@Service("tmkhProgramServiceImpl")
 public class ProgramServiceImpl implements ProgramService {
     
     private final ProgramRepository repository;

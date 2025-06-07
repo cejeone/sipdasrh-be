@@ -39,7 +39,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/ppkh/monev")
+@RequestMapping("/api/ppkh/ppkh/monev")
 public class MonevController {
 
     private final MonevService service;

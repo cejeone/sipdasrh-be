@@ -37,7 +37,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/spas")
+@RequestMapping("/api/ppkh/spas")
 public class SpasController {
 
     private final SpasService service;

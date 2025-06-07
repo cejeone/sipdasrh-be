@@ -13,7 +13,7 @@ import com.kehutanan.tktrh.master.model.Provinsi;
 import com.kehutanan.tktrh.tmkh.program.model.Program;
 
 @Data
-@Entity
+@Entity(name = "tmkhBastPusat")
 @Table(name = "trx_tmkh_bast_pusat")
 @NoArgsConstructor
 @AllArgsConstructor

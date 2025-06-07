@@ -17,7 +17,7 @@ import com.kehutanan.tktrh.master.service.SpasService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
-@Service
+@Service("masterSpasServiceImpl")
 @Transactional
 public class SpasServiceImpl implements SpasService {
 

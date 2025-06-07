@@ -21,7 +21,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  * activities
  */
 @Data
-@Entity
+@Entity(name = "ppkhKegiatanRiwayatSk")
 @Table(name = "trx_ppkh_kegiatan_riwayat_sk")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,7 +51,7 @@ public class KegiatanRiwayatSk implements Serializable {
     @Column(name = "luas_sk_ha")
     private Double luasSkHa;
 
-    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kegiatanRiwayatSk", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KegiatanRiwayatSkShp> kegiatanRiwayatSkShps = new ArrayList<>();
 

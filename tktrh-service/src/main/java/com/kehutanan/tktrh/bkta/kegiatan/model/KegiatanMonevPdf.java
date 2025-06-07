@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Entity
+@Entity(name = "bktaKegiatanMonevPdf")
 @Table(name = "trx_bkta_kegiatan_monev_pdf")
 @NoArgsConstructor
 @AllArgsConstructor

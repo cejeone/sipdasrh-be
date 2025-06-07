@@ -19,7 +19,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  * This table stores information about monitoring and evaluation of BKTA activities
  */
 @Data
-@Entity
+@Entity(name = "bktaKegiatanMonev")
 @Table(name = "trx_bkta_kegiatan_monev")
 @NoArgsConstructor
 @AllArgsConstructor

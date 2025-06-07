@@ -23,7 +23,7 @@ import com.kehutanan.tktrh.tmkh.program.service.ProgramPaguAnggaranService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("tmkhProgramPaguAnggaranServiceImpl")
 public class ProgramPaguAnggaranServiceImpl implements ProgramPaguAnggaranService {
     
     private final ProgramPaguAnggaranRepository repository;

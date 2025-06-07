@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-@Entity
+@Entity(name = "tmkhKegiatanMonev")
 @Table(name = "trx_tmkh_kegiatan_monev")
 @NoArgsConstructor
 @AllArgsConstructor

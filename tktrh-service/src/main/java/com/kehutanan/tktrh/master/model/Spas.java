@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * used in forest and land rehabilitation activities
  */
 @Data
-@Entity
+@Entity(name = "mstSpas")
 @Table(name = "mst_spas")
 @NoArgsConstructor
 @AllArgsConstructor

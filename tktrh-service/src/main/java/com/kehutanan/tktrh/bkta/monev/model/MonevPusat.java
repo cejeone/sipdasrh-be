@@ -16,7 +16,7 @@ import com.kehutanan.tktrh.master.model.Bpdas;
  * This table stores information about central monitoring and evaluation of BKTA programs
  */
 @Data
-@Entity
+@Entity(name = "bktaMonevPusat")
 @Table(name = "trx_bkta_monev_pusat")
 @NoArgsConstructor
 @AllArgsConstructor

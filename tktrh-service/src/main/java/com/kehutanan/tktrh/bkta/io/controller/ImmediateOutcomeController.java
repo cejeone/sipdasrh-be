@@ -40,7 +40,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/immediate-outcome")
+@RequestMapping("/api/bkta/immediate-outcome")
 public class ImmediateOutcomeController {
 
     private final ImmediateOutcomeService service;

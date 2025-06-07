@@ -49,7 +49,7 @@ public class KegiatanBast implements Serializable {
     private Lov kelompokMasyarakat;
 
 
-    @OneToMany(mappedBy = "kegiatan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kegiatanBast", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<KegiatanBastPdf> kegiatanKontrakPdfs = new ArrayList<>();
 

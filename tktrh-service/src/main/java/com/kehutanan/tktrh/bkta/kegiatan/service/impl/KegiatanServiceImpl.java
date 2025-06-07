@@ -35,7 +35,7 @@ import com.kehutanan.tktrh.util.FileValidationUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("bktaKegiatanServiceImpl")
 public class KegiatanServiceImpl implements KegiatanService {
     
     private final KegiatanRepository repository;

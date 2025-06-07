@@ -59,13 +59,13 @@ public class Perijinan implements Serializable{
     @Column(name = "tanggal_penetapan")
     private LocalDateTime tanggalPenetapan;
 
-    @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "perijinan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PerijinanDokumenAwalPdf> dokumenAwalPdfs = new ArrayList<>();
     
     @Column(name = "catatan_dokumen_awal", columnDefinition = "TEXT")
     private String catatanDokumenAwal;
 
-        @OneToMany(mappedBy = "uptd", cascade = CascadeType.ALL, orphanRemoval = true)
+        @OneToMany(mappedBy = "perijinan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PerijinanDokumenBastPdf> dokumenBastPdfs = new ArrayList<>();
 
     @Column(name = "catatan_dokumen_bast", columnDefinition = "TEXT")

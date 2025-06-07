@@ -14,7 +14,7 @@ import com.kehutanan.tktrh.master.model.Lov;
 import com.kehutanan.tktrh.ppkh.program.model.Program;
 
 @Data
-@Entity
+@Entity(name = "ppkhSpas")
 @Table(name = "trx_ppkh_spas")
 @NoArgsConstructor
 @AllArgsConstructor

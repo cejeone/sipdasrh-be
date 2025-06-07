@@ -21,7 +21,7 @@ import com.kehutanan.tktrh.bkta.program.service.ProgramPaguAnggaranService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@Service
+@Service("bktaProgramPaguAnggaranServiceImpl")
 public class ProgramPaguAnggaranServiceImpl implements ProgramPaguAnggaranService {
     private final ProgramPaguAnggaranRepository repository;
 

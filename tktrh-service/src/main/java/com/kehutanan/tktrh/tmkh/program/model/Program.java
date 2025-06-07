@@ -18,7 +18,7 @@ import com.kehutanan.tktrh.master.model.Lov;
  * This table stores information about BKTA programs
  */
 @Data
-@Entity
+@Entity(name = "tmkhProgram")
 @Table(name = "trx_tmkh_program")
 @NoArgsConstructor
 @AllArgsConstructor

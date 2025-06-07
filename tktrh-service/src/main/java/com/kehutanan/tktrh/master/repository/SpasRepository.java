@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kehutanan.tktrh.master.model.Spas;
 
-@Repository
+@Repository("masterSpasRepository")
 public interface SpasRepository extends JpaRepository<Spas, Long>, JpaSpecificationExecutor<Spas> {
     // Repository methods
 }

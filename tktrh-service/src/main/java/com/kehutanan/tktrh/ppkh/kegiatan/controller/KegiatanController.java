@@ -48,8 +48,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RestController
-@RequestMapping("/api/kegiatan")
+@RestController("ppkhKegiatanController") 
+@RequestMapping("/api/ppkh/kegiatan")
 public class KegiatanController {
 
     private final KegiatanService kegiatanService;
