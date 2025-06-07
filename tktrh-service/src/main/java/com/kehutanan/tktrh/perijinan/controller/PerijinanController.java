@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kehutanan.tktrh.master.model.Lov;
+import com.kehutanan.tktrh.master.model.PelakuUsaha;
 import com.kehutanan.tktrh.master.service.LovService;
+import com.kehutanan.tktrh.master.service.PelakuUsahaService;
 import com.kehutanan.tktrh.perijinan.dto.PerijinanPageDTO;
 import com.kehutanan.tktrh.perijinan.model.Perijinan;
 import com.kehutanan.tktrh.perijinan.model.dto.PerijinanDTO;
@@ -40,13 +42,16 @@ public class PerijinanController {
     private final PerijinanService service;
     private final LovService lovService;
     private final PagedResourcesAssembler<Perijinan> pagedResourcesAssembler;
+    private final PelakuUsahaService pelakuUsahaService;
 
     @Autowired
     public PerijinanController(
             PerijinanService service,
             LovService lovService,
+            PelakuUsahaService pelakuUsahaService,
             PagedResourcesAssembler<Perijinan> pagedResourcesAssembler) {
         this.service = service;
+        this.pelakuUsahaService = pelakuUsahaService;
         this.lovService = lovService;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
@@ -113,7 +118,7 @@ public class PerijinanController {
             
             if (pelakuUsahaId != null && !pelakuUsahaId.isEmpty()) {
                 Long pelakuUsahaIdLong = Long.parseLong(pelakuUsahaId);
-                Lov pelakuUsaha = lovService.findById(pelakuUsahaIdLong);
+                PelakuUsaha pelakuUsaha = pelakuUsahaService.findById(pelakuUsahaIdLong);
                 newPerijinan.setPelakuUsahaId(pelakuUsaha);
             }
             
@@ -168,7 +173,7 @@ public class PerijinanController {
             
             if (pelakuUsahaId != null && !pelakuUsahaId.isEmpty()) {
                 Long pelakuUsahaIdLong = Long.parseLong(pelakuUsahaId);
-                Lov pelakuUsaha = lovService.findById(pelakuUsahaIdLong);
+                PelakuUsaha pelakuUsaha = pelakuUsahaService.findById(pelakuUsahaIdLong);
                 existingPerijinan.setPelakuUsahaId(pelakuUsaha);
             }
             

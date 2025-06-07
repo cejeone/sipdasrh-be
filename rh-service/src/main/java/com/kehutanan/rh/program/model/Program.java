@@ -33,14 +33,13 @@ public class Program {
     @JoinColumn(name = "kategori_id", referencedColumnName = "id")
     private Lov kategoriId;
     
-    @JoinColumn(name = "kategori_id", referencedColumnName = "id")
-    @Column(name = "status_id")
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Lov statusId;
 
     private String nama;
 
     @Column(name = "tahun_pelaksana")
-    private String tahunPelaksana;
+    private Integer tahunPelaksana;
 
     @Column(name = "total_anggaran")
     private Double totalAnggaran;

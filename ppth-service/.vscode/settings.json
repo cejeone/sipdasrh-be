@@ -1,0 +1,32 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+    "workbench.colorCustomizations": {
+        "explorer.decorations.colors": true,
+        "explorer.fileLabels.decorations.colors": true,
+        "explorer.fileDecorations.colors": true
+    },
+    "explorer.decorations.badges": true,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml"
+    },
+    "files.exclude": {
+        "**/.git": true
+    },
+    "workbench.iconTheme": "material-icon-theme",
+    "material-icon-theme.folders.color": true,
+    "material-icon-theme.folders.theme": "specific",
+    "material-icon-theme.folders.associations": {
+        "perijinan": "completed",
+        "laporan": "dist"
+    },
+    "material-icon-theme.hidesExplorerArrows": false,
+    "folder-color.pathColors": [
+        {
+            "folderPath": "ppth-service\\src\\main\\java\\com\\kehutanan\\ppth\\perijinan\\",
+            "color": "foldercolorizer.color_009933"
+        }
+    ]
+}

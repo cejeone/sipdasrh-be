@@ -17,6 +17,7 @@ import com.kehutanan.tktrh.master.model.KabupatenKota;
 import com.kehutanan.tktrh.master.model.Kecamatan;
 import com.kehutanan.tktrh.master.model.KelurahanDesa;
 import com.kehutanan.tktrh.master.model.Lov;
+import com.kehutanan.tktrh.master.model.PelakuUsaha;
 import com.kehutanan.tktrh.master.model.Provinsi;
 import com.kehutanan.tktrh.master.model.UptdDokumentasiFoto;
 import com.kehutanan.tktrh.master.model.UptdDokumentasiVideo;
@@ -41,7 +42,7 @@ public class Perijinan implements Serializable{
 
     @ManyToOne
     @JoinColumn(name = "pelaku_usaha_id", referencedColumnName = "id")
-    private Lov pelakuUsahaId;
+    private PelakuUsaha pelakuUsahaId;
 
     @ManyToOne
     @JoinColumn(name = "level_id", referencedColumnName = "id")

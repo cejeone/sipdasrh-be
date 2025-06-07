@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.kehutanan.tktrh.master.model.dto.LovDTO;
+import com.kehutanan.tktrh.master.model.dto.PelakuUsahaDTO;
 import com.kehutanan.tktrh.perijinan.model.Perijinan;
 
 import lombok.Data;
@@ -15,7 +16,7 @@ import lombok.Data;
 public class PerijinanDTO implements Serializable {
 
     private Long id;
-    private LovDTO pelakuUsahaId;
+    private PelakuUsahaDTO pelakuUsahaId;
     private LovDTO levelId;
     private LovDTO statusId;
     private String tanggalPengajuan;
@@ -31,7 +32,7 @@ public class PerijinanDTO implements Serializable {
             this.id = entity.getId();
             
             if (entity.getPelakuUsahaId() != null) {
-                this.pelakuUsahaId = new LovDTO(entity.getPelakuUsahaId());
+                this.pelakuUsahaId = new PelakuUsahaDTO(entity.getPelakuUsahaId());
             }
             
             if (entity.getLevelId() != null) {

@@ -18,5 +18,6 @@ public class FileUploadConfig {
         private int image = 50;   // default 50MB
         private int video = 500;  // default 500MB
         private int shp = 50;    // default 50MB
+        private int zip = 500;    // default 50MB
     }
 }

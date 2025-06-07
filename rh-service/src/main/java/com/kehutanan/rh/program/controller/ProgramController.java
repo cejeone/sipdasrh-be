@@ -123,7 +123,7 @@ public class ProgramController {
         try {
             Program program = new Program();
             program.setNama(nama);
-            program.setTahunPelaksana(tahunPelaksana);
+            program.setTahunPelaksana(Integer.parseInt(tahunPelaksana));
             program.setTotalAnggaran(Double.parseDouble(totalAnggaran));
             program.setTargetLuas(Double.parseDouble(targetLuas));
 
@@ -155,7 +155,7 @@ public class ProgramController {
             Program program = service.findById(id);
 
             program.setNama(nama);
-            program.setTahunPelaksana(tahunPelaksana);
+            program.setTahunPelaksana(Integer.parseInt(tahunPelaksana));
             program.setTotalAnggaran(Double.parseDouble(totalAnggaran));
             program.setTargetLuas(Double.parseDouble(targetLuas));
 

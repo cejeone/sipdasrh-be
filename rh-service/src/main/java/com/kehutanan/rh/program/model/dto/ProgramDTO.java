@@ -20,7 +20,7 @@ public class ProgramDTO {
     private LovDTO kategoriId;
     private LovDTO statusId;
     private String nama;
-    private String tahunPelaksana;
+    private Integer tahunPelaksana;
     private Double totalAnggaran;
     private Double targetLuas;
     private List<ProgramSkemaDTO> skemas = new ArrayList<>();
